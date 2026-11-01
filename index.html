@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>SoaringBird 论坛</title>
+    <link rel="icon" href="logo-light.png" type="image/png">
+    <link rel="apple-touch-icon" href="logo-light.png">
+    <link rel="stylesheet" href="styles29.css?v=20261030-dusk8">
+    <script>
+    (function(){
+        var t = localStorage.getItem('bird_theme') || 'light';
+        if (t === 'light') document.documentElement.removeAttribute('data-theme');
+        else document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
+</head>
+<body>
+    <script>document.body.classList.add('app-home');</script>
+    <canvas id="geekCodeRain"></canvas>
+    <nav class="nav-bar" id="navBar">
+        <div class="nav-inner">
+            <a class="nav-logo" onclick="navigateTo('home')">
+                <img class="nav-logo-icon" src="logo-light.png" alt="SoaringBird" width="22" height="22">
+                <span>Bird</span>
+            </a>
+            <div class="nav-links" id="navLinks" style="display:none"></div>
+            <div class="nav-spacer"></div>
+            <div class="nav-actions">
+                <button class="nav-icon" onclick="toggleMsgPanel()" id="msgBtn" data-i18n-title="messages" title="消息">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span class="nav-msg-badge" id="msgBadge" hidden></span>
+                </button>
+                <button class="nav-icon" onclick="showDlModal()" id="dlBtn" data-i18n-title="download" title="下载客户端">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+                <button class="nav-icon" onclick="toggleSectionMenu(event)" id="menuBtn" data-i18n-title="menu" title="菜单" aria-label="菜单">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                </button>
+                <button class="btn-login" onclick="showLoginModal()" id="navLoginBtn" data-i18n="login">登录</button>
+                <button class="avatar-btn" onclick="toggleUserDropdown()" id="navAvatarBtn" style="display:none">
+                    <div class="avatar" id="navAvatar">?</div>
+                </button>
+            </div>
+        </div>
+    </nav>
+    <div class="dropdown" id="userDropdown">
+        <div class="dd-header"><div class="avatar avatar-md" id="dropdownAvatar">?</div><div><div class="dd-name" id="dropdownName">未登录</div><div class="dd-email" id="dropdownEmail"></div></div></div>
+        <div class="dd-sep"></div>
+        <button class="dd-item" onclick="navigateTo('profile')" data-i18n="profile">个人主页</button>
+        <button class="dd-item" onclick="navigateTo('bookmarks')" data-i18n="my_bookmarks">我的收藏</button>
+        <button class="dd-item" onclick="window.location.href='/account'" data-i18n="sbAccount">翱翔鸟账户</button>
+        <button class="dd-item" onclick="navigateTo('settings')" data-i18n="settings">设置</button>
+        <div class="dd-sep"></div>
+        <button class="dd-item danger" onclick="handleLogout()" id="logoutBtn" data-i18n="logout">退出登录</button>
+    </div>
+    <!-- 九宫格菜单（版块 + AI + 设置） -->
+    <div class="section-menu" id="sectionMenu">
+        <button class="sm-item" onclick="smNavigate('home')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></svg></span>
+            <span class="sm-label" data-i18n="nav_home">首页</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('live')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10 4.5 18.5c-.8.6-2-.03-2-1.06V6.56c0-1.03 1.2-1.66 2-1.06L15 14"/><circle cx="17" cy="12" r="4.5"/><path d="M20.5 8.5a6.5 6.5 0 0 1 0 7"/></svg></span>
+            <span class="sm-label" data-i18n="nav_live">直播</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('podcast')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="14" rx="5"/><path d="M4.5 11.5a7.5 7.5 0 0 0 15 0M12 19v3M8.5 22h7"/></svg></span>
+            <span class="sm-label">播客</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('news')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 6h8v5H8zM8 13h8M8 17h5"/></svg></span>
+            <span class="sm-label" data-i18n="nav_news">新闻</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('ai')">
+            <span class="sm-icon-wrap sm-icon-ai"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.8 2.8M14.9 14.9l2.8 2.8M17.7 6.3l-2.8 2.8M9.1 14.9l-2.8 2.8"/></svg></span>
+            <span class="sm-label">AI</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('msg')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+            <span class="sm-label" data-i18n="nav_msg">消息</span>
+            <span class="sm-badge" id="smMsgBadge" hidden></span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('me')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg></span>
+            <span class="sm-label" data-i18n="profile">我的</span>
+        </button>
+        <button class="sm-item" onclick="window.location.href='/account'">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.4 18.6a6.6 6.6 0 0 1 11.2 0"/></svg></span>
+            <span class="sm-label" data-i18n="sbAccount">翱翔鸟账户</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('settings')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+            <span class="sm-label" data-i18n="settings">设置</span>
+        </button>
+    </div>
+    <main>
+        <aside class="sb-side">
+            <a class="sb-brand" onclick="navigateTo('home')" title="翱翔鸟 论坛" aria-label="翱翔鸟 论坛"><img class="sb-logo" src="logo-light.png" alt="翱翔鸟" width="34" height="34"></a>
+            <nav class="sb-nav">
+                <button class="sb-item is-on" data-rail="home" onclick="smNavigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.4 12 3.6l8.5 6.8"/><path d="M5.8 9.4V20.4h12.4V9.4"/><path d="M9.8 20.4v-5.2h4.4v5.2"/></svg><span data-i18n="nav_home">首页</span></button>
+                <button class="sb-item" data-rail="live" onclick="smNavigate('live')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.7"/><path d="M7.6 16.4a6.2 6.2 0 0 0 0-8.8M16.4 16.4a6.2 6.2 0 0 1 0-8.8"/></svg><span data-i18n="nav_live">直播</span></button>
+                <button class="sb-item" data-rail="podcast" onclick="smNavigate('podcast')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.8" width="6" height="10.4" rx="3"/><path d="M5.8 11.4a6.2 6.2 0 0 0 12.4 0"/><path d="M12 17.6v3.6M8.6 21.2h6.8"/></svg><span>播客</span></button>
+                <button class="sb-item" data-rail="news" onclick="smNavigate('news')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.2h7.6L18 7.6V20.8H6z"/><path d="M13.4 3.2v4.6H18"/><path d="M9 12.2h6M9 15.6h6M9 8.8h2.6"/></svg><span data-i18n="nav_news">新闻</span></button>
+                <button class="sb-item" data-rail="ai" onclick="smNavigate('ai')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3.2c.5 3.9 2.2 5.6 6.1 6.1-3.9.5-5.6 2.2-6.1 6.1-.5-3.9-2.2-5.6-6.1-6.1 3.9-.5 5.6-2.2 6.1-6.1z"/><path d="M6.6 13.9c.26 2 1.14 2.88 3.14 3.14-2 .26-2.88 1.14-3.14 3.14-.26-2-1.14-2.88-3.14-3.14 2-.26 2.88-1.14 3.14-3.14z"/></svg><span>AI</span></button>
+                <button class="sb-item" data-rail="msg" onclick="smNavigate('msg')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7.4A2.4 2.4 0 0 1 6.9 5h10.2a2.4 2.4 0 0 1 2.4 2.4v6.2a2.4 2.4 0 0 1-2.4 2.4H9.4L4.5 19.6z"/></svg><span data-i18n="nav_msg">消息</span><span class="sb-badge" id="sbMsgBadge" hidden></span></button>
+                <button class="sb-item" data-rail="me" onclick="smNavigate('me')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.7"/><path d="M4.9 20.4c.55-3.75 3.65-5.9 7.1-5.9s6.55 2.15 7.1 5.9"/></svg><span data-i18n="profile">我的</span></button>
+                <button class="sb-item" data-rail="account" onclick="window.location.href='/account'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.8" width="18" height="14.4" rx="2.6"/><circle cx="8.6" cy="11" r="2.2"/><path d="M5.1 16.6c.5-1.4 1.9-2.2 3.5-2.2s3 .8 3.5 2.2"/><path d="M14.6 10.4h4M14.6 13.8h4"/></svg><span data-i18n="sbAccount">翱翔鸟账户</span></button>
+                <button class="sb-item" data-rail="settings" onclick="smNavigate('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></svg><span data-i18n="settings">设置</span></button>
+            </nav>
+            <div class="sb-foot">
+                <button class="sb-account" id="sbUser" style="display:none" onclick="toggleUserDropdown()" title="账户" aria-label="账户"><span class="sb-avatar" id="sbAvatar">?</span><span class="sb-name" id="sbName"></span></button>
+                <button class="sb-login" id="sbLogin" onclick="showLoginModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4.5H5.8A1.8 1.8 0 0 0 4 6.3v11.4a1.8 1.8 0 0 0 1.8 1.8H10"/><path d="M11 12h9M16.6 8.6 20 12l-3.4 3.4"/></svg><span data-i18n="login">登录</span></button>
+                <button class="sb-dl" onclick="showDlModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6v10"/><path d="M7.7 9.5 12 13.8l4.3-4.3"/><path d="M4.6 16v2.6A1.8 1.8 0 0 0 6.4 20.4h11.2a1.8 1.8 0 0 0 1.8-1.8V16"/></svg><span data-i18n="download">下载客户端</span></button>
+                <button class="sb-theme" onclick="toggleAppTheme()" aria-label="切换明暗主题" title="切换明暗主题">
+                    <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.4A8.4 8.4 0 0 1 9.6 4 8.4 8.4 0 1 0 20 14.4z"/></svg>
+                    <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5"/></svg>
+                </button>
+            </div>
+        </aside>
+        <div class="page" id="homePage">
+            <div class="sb-main">
+                <div class="sb-wrap">
+                    <div class="sb-head">
+                        <div class="sb-head-txt">
+                            <h1 class="sb-greet" id="sbGreet">Good morning</h1>
+                            <p class="sb-sub" id="sbSub"></p>
+                        </div>
+                        <canvas class="sb-map" id="worldHalftone" aria-hidden="true"></canvas>
+                    </div>
+                    <div class="sb-bar">
+                        <div class="sb-search">
+                            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>
+                            <input type="text" data-i18n-placeholder="search_placeholder" id="searchInput" onkeydown="if(event.key==='Enter')handleSearch(this.value)">
+                        </div>
+                        <div class="sb-sort">
+                            <button class="seg-item active" data-filter="latest" onclick="switchFeedTab('latest')" data-i18n="latest">最新</button>
+                            <button class="seg-item" data-filter="hot" onclick="switchFeedTab('hot')" data-i18n="hot">最热</button>
+                        </div>
+                        <button class="sb-new" onclick="showNewPostModal()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span data-i18n="new_post">发帖</span></button>
+                    </div>
+                    <div class="closing-bar" id="closingBar">
+                        <div class="cb-txt">
+                            <span class="cb-date">2026.12.01</span>
+                            <span class="cb-title">翱翔鸟将于 12 月 1 日终止服务</span>
+                            <span class="cb-desc">关闭前可完整导出你的内容，也可以保存一枚纪念徽章</span>
+                        </div>
+                        <div class="cb-actions">
+                            <button class="cb-btn cb-primary" onclick="showCloseNotice()">查看通知</button>
+                            <button class="cb-btn" onclick="downloadMyData()">下载我的数据</button>
+                            <button class="cb-btn" onclick="downloadBadge()">纪念徽章</button>
+                        </div>
+                    </div>
+                    <div id="accountStatusCard" class="acct-status" style="display:none"></div>
+                    <div id="announcementBar" class="announcement-bar" style="display:none"></div>
+                    <div class="sb-grid" id="postList"><div class="sb-cell is-skel"><div class="sk sk-cat"></div><div class="sk sk-title"></div><div class="sk sk-title2"></div><div class="sk sk-author"></div></div><div class="sb-cell is-skel"><div class="sk sk-cat"></div><div class="sk sk-title"></div><div class="sk sk-title2"></div><div class="sk sk-author"></div></div><div class="sb-cell is-skel"><div class="sk sk-cat"></div><div class="sk sk-title"></div><div class="sk sk-title2"></div><div class="sk sk-author"></div></div><div class="sb-cell is-skel"><div class="sk sk-cat"></div><div class="sk sk-title"></div><div class="sk sk-title2"></div><div class="sk sk-author"></div></div><div class="sb-cell is-skel"><div class="sk sk-cat"></div><div class="sk sk-title"></div><div class="sk sk-title2"></div><div class="sk sk-author"></div></div><div class="sb-cell is-skel"><div class="sk sk-cat"></div><div class="sk sk-title"></div><div class="sk sk-title2"></div><div class="sk sk-author"></div></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="page" id="postPage" style="display:none">
+            <div class="detail-wrap">
+                <button class="back-btn" onclick="navigateTo('home')" data-i18n="back">返回</button>
+                <article class="detail-card" id="postDetail"></article>
+                <div class="reply-section">
+                    <h3 class="reply-heading"><span data-i18n="replies">回复</span> <span id="replyCount">0</span></h3>
+                    <div class="reply-compose" id="replyInputArea"><div class="avatar" id="replyAvatar">?</div><div class="rc-body"><textarea id="replyTextarea" data-i18n-placeholder="reply_placeholder" rows="3" oninput="handleMentionInput(event)"></textarea><div class="mention-dropdown" id="mentionDropdown"></div><div class="reply-image-preview" id="replyImagePreview" style="display:none"></div><div class="rc-actions"><div class="rc-actions-left"><button class="reply-action" onclick="document.getElementById('replyImageInput').click()" title="添加图片"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button><input type="file" id="replyImageInput" accept="image/*" onchange="uploadReplyImage(event)" style="display:none"><button class="reply-action" id="cancelReplyToBtn" style="display:none" onclick="cancelReplyTo()">取消回复</button></div><button class="btn-primary btn-sm" onclick="submitReply()" data-i18n="submit_reply">发布回复</button></div></div></div>
+                    <div class="reply-list" id="replyList"></div>
+                </div>
+            </div>
+        </div>
+        <div class="page" id="profilePage" style="display:none"><div class="sub-wrap" id="profileContent"></div></div>
+        <div class="page" id="bookmarksPage" style="display:none"><div class="sub-wrap"><h2 class="page-title" data-i18n="my_bookmarks">我的收藏</h2><div class="post-grid" id="bookmarkList"></div></div></div>
+        <div class="page" id="settingsPage" style="display:none">
+            <div class="sub-wrap">
+                <h2 class="page-title" data-i18n="settings">设置</h2>
+                <div class="sg"><div class="sg-head" data-i18n="personal_info">个人信息</div><div class="sg-row"><label data-i18n="username">用户名</label><input type="text" id="settingUsername" data-i18n-placeholder="enter_username" class="sg-input"></div><div class="sg-sep"></div><div class="sg-row"><label data-i18n="bio">个性签名</label><input type="text" id="settingBio" data-i18n-placeholder="write_something" class="sg-input"></div><div class="sg-sep"></div><div class="sg-row"><label data-i18n="birthday">生日</label><div style="display:flex;gap:8px;align-items:center"><select id="profileBirthdayMonth" class="sg-input" style="width:auto;flex:1"><option value="0">月</option><option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option><option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option></select><select id="profileBirthdayDay" class="sg-input" style="width:auto;flex:1"><option value="0">日</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option></select></div></div><div class="sg-sep"></div><div class="sg-row"><label><span data-i18n="age">年龄</span> <span style="font-size:11px;color:var(--text3)" data-i18n="ageOptional">(可选)</span></label><input type="number" id="profileBirthdayAge" min="1" max="130" placeholder="不填则隐藏" data-i18n-placeholder="ageHiddenHint" class="sg-input" style="max-width:140px"></div><div class="sg-sep"></div><div class="sg-row"><label data-i18n="region">地区</label><input type="text" id="profileRegion" maxlength="60" placeholder="如：中国 · 上海" data-i18n-placeholder="regionPlaceholder" class="sg-input"></div><div class="sg-sep"></div><div class="sg-row"><label data-i18n="gender">性别</label><select id="profileGender" class="sg-input" style="max-width:180px"><option value="">保密</option><option value="男">男</option><option value="女">女</option><option value="其他">其他</option></select></div><div class="sg-sep"></div><div class="sg-row"><label data-i18n="avatar">头像</label><div style="display:flex;gap:8px;align-items:center"><div class="avatar avatar-md" id="settingAvatar">?</div><button class="btn-ghost" onclick="document.getElementById('avatarUploadInput').click()" data-i18n="uploadAvatar">上传头像</button><input type="file" id="avatarUploadInput" accept="image/*" onchange="uploadAvatar(event)" style="display:none"></div></div></div>
+                <div class="sg">
+                    <div class="sg-head" data-i18n="settingsEmailMgmt">邮箱管理</div>
+                    <div class="sg-row" style="flex-direction:column;align-items:stretch;gap:8px">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                            <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1">
+                                <span style="font-size:13px;color:var(--text3)" data-i18n="currentEmail">当前邮箱</span>
+                                <span id="settingEmailDisplay" style="font-size:14px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">-</span>
+                            </div>
+                            <span id="emailVerifiedBadge" style="font-size:11px;padding:2px 8px;border-radius:8px;background:rgba(48,209,88,0.15);color:#30D158;display:none">已验证</span>
+                            <span id="emailUnverifiedBadge" style="font-size:11px;padding:2px 8px;border-radius:8px;background:rgba(255,159,10,0.15);color:#FF9F0A;display:none">未验证</span>
+                        </div>
+                        <div id="emailVerifyWarning" style="font-size:12px;color:#FF9F0A;line-height:1.4;display:none"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span data-i18n="emailVerifyWarning">请尽快验证邮箱，3 天内未验证的账号将被自动删除</span></div>
+                    </div>
+                    <div class="sg-sep"></div>
+                    <div class="sg-row" style="flex-direction:column;align-items:stretch;gap:8px">
+                        <label style="font-size:13px;color:var(--text2)" data-i18n="changeEmail">修改邮箱</label>
+                        <div style="display:flex;gap:8px">
+                            <input type="email" id="settingEmailInput" placeholder="输入新邮箱" data-i18n-placeholder="newEmailPlaceholder" class="sg-input" style="flex:1">
+                            <button class="btn-ghost" onclick="changeEmail()" data-i18n="changeBtn">修改</button>
+                        </div>
+                    </div>
+                    <div class="sg-sep"></div>
+                    <div class="sg-row" style="flex-direction:column;align-items:stretch;gap:8px">
+                        <label style="font-size:13px;color:var(--text2)" data-i18n="verifyEmailTitle">验证邮箱（需先获取验证码）</label>
+                        <div id="turnstileContainerSettings" style="display:none"></div>
+                        <div style="display:flex;gap:8px">
+                            <input type="text" id="settingEmailCode" placeholder="输入验证码" data-i18n-placeholder="emailCodePlaceholder" class="sg-input" style="flex:1">
+                            <button class="btn-ghost" id="settingSendCodeBtn" onclick="sendVerifyCodeForSettings()" data-i18n="getCode">获取验证码</button>
+                            <button class="btn-primary" onclick="verifyEmail()" data-i18n="verifyBtn">验证</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="sg"><div class="sg-head" data-i18n="appearance">外观</div><div class="sg-row"><label data-i18n="theme">主题</label><div class="lang-seg"><button class="lang-seg-btn theme-btn" data-theme-val="light" onclick="setTheme('light')" data-i18n="themeLight">浅色</button><button class="lang-seg-btn theme-btn" data-theme-val="dark" onclick="setTheme('dark')" data-i18n="themeDark">深色</button><button class="lang-seg-btn theme-btn" data-theme-val="geek" onclick="setTheme('geek')" data-i18n="themeGeek">极客</button></div></div><div class="sg-sep"></div><div class="sg-row" style="flex-wrap:wrap"><label data-i18n="liquidGlass">液态玻璃</label><label class="toggle"><input type="checkbox" id="liquidGlassToggle" onchange="toggleLiquidGlass()"><span class="toggle-track"></span></label><div class="lg-hint" style="width:100%;padding-left:0" data-i18n="liquidGlassHint">部分浏览器可能不适配，请尽量使用 Edge 或 Chrome</div></div><div class="sg-sep"></div><div class="sg-row" style="flex-wrap:wrap"><label data-i18n="perfMode">性能优化</label><label class="toggle"><input type="checkbox" id="perfModeToggle" onchange="togglePerfMode()"><span class="toggle-track"></span></label><div class="lg-hint" style="width:100%;padding-left:0" data-i18n="perfModeHint">禁用动画、模糊、阴影等特效，老设备不发烫不卡顿</div></div><div class="sg-sep"></div><div class="sg-row" style="flex-wrap:wrap"><label data-i18n="language">语言</label><div class="lang-seg"><button class="lang-seg-btn active" data-lang="zh-CN" onclick="setLanguage('zh-CN')">简中</button><button class="lang-seg-btn" data-lang="zh-TW" onclick="setLanguage('zh-TW')">繁中</button><button class="lang-seg-btn" data-lang="en" onclick="setLanguage('en')">EN</button><button class="lang-seg-btn" data-lang="ja" onclick="setLanguage('ja')">日本語</button></div></div></div>
+                <div class="sg">
+                  <div class="sg-head" data-i18n="bgImage">背景图片</div>
+                  <div class="sg-row">
+                    <label data-i18n="customBg">自定义背景</label>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <button class="btn-ghost" onclick="document.getElementById('bgUploadInput').click()" data-i18n="chooseImage">选择图片</button>
+                      <button class="btn-ghost" onclick="removeBackground()" id="removeBgBtn" style="display:none" data-i18n="remove">移除</button>
+                      <input type="file" id="bgUploadInput" accept="image/*" onchange="uploadBackground(event)" style="display:none">
+                    </div>
+                  </div>
+                </div>
+                <div class="sg">
+                    <div class="sg-head" data-i18n="security">安全设置</div>
+                    <div class="sg-row">
+                        <div>
+                            <label style="font-size:14px" data-i18n="loginCodeToggle">登录验证码</label>
+                            <div style="font-size:12px;color:var(--text3);margin-top:2px" data-i18n="loginCodeHint">开启后,登录时需要输入邮箱验证码</div>
+                        </div>
+                        <label class="switch" style="position:relative;display:inline-block;width:44px;height:24px">
+                            <input type="checkbox" id="requireLoginCodeToggle" onchange="toggleLoginCode()" style="opacity:0;width:0;height:0">
+                            <span class="slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--bg-fill);border-radius:12px;transition:.3s"></span>
+                        </label>
+                    </div>
+                    <div class="sg-sep"></div>
+                </div>
+                <div class="sg">
+                    <div class="sg-head" data-i18n="passkey">安全密钥</div>
+                    <div class="sg-row" id="passkeySupportRow">
+                        <label>Passkeys</label>
+                        <span id="passkeySupportText" style="font-size:13px;color:var(--text3)" data-i18n="detecting">检测中…</span>
+                    </div>
+                    <div class="sg-sep"></div>
+                    <div id="passkeyList"></div>
+                    <div class="sg-row">
+                        <label></label>
+                        <button class="btn-ghost" id="addPasskeyBtn" onclick="registerPasskey()" style="display:none" data-i18n="addPasskey">添加安全密钥</button>
+                    </div>
+                </div>
+                <div class="sg">
+                    <div class="sg-head" data-i18n="developer">开发者</div>
+                    <div class="sg-row">
+                        <label data-i18n="devPlatform">翱翔鸟开发者平台</label>
+                        <button class="btn-ghost" onclick="window.open('/developer','_blank')" data-i18n="gotoDevPlatform">进入开发者平台</button>
+                    </div>
+                    <div class="sg-sep"></div>
+                    <div class="sg-row">
+                        <label style="font-size:12px;color:var(--text3)" data-i18n="devProtocolHint">为你的应用接入翱翔鸟登录，OAuth 2.0 标准协议</label>
+                    </div>
+                </div>
+                <div class="sg">
+                    <div class="sg-head" data-i18n="bugFeedback">Bug 反馈</div>
+                    <div class="sg-row" style="flex-direction:column;align-items:stretch;gap:8px">
+                        <textarea id="bugReportInput" placeholder="描述你遇到的 Bug..." rows="3" data-i18n-placeholder="bugPlaceholder" style="width:100%;padding:10px 12px;border:0.5px solid var(--border);border-radius:var(--radius-md);background:var(--bg);color:var(--text);font-size:14px;outline:none;resize:vertical;font-family:inherit"></textarea>
+                        <button class="btn-primary" onclick="submitBugReport()" style="align-self:flex-end" data-i18n="submitFeedback">提交反馈</button>
+                    </div>
+                </div>
+                <div class="sg">
+                    <div class="sg-head" data-i18n="openSource">开源</div>
+                    <div class="sg-row" style="flex-direction:column;align-items:stretch;gap:8px">
+                        <div style="font-size:12px;color:var(--text3);line-height:1.5" data-i18n="openSourceDesc">翱翔鸟的全部代码已公开，可以自行部署。</div>
+                        <a class="gh-link" href="https://github.com/SoaringBird23/soaringbird" target="_blank" rel="noopener">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4 1.5-4-2-5.5-2.5M15 21v-3.5c0-1 .4-2 1-2.6-3.2-.4-6-1.6-6-6.4a5 5 0 0 1 1.3-3.4 4.7 4.7 0 0 1 .1-3.4s1.3-.4 4.1 1.5a10 10 0 0 1 5 0c2.8-1.9 4.1-1.5 4.1-1.5a4.7 4.7 0 0 1 .1 3.4A5 5 0 0 1 20 7.6c0 4.8-2.8 6-6 6.4.6.6 1 1.5 1 2.6V21"/></svg>
+                            <span data-i18n="openSourceLink">在 GitHub 查看</span>
+                            <span class="gh-repo">SoaringBird23/soaringbird</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="sg">
+                    <div class="sg-head" data-i18n="dangerZone">危险操作</div>
+                    <div class="sg-row" style="flex-direction:column;align-items:stretch;gap:10px">
+                        <div style="font-size:12px;color:var(--text3);line-height:1.5" data-i18n="deleteAccountDesc">注销后，你的账号及其发布的帖子、评论、私信等全部数据将被永久删除，且无法恢复。请谨慎操作。</div>
+                        <div style="display:flex;gap:8px;justify-content:flex-end">
+                            <button class="btn-danger" onclick="openDeleteAccountModal()" data-i18n="deleteAccountBtn">注销账号</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-primary" style="margin-top:20px" onclick="saveSettings()" data-i18n="save_settings">保存设置</button>
+            </div>
+        </div>
+        <div class="page" id="searchPage" style="display:none"><section class="content-section"><h2 class="page-title" id="searchTitle" data-i18n="search_results">搜索结果</h2><div class="post-grid" id="searchResults"></div></section></div>
+    </main>
+    <!-- 注销账号确认弹窗（苹果扁平风格） -->
+    <div class="modal-overlay" id="deleteAccountModal" onclick="closeDeleteAccountModal()">
+        <div class="modal modal-sm" onclick="event.stopPropagation()">
+            <div class="modal-head"><h2 data-i18n="delAccConfirmTitle">确认注销账号</h2><button class="modal-x" onclick="closeDeleteAccountModal()">✕</button></div>
+            <div class="modal-body" style="text-align:left;padding:8px 24px 4px">
+                <p style="margin:0 0 16px;font-size:14px;color:var(--text2);line-height:1.6" data-i18n="delAccConfirmDesc">此操作不可撤销。你的账号、帖子、评论、私信等全部数据将被永久删除。请输入密码以确认注销。</p>
+                <input type="password" id="delAccPassword" placeholder="输入当前密码" data-i18n-placeholder="delAccPasswordPlaceholder" class="sg-input" style="width:100%">
+                <div id="delAccError" style="display:none;margin-top:8px;font-size:13px;color:var(--red)"></div>
+            </div>
+            <div class="modal-foot"><button class="btn-ghost" onclick="closeDeleteAccountModal()" data-i18n="cancel">取消</button><button class="btn-danger" id="delAccConfirmBtn" onclick="confirmDeleteAccount()" data-i18n="confirmDeleteBtn">确认注销</button></div>
+        </div>
+    </div>
+    <!-- 分享面板（底部弹层，苹果风格扁平） -->
+    <div class="share-scrim" id="shareScrim" onclick="closeShareSheet()"></div>
+    <div class="share-sheet" id="shareSheet" role="dialog" aria-hidden="true">
+      <div class="share-handle"></div>
+      <div class="share-sheet-head">
+        <span class="share-sheet-title" id="shareSheetTitle" data-i18n="share">分享</span>
+        <button class="share-close" onclick="closeShareSheet()" aria-label="关闭">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="share-link-row">
+        <button class="share-row" onclick="copyShareLink()">
+          <span class="share-row-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+          <span class="share-row-label" data-i18n="copyLink">复制链接</span>
+        </button>
+        <button class="share-row" onclick="shareLinkNative()" id="shareLinkNative">
+          <span class="share-row-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span>
+          <span class="share-row-label" data-i18n="systemShare">系统分享</span>
+        </button>
+      </div>
+      <div class="share-divider"></div>
+      <div class="share-sub" id="shareSub"><span data-i18n="saveAsImage">分享为图片</span> <span class="share-sub-en">SAVE AS IMAGE</span></div>
+      <div class="share-styles">
+        <button class="share-style" id="shareStyleBlack" onclick="shareAsImage('black')">
+          <span class="share-thumb share-thumb-black"><span class="t-brand">翱翔鸟论坛</span><span class="t-lines"><i></i><i></i><i></i></span></span>
+          <span class="share-style-name"><span class="dot dot-black"></span><span data-i18n="darkCard">深色卡片</span></span>
+        </button>
+        <button class="share-style" id="shareStyleWhite" onclick="shareAsImage('white')">
+          <span class="share-thumb share-thumb-white"><span class="t-brand">翱翔鸟论坛</span><span class="t-lines"><i></i><i></i><i></i></span></span>
+          <span class="share-style-name"><span class="dot dot-white"></span><span data-i18n="lightCard">浅色卡片</span></span>
+        </button>
+      </div>
+      <div class="share-preview" id="sharePreview" style="display:none">
+        <div class="share-preview-head"><span data-i18n="preview">预览</span><span class="share-preview-hint" data-i18n="previewHint">效果即为分享图</span></div>
+        <img id="sharePreviewImg" alt="分享图片预览">
+        <div class="share-preview-actions">
+          <button class="btn-primary btn-full" onclick="saveShareImage()" data-i18n="saveImage">保存图片</button>
+          <button class="btn-follow" onclick="shareImageNative()" id="shareImageNative" style="margin-top:10px" data-i18n="systemShareImage">系统分享图片</button>
+        </div>
+      </div>
+    </div>
+    <footer class="site-footer">
+        <span id="copyrightText">© 2026 SoaringBird Forum. All rights reserved.</span>
+        <span class="footer-links"> · <a href="/terms" data-i18n="terms">用户协议</a> · <a href="/privacy" data-i18n="privacy">隐私政策</a> · <a href="/values" data-i18n="values">价值观</a> · <a href="https://github.com/SoaringBird23/soaringbird" target="_blank" rel="noopener" data-i18n="openSource">开源</a></span>
+    </footer>
+    <div class="modal-overlay" id="newPostModal" onclick="closeModalOutside(event)">
+        <div class="modal" id="postModal"><div class="modal-head"><h2 data-i18n="create_post">发布新帖</h2><div class="modal-head-actions"><button class="modal-x modal-expand" id="postExpandBtn" onclick="togglePostFullscreen()" data-i18n-title="fullscreen" title="全屏编辑"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button><button class="modal-x" onclick="closeNewPostModal()">✕</button></div></div>
+        <div class="modal-body">
+            <div class="pm-draft" id="postDraftBar" hidden>
+                <span class="pm-draft-txt">已恢复未发布的草稿</span>
+                <div class="pm-draft-acts"><button type="button" id="postDraftDiscard">丢弃</button></div>
+            </div>
+            <div class="fg"><label data-i18n="title">标题</label><input type="text" id="postTitle" data-i18n-placeholder="enter_title"></div>
+            <div class="fg"><label data-i18n="category">分类</label><select id="postCategory"></select></div>
+            <div class="fg"><label data-i18n="tags">标签</label><input type="text" id="postTags" data-i18n-placeholder="tags_separator"></div>
+            <div class="fg">
+                <div class="fg-row">
+                    <label data-i18n="content">内容</label>
+                    <div class="pm-modes" id="postModes">
+                        <button type="button" class="pm-mode is-on" data-mode="write">撰写</button>
+                        <button type="button" class="pm-mode" data-mode="preview">预览</button>
+                    </div>
+                </div>
+                <div class="pm-pane">
+                    <textarea id="postContent" data-i18n-placeholder="write_thoughts" rows="6"></textarea>
+                    <div class="pm-preview" id="postPreview" hidden></div>
+                </div>
+                <div class="pm-tools">
+                    <button type="button" class="pm-emoji-btn" id="postEmojiBtn" title="插入表情" aria-label="插入表情">☺</button>
+                    <span class="pm-count" id="postCount">0 字 · 0 行</span>
+                    <div class="pm-emoji-pop" id="postEmojiPop" hidden></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-foot"><button class="btn-ghost" onclick="closeNewPostModal()" data-i18n="cancel">取消</button><button class="btn-primary" id="submitPostBtn" onclick="submitNewPost()" data-i18n="publish">发布</button></div></div>
+    </div>
+    <div class="modal-overlay" id="loginModal" onclick="closeModalOutside(event)">
+        <div class="modal modal-sm"><div class="modal-head"><h2 id="authModalTitle">登录</h2><button class="modal-x" onclick="closeLoginModal()">✕</button></div>
+        <div class="modal-body" style="text-align:center;padding:32px 20px">
+            <p style="color:var(--text2);margin-bottom:20px;font-size:14px" data-i18n="chooseLoginMethod">选择登录方式</p>
+            <button class="btn-primary btn-full" onclick="window.location.href='/signin'" style="margin-bottom:12px" data-i18n="sbAccountLogin">翱翔鸟账号登录</button>
+            <!-- 幻霜登录方式已隐藏（安全考虑） -->
+        </div></div>
+    </div>
+    <!-- 下载客户端弹窗（苹果风格） -->
+    <div class="modal-overlay" id="dlModal" onclick="closeDlModal()">
+        <div class="modal modal-sm dl-modal">
+            <div class="dl-hero">
+                <div class="dl-app-icon">
+                    <img src="logo-light.png" alt="SoaringBird" width="40" height="40" style="border-radius:10px">
+                </div>
+                <div class="dl-hero-text">
+                    <div class="dl-app-name">SoaringBird</div>
+                    <div class="dl-app-sub" data-i18n="dlAppName">翱翔鸟论坛客户端</div>
+                </div>
+                <button class="modal-x dl-close" onclick="closeDlModal()">✕</button>
+            </div>
+            <div class="dl-body">
+                <div class="dl-desc" data-i18n="dlDesc">随时随地与社区保持连接，通知、私聊、直播一触即达。</div>
+                <div class="dl-actions">
+                    <button class="btn-primary btn-full" onclick="window.open('/download','_blank')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span data-i18n="dlGoDownload">前往下载页</span>
+                    </button>
+                    <button class="dl-ghost" onclick="closeDlModal()" data-i18n="dlLater">稍后再说</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 生日弹窗（仅当日生日的登录用户显示，苹果风格） -->
+    <div class="modal-overlay bday-overlay" id="birthdayModal">
+        <div class="modal bday-modal">
+            <div class="bday-confetti bday-confetti-1"></div>
+            <div class="bday-confetti bday-confetti-2"></div>
+            <div class="bday-confetti bday-confetti-3"></div>
+            <div class="bday-confetti bday-confetti-4"></div>
+            <div class="bday-confetti bday-confetti-5"></div>
+            <div class="bday-confetti bday-confetti-6"></div>
+            <div class="bday-confetti bday-confetti-7"></div>
+            <div class="bday-confetti bday-confetti-8"></div>
+            <div class="bday-body">
+                <div class="bday-emoji" role="img" aria-label="庆祝">🥳</div>
+                <div class="bday-title" id="bdayTitle" data-i18n="happyBirthday">生日快乐</div>
+                <div class="bday-sub" id="bdaySub" data-i18n="bdaySub">愿你的每一天都闪闪发光</div>
+                <button class="bday-continue" onclick="closeBirthdayModal()" data-i18n="continue">继续</button>
+            </div>
+        </div>
+    </div>
+    <div class="toast-wrap" id="toastContainer"></div>
+    <!-- 邮箱验证提醒弹窗（仅未验证用户显示） -->
+    <div class="splash-overlay" id="verifySplashOverlay" style="display:none">
+        <div class="splash-card">
+            <div class="splash-badge" style="background:rgba(255,159,10,0.12);color:#FF9F0A" data-i18n="needAction">需要操作</div>
+            <div class="splash-logo" style="font-size:42px" data-i18n="emailUnverified">邮箱未验证</div>
+            <div class="splash-subtitle" data-i18n="verifySplashSub">你的邮箱尚未验证，请尽快完成验证</div>
+            <div class="splash-features">
+                <div class="splash-feature">
+                    <div class="splash-feature-icon" style="background:rgba(255,159,10,0.12);color:#FF9F0A">⚠</div>
+                    <div class="splash-feature-info"><div class="splash-feature-title" data-i18n="willDelete">3 天内未验证将删除账号</div><div class="splash-feature-desc" data-i18n="willDeleteDesc">为防止虚假注册，未验证账号将被自动清理</div></div>
+                </div>
+                <div class="splash-feature">
+                    <div class="splash-feature-icon" style="background:rgba(0,113,227,0.1);color:var(--accent)">✓</div>
+                    <div class="splash-feature-info"><div class="splash-feature-title" data-i18n="goVerify">前往设置验证邮箱</div><div class="splash-feature-desc" data-i18n="goVerifyDesc">设置 → 邮箱管理 → 获取验证码 → 验证</div></div>
+                </div>
+            </div>
+            <div class="splash-version" data-i18n="splashVersion">翱翔鸟论坛</div>
+            <button class="splash-btn" onclick="closeVerifySplash()" data-i18n="verifyNow">前往验证</button>
+            <button class="splash-btn" style="background:transparent;color:var(--text3);box-shadow:none;margin-top:8px;font-weight:400" onclick="dismissVerifySplash()" data-i18n="dismissLater">稍后提醒</button>
+        </div>
+    </div>
+    <!-- 管理员消息 · 开屏弹窗 -->
+    <div class="announce-overlay" id="announceSplash" style="display:none" onclick="if(event.target===this)closeAnnounceSplash()">
+        <div class="announce-card">
+            <div class="announce-head">
+                <span class="announce-kicker" id="annSplashKicker">公告</span>
+                <button class="announce-x" onclick="closeAnnounceSplash()" aria-label="关闭">✕</button>
+            </div>
+            <div class="announce-list" id="annSplashList"></div>
+            <button class="announce-btn" onclick="closeAnnounceSplash()">知道了</button>
+        </div>
+    </div>
+    <!-- 关站全屏通知（每次打开都会出现） -->
+    <div class="close-notice" id="closeNotice" aria-hidden="true">
+        <div class="cn-dusk"></div>
+        <div class="cn-sun"></div>
+        <div class="cn-ground"></div>
+        <div class="cn-grain"></div>
+        <div class="cn-letter">
+            <div class="cn-date">2026.12.01</div>
+            <h1 class="cn-title"><img class="cn-mark" src="logo-dark.png" alt="" width="28" height="28">SoaringBird</h1>
+            <div class="cn-rule"></div>
+            <div class="cn-body">
+                <p class="cn-salute">你好，</p>
+                <p>出于实用性与运营上的考量，我们将在 2026 年 12 月 1 日终止一切服务。</p>
+                <p>我们重视你的数据。服务结束前，你可以通过论坛支持页完整下载属于你的全部数据。</p>
+                <p>很感谢你一直以来的支持与陪伴。</p>
+                <p>再见。</p>
+            </div>
+            <div class="cn-actions">
+                <button class="cn-primary" onclick="downloadMyData()">下载我的数据</button>
+                <button class="cn-link" onclick="closeCloseNotice()">进入论坛</button>
+                <button class="cn-link" onclick="downloadBadge()">纪念徽章</button>
+            </div>
+            <div class="cn-foot">2026.6.5 — 2026.12.1 · 2026.12.01 终止服务 · 2027.06 域名到期<br>帖子、回复、视频与新闻评论均可完整导出，格式为 JSON / Markdown<br>导出需要登录 · 疑问请通过站内聊天联系我们</div>
+        </div>
+    </div>
+    <!-- 申诉弹窗（禁言 / 封号通用） -->
+    <div class="modal-overlay" id="appealModal" onclick="if(event.target===this)closeAppealModal()">
+        <div class="modal appeal-modal">
+            <div class="modal-head"><h2 id="appealTitle">提交申诉</h2><button class="modal-x" onclick="closeAppealModal()">✕</button></div>
+            <div class="modal-body">
+                <p class="appeal-desc" id="appealDesc"></p>
+                <div class="fg" id="appealUserRow" style="display:none"><label>账号</label><input type="text" id="appealUser" readonly></div>
+                <div class="fg" id="appealPassRow" style="display:none"><label>密码（验证身份）</label><input type="password" id="appealPass" placeholder="请输入该账号密码" autocomplete="current-password"></div>
+                <div class="fg"><label>申诉说明</label><textarea id="appealText" rows="4" maxlength="1000" placeholder="请说明情况（至少 5 个字）"></textarea></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeAppealModal()">取消</button>
+                <button class="btn-primary" id="appealSubmit" onclick="submitAppeal()">提交申诉</button>
+            </div>
+        </div>
+    </div>
+    <!-- 统一消息面板（聊天 + 通知） -->
+    <div class="chat-overlay" id="chatOverlay" onclick="toggleMsgPanel()"></div>
+    <div class="chat-panel" id="chatPanel">
+        <!-- 面板顶部分段控制 -->
+        <div class="msg-tabs">
+            <div class="msg-tabs-inner">
+                <button class="msg-tab active" data-msgtab="chat" onclick="switchMsgTab('chat')" data-i18n="chat">聊天</button>
+                <button class="msg-tab" data-msgtab="notif" onclick="switchMsgTab('notif')"><span data-i18n="notif">通知</span><span class="msg-tab-badge" id="msgTabNotifBadge" hidden></span></button>
+            </div>
+        </div>
+        <!-- 聊天视图 -->
+        <div class="msg-body-chat" id="msgBodyChat">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="chat-title" data-i18n="chat">聊天</div>
+                    <div class="chat-online-row" id="chatOnlineRow">
+                        <span class="chat-online-dot"></span>
+                        <span class="chat-online-label" id="chatOnlineCount">0 人在线</span>
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="chat-action-btn" onclick="switchChatTab('group')" id="chatTabGroup" data-i18n-title="chatGroup" title="群聊">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </button>
+                    <button class="chat-action-btn" onclick="switchChatTab('dm')" id="chatTabDm" data-i18n-title="chatDm" title="私聊">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </button>
+                    <button class="chat-action-btn" onclick="toggleChatFullscreen()" id="chatFullscreenBtn" data-i18n-title="chatFullscreen" title="全屏">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                    </button>
+                    <button class="chat-action-btn" onclick="toggleMsgPanel()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="chat-online-users" id="chatOnlineUsers"></div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-area" id="chatInputArea">
+                <input type="text" id="chatInput" placeholder="发送消息..." data-i18n-placeholder="chatInputHint" maxlength="2000" onkeydown="if(event.key==='Enter')sendChatMessage()">
+                <button class="chat-send-btn" onclick="sendChatMessage()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+        </div>
+        <!-- 通知视图 -->
+        <div class="msg-body-notif" id="msgBodyNotif" style="display:none">
+            <div class="np-header"><h3 data-i18n="notifications">通知</h3><button onclick="clearNotifications()" data-i18n="mark_all_read">全部已读</button></div>
+            <div class="np-list" id="notifList"><div class="np-empty" data-i18n="no_notifications">暂无通知</div></div>
+        </div>
+    </div>
+
+    <script src="liquid-glass.js?v=29"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="app29.js?v=20261030-dusk9"></script>
+    <style>
+    /* 直播活跃数徽章（嵌于 navLiveLink 内） */
+    .nav-live-count{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-width:17px;height:17px;margin-left:6px;padding:0 5px;
+      border-radius:980px;background:var(--live,#FF453A);color:#fff;
+      font-size:10px;font-weight:700;letter-spacing:0;line-height:1;
+      font-variant-numeric:tabular-nums;vertical-align:middle;
+      box-shadow:0 0 8px rgba(255,69,58,.45);
+      animation:navLivePulse 1.4s ease-in-out infinite;
+    }
+    @keyframes navLivePulse{0%,100%{box-shadow:0 0 6px rgba(255,69,58,.4)}50%{box-shadow:0 0 10px rgba(255,69,58,.6)}}
+    </style>
+    <script>
+    // 直播入口：所有已登录用户可见 + 10s 轮询活跃直播数
+    (function(){
+      var liveLink = document.getElementById('navLiveLink');
+      var liveCount = document.getElementById('navLiveCount');
+      var liveTimer = null;
+
+      function updateLiveCount(){
+        fetch('/api/live/active-count', {cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+          if(!liveCount) return;
+          var n = d && typeof d.count === 'number' ? d.count : 0;
+          if(n > 0){
+            liveCount.textContent = n > 99 ? '99+' : String(n);
+            liveCount.hidden = false;
+          }else{
+            liveCount.hidden = true;
+          }
+        }).catch(function(){});
+      }
+
+      fetch('/api/me').then(function(r){return r.json();}).then(function(d){
+        if(d.user){
+          if(liveLink) liveLink.hidden = false;
+          updateLiveCount();
+          liveTimer = setInterval(updateLiveCount, 10000);
+          // 页面重新可见时立即刷新
+          document.addEventListener('visibilitychange', function(){
+            if(!document.hidden) updateLiveCount();
+          });
+        }
+      }).catch(function(){});
+
+      // 清理（页面卸载时）
+      window.addEventListener('beforeunload', function(){
+        if(liveTimer) clearInterval(liveTimer);
+      });
+    })();
+    </script>
+</body>
+</html>

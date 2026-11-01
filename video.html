@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Video - 翱翔鸟</title>
+    <link rel="icon" href="/logo-light.png" type="image/png">
+    <link rel="apple-touch-icon" href="/logo-light.png">
+    <link rel="stylesheet" href="/styles29.css">
+    <link rel="stylesheet" href="/video.css?v=20260802-5">
+    <script>
+    (function(){
+        var t = localStorage.getItem('bird_theme') || 'light';
+        if (t === 'light') document.documentElement.removeAttribute('data-theme');
+        else document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
+</head>
+<body>
+    <!-- 主界面 -->
+    <div class="vd-app" id="vdApp">
+        <!-- 毛玻璃导航栏 -->
+        <nav class="vd-nav">
+            <div class="vd-nav-inner">
+                <div class="vd-nav-left">
+                    <a class="vd-nav-back" href="/" title="返回论坛">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+                    </a>
+                    <span class="vd-nav-label">Video</span>
+                </div>
+                <div class="vd-nav-right">
+                    <a class="vd-nav-link" href="/signin" id="navLoginBtn">登录</a>
+                    <div class="vd-nav-user" id="navUser" style="display:none">
+                        <img class="vd-nav-avatar" id="navAvatar" alt="">
+                    </div>
+                    <button class="vd-upload-pill" id="uploadBtn">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        上传
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="vd-content">
+            <!-- 列表视图 -->
+            <section id="listView">
+                <!-- Hero 精选区（大图） -->
+                <div class="vd-hero" id="heroSection">
+                    <div class="vd-hero-bg" id="heroBg"></div>
+                    <div class="vd-hero-overlay"></div>
+                    <div class="vd-hero-info">
+                        <div class="vd-hero-badge">精选</div>
+                        <h1 class="vd-hero-title" id="heroTitle"></h1>
+                        <div class="vd-hero-meta" id="heroMeta"></div>
+                        <button class="vd-hero-play" id="heroPlay">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                            播放
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 内容区域 -->
+                <div class="vd-shelf">
+                    <!-- 搜索 + 排序 -->
+                    <div class="vd-bar">
+                        <div class="vd-search">
+                            <svg class="vd-search-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" class="vd-search-input" id="searchInput" placeholder="搜索">
+                        </div>
+                        <div class="vd-seg-bar" id="filterBar">
+                            <button class="vd-seg active" data-sort="latest">最新</button>
+                            <button class="vd-seg" data-sort="popular">热门</button>
+                            <button class="vd-seg" data-sort="likes">点赞</button>
+                        </div>
+                    </div>
+
+                    <!-- 视频网格 -->
+                    <div class="vd-grid" id="videoGrid"></div>
+                    <div class="vd-empty" id="videoEmpty" style="display:none">
+                        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                        <p>暂无视频</p>
+                    </div>
+                    <div class="vd-loading" id="videoLoading" style="display:none">
+                        <div class="vd-spinner"></div>
+                    </div>
+                    <div class="vd-pager" id="pager"></div>
+                </div>
+            </section>
+
+            <!-- 播放视图 -->
+            <section id="playView" style="display:none">
+                <div class="vd-play-screen">
+                    <button class="vd-play-close" id="backBtn">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+                    </button>
+                    <div class="vd-player-frame">
+                        <video class="vd-player" id="videoPlayer" controls playsinline></video>
+                    </div>
+                    <div class="vd-play-detail">
+                        <h1 class="vd-play-title" id="dTitle"></h1>
+                        <div class="vd-play-row">
+                            <div class="vd-play-author" id="dAuthorLink">
+                                <img class="vd-play-avatar" id="dAvatar" alt="">
+                                <span id="dAuthor"></span>
+                            </div>
+                            <span class="vd-sep"></span>
+                            <span class="vd-play-meta-text" id="dViews"></span>
+                            <span class="vd-sep"></span>
+                            <span class="vd-play-meta-text" id="dTime"></span>
+                            <div class="vd-play-btns">
+                                <button class="vd-pill" id="dLikeBtn">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                    <span id="dLikeCount">0</span>
+                                </button>
+                                <button class="vd-pill" id="dShareBtn">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                                </button>
+                                <button class="vd-pill vd-pill-red" id="dDeleteBtn" style="display:none">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="vd-play-desc" id="dDesc"></p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 上传模态框 -->
+        <div class="modal-overlay" id="uploadModal">
+            <div class="vd-modal">
+                <div class="vd-modal-bar">
+                    <h2 class="vd-modal-title">发布视频</h2>
+                    <button class="vd-modal-x" id="uploadCancel">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <!-- 拖拽区 -->
+                <div class="vd-drop" id="uploadZone">
+                    <div class="vd-drop-icon">
+                        <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    </div>
+                    <p class="vd-drop-text">选择或拖拽视频</p>
+                    <p class="vd-drop-sub">MP4 / MOV / WebM · 最长 10 分钟 · 最大 600MB</p>
+                    <input type="file" id="uploadFile" accept="video/mp4,video/quicktime,video/webm,video/x-m4v" hidden>
+                </div>
+                <!-- 预览区 -->
+                <div class="vd-prev" id="uploadPreview" style="display:none">
+                    <div class="vd-prev-thumb-wrap">
+                        <img class="vd-prev-img" id="previewThumb" alt="">
+                        <div class="vd-prev-play-overlay">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                        </div>
+                    </div>
+                    <div class="vd-prev-meta">
+                        <span class="vd-prev-name" id="uploadFileName"></span>
+                        <div class="vd-prev-tags">
+                            <span class="vd-prev-tag" id="uploadFileSize"></span>
+                            <span class="vd-prev-tag" id="uploadDuration"></span>
+                        </div>
+                    </div>
+                    <button class="vd-prev-change" id="uploadChange">更换视频</button>
+                </div>
+                <video id="previewVideo" muted playsinline style="display:none"></video>
+                <!-- 自定义封面 -->
+                <div class="vd-cover-section" id="coverSection" style="display:none">
+                    <label class="vd-cover-label">封面</label>
+                    <div class="vd-cover-row">
+                        <img class="vd-cover-preview" id="coverPreview" alt="">
+                        <button class="vd-cover-btn" id="coverBtn" type="button">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            选择封面
+                        </button>
+                        <input type="file" id="coverFile" accept=".jpg,.jpeg,.png,.gif,.webp" hidden>
+                    </div>
+                    <p class="vd-cover-hint">不选则自动截取视频首帧</p>
+                </div>
+                <!-- 表单 -->
+                <div class="vd-form-section" id="uploadForm" style="display:none">
+                    <div class="vd-field-wrap">
+                        <input type="text" class="vd-in" id="uploadTitle" placeholder="标题" maxlength="120">
+                        <span class="vd-count" id="titleCount">0/120</span>
+                    </div>
+                    <div class="vd-field-wrap">
+                        <textarea class="vd-in vd-in-area" id="uploadDesc" placeholder="描述（选填）" rows="3" maxlength="500"></textarea>
+                        <span class="vd-count" id="descCount">0/500</span>
+                    </div>
+                </div>
+                <!-- 进度 -->
+                <div class="vd-prog" id="uploadProgress" style="display:none">
+                    <div class="vd-prog-text" id="uploadProgressText">上传中</div>
+                    <div class="vd-prog-track"><div class="vd-prog-bar" id="uploadProgressBar"></div></div>
+                </div>
+                <!-- 操作 -->
+                <div class="vd-modal-actions">
+                    <button class="vd-cancel" id="uploadCancel2">取消</button>
+                    <button class="vd-publish" id="uploadSubmit" disabled>提交审核</button>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="thumbCanvas" style="display:none"></canvas>
+        <div class="vd-toast" id="toast"></div>
+    </div>
+
+    <script src="/video.js?v=20260729-4"></script>
+</body>
+</html>

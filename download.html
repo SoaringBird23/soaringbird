@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>翱翔鸟 — Android</title>
+<meta name="description" content="翱翔鸟。发帖、阅读、直播，以你喜欢的方式。">
+<link rel="icon" href="/logo-light.png" type="image/png">
+<link rel="apple-touch-icon" href="/logo-light.png">
+<style>
+:root{
+  --ink:#1d1d1f;
+  --ink-2:#6e6e73;
+  --ink-3:#86868b;
+  --accent:#a945e3;
+  --tile-bg:#f5f5f7;
+  --bg:#fff;
+  --bg-2:#f0f0f4;
+  --line:#d2d2d7;
+  --navdark:#161617;
+  --glass:rgba(251,251,253,.8);
+  /* 深色霓虹：背景压暗，字形高亮，对比拉开 */
+  --hero-grad:linear-gradient(130deg,#070510 0%,#120a2b 32%,#221050 62%,#35166b 82%,#1c0a54 100%);
+  --grad-text:linear-gradient(100deg,#8be9ff 0%,#a99bff 45%,#e88bff 100%);
+  --spring:cubic-bezier(.28,.8,.24,1);
+  --ease:cubic-bezier(.4,0,.2,1);
+  --sans:"SF Pro Display","SF Pro Text","SF Pro Icons","PingFang SC","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.48421;letter-spacing:-0.003em;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;border:none;cursor:pointer;background:none;color:inherit}
+img{display:block}
+
+::selection{background:var(--accent);color:#fff}
+
+/* 滚动进场：淡入上浮 */
+.build-in{opacity:0;transform:translateY(28px);will-change:opacity,transform;transition:opacity .9s var(--spring),transform .9s var(--spring)}
+.build-in.ready{opacity:1;transform:none}
+/* 分层延时（用于同一屏多个 build-in 交错入场） */
+.build-in.d1{transition-delay:.12s}
+.build-in.d2{transition-delay:.24s}
+.build-in.d3{transition-delay:.36s}
+.build-in.d4{transition-delay:.48s}
+
+/* ===== 全局导航 ===== */
+.gnav{background:var(--navdark)}
+.gnav-in{max-width:1100px;margin:0 auto;height:44px;padding:0 22px;display:flex;align-items:center;justify-content:space-between}
+.gnav-l{display:flex;align-items:center;font-size:12px;color:#f5f5f7}
+.gnav-l a{padding:0 12px;line-height:44px;opacity:.85;transition:opacity .2s;white-space:nowrap}
+.gnav-l a:hover{opacity:1}
+@media(max-width:640px){.gnav-l .navchild{display:none}}
+.logo-chip{width:24px;height:24px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center}
+.logo-chip img{width:18px;height:18px;border-radius:5px;object-fit:cover}
+.gnav-l a.logo{display:flex;align-items:center;height:44px;padding-left:0;margin-right:8px}
+.gnav-r{font-size:12px;color:#f5f5f7;opacity:.85}
+.gnav-r a{padding:0 12px;line-height:44px;display:inline-block}
+
+/* ===== 产品导航 ===== */
+.snav{position:sticky;top:0;z-index:100;height:52px;background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
+.snav-in{max-width:1100px;margin:0 auto;height:52px;padding:0 22px;display:flex;align-items:center;justify-content:space-between}
+.snav-brand{display:flex;align-items:center;gap:9px;font-size:20px;font-weight:600;white-space:nowrap}
+.snav-brand img{width:24px;height:24px;border-radius:7px;object-fit:cover}
+.snav-links{display:flex}
+.snav-links a{font-size:12px;color:var(--ink-2);padding:0 14px;line-height:52px;transition:color .2s}
+.snav-links a:hover{color:var(--ink)}
+@media(max-width:760px){.snav-links{display:none}}
+.snav-cta{font-size:12px;color:var(--accent);font-weight:500;transition:opacity .2s;white-space:nowrap}
+.snav-cta:hover{opacity:.7}
+
+/* ===== Hero（渐变背景 + 居中内容） ===== */
+.section-hero{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100svh;color:#fff}
+.section-hero .hero-bg{position:absolute;left:-10%;top:-20%;width:120%;height:140%;background:var(--hero-grad);background-size:320% 320%;animation:heroFlow 22s ease-in-out infinite;pointer-events:none}
+.section-hero .hero-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 70% at 50% 34%,rgba(140,90,255,.5) 0%,rgba(232,139,255,.16) 45%,rgba(255,255,255,0) 70%)}
+.section-hero .hero-bg::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 60% at 50% 0%,rgba(10,5,30,.35) 0%,transparent 60%);pointer-events:none}
+@keyframes heroFlow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero-content{position:relative;z-index:1;width:calc(100% - 40px);max-width:1300px;padding:150px 0 90px;text-align:center}
+.hero-brand{display:flex;align-items:center;justify-content:center;gap:11px;margin-bottom:30px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:980px;padding:9px 20px;width:max-content;margin-left:auto;margin-right:auto;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.hero-brand img{width:26px;height:26px;border-radius:7px;object-fit:cover}
+.hero-brand span{font-size:16px;font-weight:500;letter-spacing:0}
+.hero-headline{font-size:80px;line-height:1.05;font-weight:600;letter-spacing:-0.015em}
+.hero-headline .nowrap{white-space:nowrap}
+.hero-copy{margin:26px auto 0;max-width:760px;color:rgba(255,255,255,.85);font-size:21px;line-height:1.421;letter-spacing:0}
+.hero-button{--sk-button-color-hover:#a945e3;background:#fbfbfd;color:var(--accent);margin-top:30px;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:28px;padding:17px 32px;border-radius:980px;font-size:17px;line-height:1.1764805882;font-weight:500;letter-spacing:-0.022em;transition:transform .25s var(--spring),opacity .25s var(--ease)}
+.hero-button:hover{transform:scale(1.04);opacity:.88}
+.hero-art{margin:60px auto 0;max-width:980px;width:100%}
+.hero-art .frame{background:transparent;padding:0;box-shadow:0 50px 120px rgba(20,0,50,.6)}
+.hero-art img{width:100%;height:auto;display:block;border-radius:24px}
+
+@media(max-width:1068px){
+  .hero-headline{font-size:56px;line-height:1.07143;letter-spacing:-0.005em}
+  .hero-copy{max-width:600px;font-size:19px}
+  .hero-content{padding-top:120px}
+}
+@media(max-width:734px){
+  .hero-headline{font-size:40px;line-height:1.1;letter-spacing:0}
+  .hero-copy{max-width:100%;font-size:17px}
+  .hero-content{padding-top:100px}
+  .hero-art{margin-top:44px}
+}
+
+/* 章节内容基线 */
+.section-content{margin-left:auto;margin-right:auto;width:980px;max-width:91.7%}
+.section-pad-top{padding-top:150px}
+
+.eyebrow{font-size:12px;font-weight:600;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:26px}
+.copy{font-size:19px;line-height:1.48421;color:var(--ink-2);font-weight:400;letter-spacing:0em}
+/* 强化浅底说明文字对比：#6e6e73 → #5f5f63 */
+.in-decor .copy,.tile .tile-copy,.gallery-copy p,.section-header-copy,.section-subscribe p,.section-stats p,.section-download .copy{color:#5f5f63}
+
+/* 渐变重点字 + 流体流动
+   display:inline 保证与相邻普通文字基线对齐，避免 background-clip:text 造成的小字符错位 */
+.headline-gradient{display:inline;color:transparent;-webkit-background-clip:text;background-clip:text;background-image:var(--grad-text);background-size:250% auto;-webkit-box-decoration-break:clone;box-decoration-break:clone;animation:gradFlow 10s ease-in-out infinite}
+@keyframes gradFlow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+/* 浅色背景上的渐变字用深色版，保证对比 */
+.section-catalog .headline-gradient,.section-subscribe .headline-gradient,.section-stats .headline-gradient,.section-download .headline-gradient,.section-faq .headline-gradient{background-image:linear-gradient(100deg,#2d6bff 0%,#7b3dd9 50%,#c22bb0 100%)}
+
+/* ===== 章节头部 ===== */
+.section-header{text-align:center}
+.section-header-headline{font-size:72px;line-height:1.05556;font-weight:600;letter-spacing:-0.00086em}
+.section-header-copy{margin:28px auto 0;max-width:700px}
+
+/* ===== Catalog Marquee / Tab 画廊 ===== */
+.section-catalog .tab-gallery-headline{font-size:72px;line-height:1.05556;font-weight:600;letter-spacing:-0.00086em}
+.tabnav{display:flex;gap:30px;justify-content:center;margin:52px auto 0}
+.tabnav a{font-size:17px;color:var(--ink-3);padding-bottom:8px;border-bottom:2px solid transparent;letter-spacing:-.022em;transition:color .2s,border-color .2s}
+.tabnav a:hover{color:var(--ink)}
+.tabnav a.on{color:var(--ink);border-bottom-color:var(--ink)}
+.tabnav a.on span,.tabnav a:hover span{color:transparent;-webkit-background-clip:text;background-clip:text;background-image:linear-gradient(100deg,#2d6bff 0%,#7b3dd9 50%,#c22bb0 100%);background-size:250% auto;animation:gradFlow 8s ease-in-out infinite}
+.gallery{margin:40px auto 0;max-width:820px}
+.gallery-item{display:none}
+.gallery-item.on{display:block;animation:fade .5s var(--ease)}
+@keyframes fade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center}
+.gallery-copy h3{font-size:40px;line-height:1.09091;font-weight:600;letter-spacing:-.004em;text-align:center;margin:0 auto;max-width:22ch}
+.gallery-copy p{margin:20px auto 0;max-width:44ch;text-align:center}
+.gallery-copy .link{display:inline-flex;align-items:center;justify-content:center;gap:4px;margin-top:24px;color:var(--accent);font-size:17px;font-weight:500;letter-spacing:-.022em;transition:gap .3s var(--spring),opacity .2s}
+.gallery-copy .link:hover{gap:8px;opacity:.75}
+.gallery-img{border-radius:16px;border:1px solid var(--hairline,rgba(0,0,0,.08));overflow:hidden;background:#fff;max-width:250px;justify-self:center;transition:transform .35s var(--spring),box-shadow .35s var(--spring)}
+.gallery-img:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(169,69,227,.18)}
+.gallery-img img{width:100%;height:auto;display:block}
+
+@media(max-width:734px){
+  .gallery-grid{grid-template-columns:1fr;gap:28px}
+  .tabnav{gap:22px}
+}
+
+/* ===== Tiles（圆角图块） ===== */
+.section-tiles{padding-top:150px}
+.section-tiles .grid{display:grid;gap:24px}
+.tile{position:relative;overflow:hidden;border-radius:30px;padding:80px 60px;min-height:600px;display:flex;align-items:center;background:var(--tile-bg);transition:transform .4s var(--spring),box-shadow .4s var(--spring);text-align:center}
+.tile:hover{transform:translateY(-6px);box-shadow:0 30px 60px rgba(169,69,227,.14)}
+@media(max-width:1068px){.tile{border-radius:24px;padding:60px 40px;min-height:540px}}
+@media(max-width:734px){.tile{border-radius:18px;padding:48px 26px;min-height:auto}}
+.tile-headline{font-size:51px;line-height:1.059;font-weight:600;letter-spacing:-0.0015em;margin:0 auto}
+.tile-copy{margin:24px auto 0;max-width:40rem}
+.tile-meta{display:flex;justify-content:center;gap:6px;margin-bottom:18px}
+.tile-meta .eyebrow{margin-bottom:0}
+.tile-image{width:100%;max-width:340px;margin:40px auto 0}
+.tile-image img{width:100%;height:auto;display:block;border-radius:14px}
+/* 暗色图块 */
+.tile-theme-dark .tile-headline,.tile-purple .tile-headline,.tile-audio .tile-headline{color:#fff}
+.tile-purple .tile-copy,.tile-audio .tile-copy{color:rgba(255,255,255,.82)}
+.tile-purple{background:var(--hero-grad);background-size:300% 300%;animation:heroFlow 22s ease-in-out infinite}
+/* 音频/创作图块：珊瑚红 */
+.tile-audio{background:linear-gradient(180deg,#ff4f5e -20%,#c11e4a 55%,#7c1140 100%);background-size:300% 300%;animation:heroFlow 26s ease-in-out infinite}
+.tile-audio .tile-headline{color:#fff}
+.tile-audio .tile-copy{color:rgba(255,255,255,.82)}
+.tile-link{display:inline-flex;align-items:center;justify-content:center;gap:4px;margin-top:28px;color:var(--accent);font-size:17px;font-weight:500;letter-spacing:-.022em;transition:gap .3s var(--spring),opacity .2s}
+.tile-link:hover{gap:8px;opacity:.75}
+
+/* 分阶段 build-in 延时 */
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+/* ===== Subscribe ===== */
+.section-subscribe{padding-top:160px;text-align:center}
+.section-subscribe h2{font-size:72px;line-height:1.05556;font-weight:600;letter-spacing:-0.00086em}
+.section-subscribe p{margin:30px auto 0;max-width:560px}
+.section-subscribe .hero-button{margin-top:40px}
+.tagline{margin-top:40px;font-size:15px;color:var(--ink-3)}
+
+/* ===== 随处可用统计 ===== */
+.section-stats{padding-top:150px;text-align:center;background:var(--bg-2);margin-top:140px;padding-bottom:120px}
+.section-stats h2{font-size:72px;line-height:1.05556;font-weight:600;letter-spacing:-0.00086em}
+.section-stats p{margin:28px auto 0;max-width:620px}
+.stats-grid{max-width:1100px;margin:52px auto 0;padding:0 22px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat{background:#fff;border:1px solid var(--hairline,rgba(0,0,0,.08));border-radius:18px;padding:26px 14px;transition:transform .35s var(--spring)}
+.stat:hover{transform:translateY(-4px)}
+.stat .k{font-size:12px;color:var(--ink-3);margin-bottom:12px}
+.stat .v{font-size:22px;font-weight:600;letter-spacing:-0.01em}
+@media(max-width:734px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ===== 下载 ===== */
+.section-download{padding-top:150px;text-align:center}
+.section-download h2{font-size:72px;line-height:1.05556;font-weight:600;letter-spacing:-0.00086em}
+.dl-card{max-width:430px;margin:44px auto 0;border:1px solid var(--line);border-radius:22px;padding:30px 26px;background:#fff}
+.ts-holder{min-height:66px;display:flex;justify-content:center}
+.dl-btn{width:100%;height:54px;font-size:17px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:980px;background:var(--accent);color:#fff;font-size:17px;font-weight:400;letter-spacing:-0.022em;transition:opacity .25s var(--ease)}
+.btn:hover{opacity:.88}
+.btn .ic{width:16px;height:16px}
+.dl-note{margin-top:14px;font-size:13px;color:var(--ink-3)}
+.dl-msg{margin-top:12px;font-size:13px;color:var(--ink-3);min-height:18px}
+
+/* ===== FAQ ===== */
+.section-faq{padding-top:140px;padding-bottom:80px}
+.section-faq .headline{text-align:center;font-size:44px;line-height:1.09091;font-weight:600;letter-spacing:-.004em;margin-bottom:30px}
+.accordion{max-width:760px;margin:0 auto}
+.qa{border-top:1px solid var(--line);text-align:left}
+.qa button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 2px;font-size:18px;font-weight:500;transition:opacity .2s}
+.qa button:hover{opacity:.7}
+.qa .ic{font-size:20px;color:var(--ink-3);transition:transform .35s var(--spring);font-style:normal;font-weight:300}
+.qa.on .ic{transform:rotate(45deg)}
+.qa .body{max-height:0;overflow:hidden;transition:max-height .5s var(--spring)}
+.qa .body p{padding:0 2px 26px;font-size:15px;color:var(--ink-2);line-height:1.7}
+.qa:last-child{border-bottom:1px solid var(--line)}
+
+/* ===== 页脚 ===== */
+.footer{background:var(--bg-2);padding:52px 22px 80px;margin-top:60px;font-size:12px;color:var(--ink-3);line-height:1.7}
+.footer-inner{max-width:1100px;margin:0 auto}
+.footer-links{display:flex;flex-wrap:wrap;gap:14px 26px;padding-bottom:24px;border-bottom:1px solid #d8d8dc;margin-bottom:26px}
+.footer-links a:hover{text-decoration:underline;color:var(--ink)}
+.footer-links .sep{color:#86868b}
+
+@media(max-width:1068px){
+  .section-header-headline,.section-catalog .tab-gallery-headline,.section-subscribe h2,.section-stats h2,.section-download h2{font-size:44px;line-height:1.09091;letter-spacing:-.004em}
+  .tile-headline{font-size:32px}
+}
+@media(max-width:734px){
+  .section-header-headline,.section-catalog .tab-gallery-headline,.section-subscribe h2,.section-stats h2,.section-download h2{font-size:34px}
+  .section-pad-top,.section-tiles,.section-stats,.section-download{padding-top:100px}
+  .section-subscribe{padding-top:120px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+  .build-in{opacity:1}
+  .section-hero .hero-bg,.tile-purple,.headline-gradient{animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- 全局导航 -->
+<nav class="gnav">
+  <div class="gnav-in">
+    <div class="gnav-l">
+      <a class="logo" href="/"><span class="logo-chip"><img src="/logo-light.png" alt="翱翔鸟"></span></a>
+      <a class="navchild" href="/posts">论坛</a><a class="navchild" href="/news">新闻</a><a class="navchild" href="/live">直播</a><a class="navchild" href="/download">下载</a>
+    </div>
+    <div class="gnav-r"><a href="/signin">登录</a></div>
+  </div>
+</nav>
+
+<!-- 产品导航 -->
+<nav class="snav">
+  <div class="snav-in">
+    <a class="snav-brand" href="/download"><img src="/logo-light.png" alt="翱翔鸟">翱翔鸟</a>
+    <div class="snav-links"><a href="#catalog">精选</a><a href="#video">直播</a><a href="#reading">阅读</a></div>
+    <a class="snav-cta" href="#download">获取</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="section-hero" id="intro">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-brand build-in"><img src="/logo-dark.png" alt=""><span>翱翔鸟 · Android</span></div>
+    <h1 class="hero-headline" style="opacity:0">发帖、阅读、直播。 <span class="nowrap">现在，开始对话。</span></h1>
+    <p class="hero-copy build-in" style="opacity:0">享受你喜欢的内容，用你喜欢的方式。发现沉浸式的讨论，解锁创作者之力，一切在你的设备间同步。</p>
+    <div class="build-in" style="opacity:0"><a class="hero-button" href="#download">获取 App</a></div>
+    <div class="hero-art build-in" style="opacity:0"><div class="frame"><img src="imgs/Hero.png" alt="翱翔鸟"></div></div>
+  </div>
+</section>
+
+<!-- Catalog：精选 Tab 画廊 -->
+<section class="section-catalog section-pad-top" id="catalog">
+  <div class="section-content">
+    <header class="section-header build-in">
+      <span class="eyebrow">精选</span>
+      <h2 class="tab-gallery-headline">编辑把关。 <br /><span class="headline-gradient">为你选取。</span></h2>
+      <p class="copy section-header-copy">沉浸在打动心灵的高质量讨论中。从编辑精选到独立创作者，你关心的话题，都在这里。</p>
+    </header>
+    <div class="tabnav build-in d2" id="tabs">
+      <a href="#catalog" class="on" data-tab="0"><span>发现</span></a>
+      <a href="#catalog" data-tab="1"><span>关注</span></a>
+      <a href="#catalog" data-tab="2"><span>榜单</span></a>
+    </div>
+    <div class="gallery build-in d3">
+      <div class="gallery-item on" data-slide="0">
+        <div class="gallery-grid">
+          <div class="gallery-copy">
+            <h3>最新与热门，编辑为你把关。</h3>
+            <p class="copy">每天为你挑选今日的好内容。沉浸进你真正在乎的话题，发现下一个让你着迷的讨论。</p>
+            <a class="link" href="/">去看看 ›</a>
+          </div>
+          <div class="gallery-img"><img src="imgs/首页.png" alt="发现"></div>
+        </div>
+      </div>
+      <div class="gallery-item" data-slide="1">
+        <div class="gallery-grid">
+          <div class="gallery-copy">
+            <h3>你的关注与收藏，都在一处。</h3>
+            <p class="copy">关注喜欢的创作者，收藏与偏好一处管理。当那篇你等的文章出现，你不会错过。</p>
+            <a class="link" href="/">管理我的 ›</a>
+          </div>
+          <div class="gallery-img"><img src="imgs/我的页.png" alt="关注"></div>
+        </div>
+      </div>
+      <div class="gallery-item" data-slide="2">
+        <div class="gallery-grid">
+          <div class="gallery-copy">
+            <h3>今日最热，一目了然。</h3>
+            <p class="copy">榜单带来全网正在讨论的一切，从最新到最热，一览无余。</p>
+            <a class="link" href="/news">去看新闻 ›</a>
+          </div>
+          <div class="gallery-img"><img src="imgs/新闻页.png" alt="榜单"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tiles -->
+<section class="section-tiles" id="video">
+  <div class="section-content">
+    <!-- 直播：居中图块 -->
+    <div class="tile tile-purple build-in">
+      <div style="width:100%">
+        <h2 class="tile-headline">不止文字， <span class="headline-gradient">还有直播。</span></h2>
+        <p class="tile-copy" style="color:rgba(255,255,255,.84)">全屏观看，画中画边看边聊。画质随网络自适应，无论在哪都流畅清晰。</p>
+        <div class="tile-image"><img src="imgs/直播页.png" alt="直播"></div>
+      </div>
+    </div>
+
+    <!-- 阅读：居中图块 -->
+    <div class="tile build-in d1" id="reading" style="margin-top:24px">
+      <div style="width:100%">
+        <div class="tile-meta"><span class="eyebrow">阅读</span></div>
+        <h2 class="tile-headline"><span class="headline-gradient" style="background-image:linear-gradient(100deg,#2d6bff 0%,#7b3dd9 50%,#c22bb0 100%)">把讨论</span>落成文字。</h2>
+        <p class="tile-copy" style="color:var(--ink-2)">边看边读，或单独查看全文。搜索心仪的瞬间，深入每一段对话。</p>
+        <a class="tile-link" href="/">慢慢读一段 ›</a>
+        <div class="tile-image"><img src="imgs/帖子详情页.png" alt="阅读"></div>
+      </div>
+    </div>
+
+    <!-- 创作：居中图块（珊瑚红） -->
+    <div class="tile tile-audio build-in d2" style="margin-top:24px">
+      <div style="width:100%">
+        <div class="tile-meta"><span class="eyebrow" style="color:rgba(255,255,255,.6)">创作</span></div>
+        <h2 class="tile-headline">一笔一划，<br /><span class="headline-gradient">行云流水。</span></h2>
+        <p class="tile-copy" style="color:rgba(255,255,255,.84)">完整 Markdown 编辑，专注排版、克制动效。写下你的想法，让长文创作顺畅惬意。</p>
+        <a class="tile-link" style="color:#fff" href="/">开始创作 ›</a>
+        <div class="tile-image"><img src="imgs/发帖页.png" alt="书写"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Subscribe -->
+<section class="section-subscribe" id="free">
+  <div class="section-content">
+    <h2 class="build-in">无需订阅。<br /><span class="headline-gradient">彻底免费。</span></h2>
+    <p class="copy build-in d1">无广告，无内购，只为你的全部热爱。你的支持，也让创作者持续发声。</p>
+    <div class="build-in d2"><a class="hero-button" href="/signin">开始使用 ›</a></div>
+    <div class="tagline build-in d3">发帖 · 阅读 · 直播</div>
+  </div>
+</section>
+
+<!-- 随处可用统计 -->
+<section class="section-stats" id="everywhere">
+  <div class="section-content">
+    <span class="eyebrow build-in">随处可用</span>
+    <h2 class="build-in">故事，<span class="headline-gradient">随处继续。</span></h2>
+    <p class="copy build-in d1">在 Android 上使用翱翔鸟，或在任何浏览器中直接访问。下载到本地，离线阅读，进度自动同步。</p>
+    <div class="stats-grid">
+      <div class="stat build-in"><div class="k">版本</div><div class="v">3.0</div></div>
+      <div class="stat build-in d1"><div class="k">大小</div><div class="v">12 MB</div></div>
+      <div class="stat build-in d2"><div class="k">系统</div><div class="v">Android 8.0+</div></div>
+      <div class="stat build-in d3"><div class="k">Web</div><div class="v">任意浏览器</div></div>
+      <div class="stat build-in"><div class="k">能力</div><div class="v">读帖</div></div>
+      <div class="stat build-in d1"><div class="k">能力</div><div class="v">直播</div></div>
+      <div class="stat build-in d2"><div class="k">能力</div><div class="v">新闻</div></div>
+      <div class="stat build-in d3"><div class="k">能力</div><div class="v">离线</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 下载 -->
+<section class="section-download" id="download">
+  <div class="section-content">
+    <h2 class="build-in">下载 <span class="headline-gradient">Android</span> 客户端</h2>
+    <div class="dl-card build-in d1">
+      <div class="ts-holder"><div class="cf-turnstile" id="tsBox"></div></div>
+      <button id="downloadBtn" disabled onclick="handleDownload()" class="btn dl-btn">
+        <span id="downloadBtnText">等待人机验证</span>
+        <svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      </button>
+      <div class="dl-note">完成人机验证后即可下载。同一 IP 每 15 分钟限 2 次。</div>
+      <div class="dl-msg" id="downloadMsg"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section-faq">
+  <h2 class="headline build-in">问题？<span class="headline-gradient">答案。</span></h2>
+  <div class="accordion">
+    <div class="qa build-in"><button><span>翱翔鸟是什么？</span><i class="ic">+</i></button><div class="body"><p>翱翔鸟是用于读帖、发帖与收看直播的社区应用。你可以通过编辑精选与个性化推荐，轻松发现新的高质量讨论。</p></div></div>
+    <div class="qa build-in d1"><button><span>在哪里可以使用？</span><i class="ic">+</i></button><div class="body"><p>已可在 Android 设备与任何浏览器中访问。你在手机上的内容会在各平台自动同步，也可下载到本地离线使用。</p></div></div>
+    <div class="qa build-in d2"><button><span>如何下载安装包？</span><i class="ic">+</i></button><div class="body"><p>点击上方「获取」，完成人机验证后即可下载。同一 IP 每 15 分钟限 2 次，请勿滥用。</p></div></div>
+    <div class="qa build-in d3"><button><span>需要付费吗？</span><i class="ic">+</i></button><div class="body"><p>翱翔鸟提供海量免费内容，方式简单且完全免费，无广告、无内购。</p></div></div>
+    <div class="qa build-in d4"><button><span>隐私与数据如何？</span><i class="ic">+</i></button><div class="body"><p>我们重视你的隐私。密码高强度哈希保存，私人消息默认加密。所有订阅资格均在账户设置中管理。</p></div></div>
+  </div>
+</section>
+
+<!-- 页脚 -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-links"><a href="/">论坛</a><span class="sep">·</span><a href="/download">下载</a><span class="sep">·</span><a href="/signin">登录</a><span class="sep">·</span><a href="/privacy">隐私</a><span class="sep">·</span><a href="/terms">条款</a><span class="sep">·</span><a href="/developer">开发者</a></div>
+    <div>© 2026 翱翔鸟 · Soaring Bird。保留所有权利。</div>
+  </div>
+</footer>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+/* 滚动进场 */
+(function(){
+  function getSpring(){return 'cubic-bezier(.28,.8,.24,1)';}
+  var els=document.querySelectorAll('.build-in');
+  if(!('IntersectionObserver'in window)){els.forEach(function(e){e.classList.add('ready');});return;}
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('ready');io.unobserve(e.target);}});},{threshold:.18,rootMargin:'0px 0px -50px 0px'});
+  /* 排除 Hero 内的 build-in（由下方专门入场逻辑接管，避免提前闪入） */
+  els.forEach(function(e){if(e.closest('.hero-content')){return;}io.observe(e);});
+  /* Hero 元素：入场淡入上浮 + 大图微缩放 */
+  var heroEls=[].slice.call(document.querySelectorAll('.hero-content .build-in'));
+  heroEls.forEach(function(e,i){
+    setTimeout(function(){
+      e.style.opacity=''; /* 清除 inline opacity，交由 CSS .ready 过渡 */
+      e.classList.add('ready');
+      if(e.classList.contains('hero-art')){
+        e.style.transition='opacity 1.3s '+getSpring()+',transform 1.4s '+getSpring();
+        e.style.transform='translateY(0) scale(0.96)';
+        requestAnimationFrame(function(){requestAnimationFrame(function(){e.style.transform='translateY(0) scale(1)';});});
+      }
+    },300+i*200);
+  });
+  var hl=document.querySelector('.hero-headline');
+  if(hl){setTimeout(function(){hl.style.opacity='';hl.classList.add('ready');},120);}
+})();
+
+/* Tab */
+var tabs=document.querySelectorAll('#tabs a'),slides=document.querySelectorAll('.gallery-item');
+tabs.forEach(function(a){a.addEventListener('click',function(e){
+  e.preventDefault();
+  tabs.forEach(function(t){t.classList.remove('on');});
+  a.classList.add('on');
+  var i=a.getAttribute('data-tab');
+  slides.forEach(function(s){s.classList.remove('on');});
+  document.querySelector('[data-slide="'+i+'"]').classList.add('on');
+});});
+
+/* FAQ */
+document.querySelectorAll('.qa button').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var qa=btn.parentElement,b=qa.querySelector('.body');
+    var open=qa.classList.toggle('on');
+    b.style.maxHeight=open?(b.scrollHeight+24)+'px':'0';
+  });
+});
+
+/* Turnstile */
+var _t='';
+(function(){
+  fetch('/api/turnstile-site-key').then(function(r){return r.json();}).then(function(d){
+    var sk=d&&d.site_key?d.site_key:'';
+    var w=document.getElementById('tsBox');
+    if(sk&&w){waitTS(function(){try{turnstile.render(w,{sitekey:sk,callback:function(t){_t=t||'';enableBtn('下载安卓安装包');},theme:'light'});}catch(e){enableBtn('下载安卓安装包');}});}
+    else{enableBtn('下载安卓安装包');}
+  }).catch(function(){enableBtn('下载安卓安装包');});
+})();
+function waitTS(cb){if(window.turnstile){cb();return;}var n=0,t=setInterval(function(){n++;if(window.turnstile){clearInterval(t);cb();}else if(n>60){clearInterval(t);enableBtn('下载安卓安装包');}},500);}
+function enableBtn(t){var b=document.getElementById('downloadBtn'),x=document.getElementById('downloadBtnText');if(!b)return;b.disabled=false;x.textContent=t;}
+function sm(m,ty){var e=document.getElementById('downloadMsg');e.textContent=m;e.style.color=ty==='error'?'#d70015':'#86868b';}
+var _b=false;
+function handleDownload(){
+  if(_b)return;_b=true;
+  var b=document.getElementById('downloadBtn'),x=document.getElementById('downloadBtnText');
+  b.disabled=true;x.textContent='验证中…';sm('检查中…');
+  fetch('/api/download/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({turnstile_token:_t})})
+    .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d};});})
+    .then(function(res){
+      enableBtn('下载安卓安装包');b.disabled=false;_b=false;
+      if(!res.ok||!res.data.download_url){sm((res.data&&res.data.error)||'验证失败');return;}
+      window.location.href=res.data.download_url;
+    })
+    .catch(function(){enableBtn('下载安卓安装包');b.disabled=false;_b=false;sm('网络错误');});
+}
+</script>
+</body>
+</html>

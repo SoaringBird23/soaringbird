@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>翱翔鸟账户</title>
+<link rel="icon" href="/logo-light.png" type="image/png">
+<link rel="apple-touch-icon" href="/logo-light.png">
+<script>
+(function() {
+  try {
+    var t = localStorage.getItem('bird_theme') || 'light';
+    if (t !== 'light') document.documentElement.setAttribute('data-theme', t);
+  } catch(e) {}
+})();
+</script>
+<link rel="stylesheet" href="/account-ui.css?v=1">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+
+<div class="globalnav">
+  <div class="globalnav-content">
+    <ul class="globalnav-list">
+      <li><a class="is-brand" href="/"><img src="/logo-light.png" alt="翱翔鸟"></a></li>
+      <li><a href="/">论坛</a></li>
+      <li><a href="/podcast">播客</a></li>
+      <li><a href="/peacenews">新闻</a></li>
+      <li><a href="/live">直播</a></li>
+      <li><a href="/apps">客户端</a></li>
+      <li><a href="/developer">开发者</a></li>
+      <li><a href="/account">账户</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="localnav">
+  <div class="localnav-content">
+    <a class="localnav-title" href="/account">翱翔鸟账户</a>
+    <ul class="localnav-menu">
+      <li><a href="/developer">开发者</a></li>
+      <li><a href="/">返回翱翔鸟</a></li>
+      <li><a href="#" id="signOut">退出登录</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="acc-shell">
+
+  <aside class="acc-side">
+    <div class="acc-avatar" id="sideAvatar"></div>
+    <div class="acc-name" id="sideName">…</div>
+    <div class="acc-mail" id="sideMail"></div>
+    <div class="acc-vf" id="sideVerified" hidden>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.5 2.5L16 9.5"/></svg>
+      <span id="sideVerifiedText">已验证</span>
+    </div>
+    <nav class="acc-nav" id="sideNav">
+      <button type="button" data-sec="profile">个人信息</button>
+      <button type="button" data-sec="security">登录与安全性</button>
+      <button type="button" data-sec="devices">设备与登录历史</button>
+      <button type="button" data-sec="apps">已授权的第三方应用</button>
+    </nav>
+  </aside>
+
+  <main class="acc-body">
+
+    <div id="skelShell">
+      <div class="acc-skel" style="height:34px;width:210px"></div>
+      <div class="acc-skel" style="height:16px;width:min(420px,80%);margin-top:12px"></div>
+      <div class="acc-grid" style="margin-top:28px">
+        <div class="acc-skel" style="height:132px"></div>
+        <div class="acc-skel" style="height:132px"></div>
+      </div>
+    </div>
+
+    <!-- ============ 个人信息 ============ -->
+    <section class="acc-sec" id="sec-profile" hidden>
+      <h1 class="acc-h1">个人信息</h1>
+      <p class="acc-sub">姓名、用户名和简介会展示给其他翱翔鸟用户，出生日期与地区只有你自己看得到。</p>
+
+      <div class="acc-section">
+        <div class="acc-grid">
+          <div class="acc-card">
+            <div class="acc-card-head">
+              <div class="acc-card-title">姓名</div>
+              <div class="acc-card-icon" data-icon="user"></div>
+            </div>
+            <div class="acc-card-body" id="vName">—</div>
+            <div class="acc-card-foot"><button type="button" class="acct-btn-plain" data-sheet="name">编辑</button></div>
+          </div>
+
+          <div class="acc-card">
+            <div class="acc-card-head">
+              <div class="acc-card-title">用户名</div>
+              <div class="acc-card-icon" data-icon="at"></div>
+            </div>
+            <div class="acc-card-body" id="vUsername">—</div>
+            <div class="acc-card-foot"><button type="button" class="acct-btn-plain" data-sheet="username">更改用户名</button></div>
+          </div>
+
+          <div class="acc-card">
+            <div class="acc-card-head">
+              <div class="acc-card-title">出生日期</div>
+              <div class="acc-card-icon" data-icon="calendar"></div>
+            </div>
+            <div class="acc-card-body" id="vBirthday">—</div>
+            <div class="acc-card-foot"><button type="button" class="acct-btn-plain" data-sheet="birthday">编辑</button></div>
+          </div>
+
+          <div class="acc-card">
+            <div class="acc-card-head">
+              <div class="acc-card-title">国家或地区</div>
+              <div class="acc-card-icon" data-icon="globe"></div>
+            </div>
+            <div class="acc-card-body" id="vRegion">—</div>
+            <div class="acc-card-foot"><button type="button" class="acct-btn-plain" data-sheet="region">编辑</button></div>
+          </div>
+
+          <div class="acc-card is-full">
+            <div class="acc-card-head">
+              <div class="acc-card-title">个人简介</div>
+              <div class="acc-card-icon" data-icon="edit"></div>
+            </div>
+            <div class="acc-card-body" id="vBio">—</div>
+            <div class="acc-card-foot"><button type="button" class="acct-btn-plain" data-sheet="bio">编辑</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-section">
+        <div class="acc-section-title">账户</div>
+        <div class="acc-grid">
+          <div class="acc-card">
+            <div class="acc-card-head">
+              <div class="acc-card-title">电子邮件</div>
+              <div class="acc-card-icon" data-icon="mail"></div>
+            </div>
+            <div class="acc-card-body" id="vEmail">—</div>
+            <div class="acc-card-foot">
+              <button type="button" class="acct-btn-plain" data-sheet="email">更改邮箱</button>
+              <button type="button" class="acct-btn-plain" data-sheet="verifyEmail" id="btnVerifyEmail" hidden>验证邮箱</button>
+            </div>
+          </div>
+
+          <div class="acc-card">
+            <div class="acc-card-head">
+              <div class="acc-card-title">账户信息</div>
+              <div class="acc-card-icon" data-icon="info"></div>
+            </div>
+            <div class="acc-card-body" id="vMeta">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 登录与安全性 ============ -->
+    <section class="acc-sec" id="sec-security" hidden>
+      <h1 class="acc-h1">登录与安全性</h1>
+      <p class="acc-sub">更改密码之后，除当前设备以外的所有登录都会被立即下线。</p>
+
+      <div class="acc-section">
+        <div class="acc-grid">
+          <div class="acc-card">
+            <div class="acc-card-head">
+              <div class="acc-card-title">密码</div>
+              <div class="acc-card-icon" data-icon="lock"></div>
+            </div>
+            <div class="acc-card-body" id="vPassword">—</div>
+            <div class="acc-card-foot"><button type="button" class="acct-btn-plain" data-sheet="password">更改密码</button></div>
+          </div>
+
+          <div class="acc-card">
+            <div class="acc-card-head">
+              <div class="acc-card-title">登录验证码</div>
+              <div class="acc-card-icon" data-icon="shield"></div>
+            </div>
+            <div class="acc-card-body">开启之后，在新设备上用密码登录还需要一个发到邮箱的验证码。</div>
+            <div class="acc-card-foot">
+              <label class="acct-switch">
+                <input type="checkbox" id="tglLoginCode">
+                <span class="track"></span>
+                <span class="acct-switch-text" id="tglLoginCodeText">已关闭</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="acc-card">
+            <div class="acc-card-head">
+              <div class="acc-card-title">邮箱验证</div>
+              <div class="acc-card-icon" data-icon="mailCheck"></div>
+            </div>
+            <div class="acc-card-body" id="vEmailState">—</div>
+          </div>
+
+          <div class="acc-card">
+            <div class="acc-card-head">
+              <div class="acc-card-title">通行密钥</div>
+              <div class="acc-card-icon" data-icon="key"></div>
+            </div>
+            <div class="acc-card-body" id="vPasskeys">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-section">
+        <div class="acc-section-title">安全建议</div>
+        <div class="acc-grid">
+          <div class="acc-card is-full">
+            <div class="acc-card-body" id="vAdvice">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 设备与登录历史 ============ -->
+    <section class="acc-sec" id="sec-devices" hidden>
+      <h1 class="acc-h1">设备与登录历史</h1>
+      <p class="acc-sub">这些设备目前可以访问你的翱翔鸟账户。看到不认识的设备，就把它下线。</p>
+
+      <div class="acc-section">
+        <div class="acc-grid">
+          <div class="acc-card is-full">
+            <div class="acc-card-head">
+              <div class="acc-card-title">登录中的设备</div>
+              <div class="acc-card-icon" data-icon="monitor"></div>
+            </div>
+            <div class="acc-rows" id="vSessions"></div>
+            <div class="acc-card-foot">
+              <button type="button" class="acct-btn-quiet" id="revokeOthers">下线其他所有设备</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 已授权的第三方应用 ============ -->
+    <section class="acc-sec" id="sec-apps" hidden>
+      <h1 class="acc-h1">已授权的第三方应用</h1>
+      <p class="acc-sub">这些应用现在可以使用你的翱翔鸟账户登录。撤销之后，它们需要重新向你申请授权。</p>
+
+      <div class="acc-section">
+        <div class="acc-grid">
+          <div class="acc-card is-full">
+            <div class="acc-card-head">
+              <div class="acc-card-title">已授权的应用</div>
+              <div class="acc-card-icon" data-icon="apps"></div>
+            </div>
+            <div class="acc-rows" id="vGrants"></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="acct-hint" style="margin-top:18px">
+        想让自己的应用接入翱翔鸟账户？先看看 <a href="/developer">开发者文档</a>。
+      </p>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ 通用弹层 ============ -->
+<div class="acct-veil" id="veil">
+  <div class="acct-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h2 id="sheetTitle">标题</h2>
+    <p class="sheet-sub" id="sheetSub"></p>
+    <form class="acct-form" id="sheetForm" novalidate></form>
+    <p class="acct-msg" id="sheetMsg" role="alert" aria-live="polite"></p>
+    <div class="acct-sheet-actions">
+      <button type="button" class="acct-btn acct-btn-quiet" id="sheetCancel">取消</button>
+      <button type="submit" class="acct-btn" id="sheetOk" form="sheetForm">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="acct-toast" id="toast"></div>
+
+<script>
+'use strict';
+
+var $ = function (id) { return document.getElementById(id); };
+
+var state = {
+  me: null,        // /api/account/overview 的返回值
+  section: 'profile',
+  sheet: '',
+  tsWidgets: {}    // Turnstile: 容器 id -> widget id
+};
+
+/* ============================================================
+   工具
+   ============================================================ */
+
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function toast(text, isErr) {
+  var el = $('toast');
+  el.textContent = text;
+  el.className = 'acct-toast on' + (isErr ? ' is-err' : '');
+  clearTimeout(el._t);
+  el._t = setTimeout(function () { el.className = 'acct-toast'; }, 2600);
+}
+
+function setMsg(id, text, kind) {
+  var el = $(id);
+  el.textContent = text || '';
+  el.className = 'acct-msg' + (kind ? ' is-' + kind : '');
+}
+
+function clearMsg(id) { setMsg(id, ''); }
+
+function busy(btn, on, label) {
+  if (on) {
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent.trim();
+    btn.disabled = true;
+    btn.textContent = label || '处理中…';
+  } else {
+    btn.disabled = false;
+    if (btn.dataset.label) { btn.textContent = btn.dataset.label; delete btn.dataset.label; }
+  }
+}
+
+function fmtDate(ts) {
+  if (!ts) return '';
+  var d = new Date(ts * 1000);
+  return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+}
+
+// 列表里用相对时间更好读，超过一周就退回日期
+function fmtWhen(ts) {
+  if (!ts) return '从未';
+  var diff = Math.floor(Date.now() / 1000 - ts);
+  if (diff < 0) diff = 0;
+  if (diff < 60) return '刚刚';
+  if (diff < 3600) return Math.floor(diff / 60) + ' 分钟前';
+  if (diff < 86400) return Math.floor(diff / 3600) + ' 小时前';
+  if (diff < 604800) return Math.floor(diff / 86400) + ' 天前';
+  return fmtDate(ts);
+}
+
+function req(url, method, body) {
+  return fetch(url, {
+    method: method || 'GET',
+    credentials: 'include',
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined
+  }).then(function (r) {
+    if (r.status === 401) {
+      // 会话被下线了（比如在别的设备上改了密码），回登录页并记住要回来
+      location.href = '/signin?redirect=' + encodeURIComponent('/account');
+      throw new Error('unauthorized');
+    }
+    return r.json().catch(function () { return {}; }).then(function (d) {
+      return { ok: r.ok, data: d };
+    });
+  });
+}
+
+/* ============================================================
+   图标（细线）
+   ============================================================ */
+
+var ICONS = {
+  user: '<circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-3.6 3.1-5.8 7-5.8s7 2.2 7 5.8"/>',
+  at: '<circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 5 2.2"/><path d="M16 12a4 4 0 1 1-1.2 2.9"/>',
+  calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>',
+  globe: '<circle cx="12" cy="12" r="8.6"/><path d="M3.4 12h17.2M12 3.4c2.2 2.4 3.3 5.4 3.3 8.6s-1.1 6.2-3.3 8.6c-2.2-2.4-3.3-5.4-3.3-8.6S9.8 5.8 12 3.4Z"/>',
+  edit: '<path d="M4 20h4l10-10-4-4L4 16v4Z"/><path d="m14.5 5.5 4 4"/>',
+  mail: '<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="m4 8 7.1 4.7a2 2 0 0 0 2 0L20 8"/>',
+  mailCheck: '<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="m4 8 4.7 3.2M20 8l-4.7 3.2M12.6 17l1.9 1.9 3.5-3.6"/>',
+  info: '<circle cx="12" cy="12" r="8.6"/><path d="M12 11v5.5M12 7.8h.01"/>',
+  lock: '<rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.6a4 4 0 0 1 8 0V10"/>',
+  shield: '<path d="M12 3 5 6v5.6c0 4.6 3 8.4 7 9.4 4-1 7-4.8 7-9.4V6l-7-3Z"/><path d="m9.2 11.8 2 2 3.6-3.8"/>',
+  key: '<circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M15 12v2.5"/>',
+  monitor: '<rect x="3" y="4.5" width="18" height="12.5" rx="2.4"/><path d="M8.5 20.5h7M12 17v3.5"/>',
+  apps: '<rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>'
+};
+
+function fillIcons() {
+  var nodes = document.querySelectorAll('[data-icon]');
+  for (var i = 0; i < nodes.length; i++) {
+    var path = ICONS[nodes[i].getAttribute('data-icon')];
+    if (!path) continue;
+    nodes[i].innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"'
+      + ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>';
+  }
+}
+
+/* ============================================================
+   Turnstile（只在要发验证码时才真的渲染出来）
+   ============================================================ */
+
+var _siteKey;
+
+function siteKey() {
+  if (_siteKey !== undefined) return Promise.resolve(_siteKey);
+  return fetch('/api/turnstile-site-key')
+    .then(function (r) { return r.json(); })
+    .then(function (d) { _siteKey = d.site_key || ''; return _siteKey; })
+    .catch(function () { _siteKey = ''; return _siteKey; });
+}
+
+function tsRender(hostId) {
+  var host = $(hostId);
+  if (!host || !_siteKey || typeof turnstile === 'undefined') return;
+  if (state.tsWidgets[hostId] !== undefined) return;
+  host.hidden = false;
+  host.innerHTML = '';
+  try {
+    state.tsWidgets[hostId] = turnstile.render(host, { sitekey: _siteKey, theme: 'auto' });
+  } catch (e) {}
+}
+
+function tsToken(hostId) {
+  var w = state.tsWidgets[hostId];
+  if (w === undefined) return '';
+  try { return turnstile.getResponse(w) || ''; } catch (e) { return ''; }
+}
+
+function tsReset(hostId) {
+  var w = state.tsWidgets[hostId];
+  if (w === undefined) return;
+  try { turnstile.reset(w); } catch (e) {}
+}
+
+function getTurnstile(hostId) {
+  return siteKey().then(function (key) {
+    if (!key) return { token: '' };
+    if (typeof turnstile === 'undefined') return { error: '人机验证组件没有加载成功，请刷新页面再试。' };
+    tsRender(hostId);
+    var tries = 0;
+    function poll() {
+      var t = tsToken(hostId);
+      if (t) return { token: t };
+      if (++tries >= 12) return { error: '请先完成人机验证。' };
+      return new Promise(function (res) { setTimeout(res, 500); }).then(poll);
+    }
+    return poll();
+  });
+}
+
+/* ============================================================
+   加载与渲染
+   ============================================================ */
+
+function load() {
+  return req('/api/account/overview').then(function (r) {
+    if (!r.ok) { toast(r.data.error || '账户信息加载失败', true); return; }
+    state.me = r.data;
+    renderSide();
+    renderProfile();
+    renderSecurity();
+    renderDevices();
+    renderApps();
+    showSection(state.section);
+  });
+}
+
+function displayName() {
+  var u = state.me.user;
+  return ((u.last_name || '') + (u.first_name || '')).trim();
+}
+
+function renderSide() {
+  var u = state.me.user;
+  $('sideAvatar').innerHTML = u.avatar
+    ? '<img src="' + esc(u.avatar) + '" alt="">'
+    : esc((u.username || '?').charAt(0).toUpperCase());
+  $('sideName').textContent = displayName() || u.username;
+  $('sideMail').textContent = u.email || '未绑定邮箱';
+  if (u.verified) {
+    $('sideVerified').hidden = false;
+    $('sideVerifiedText').textContent = u.verified_text || '已验证';
+  } else {
+    $('sideVerified').hidden = true;
+  }
+}
+
+function renderProfile() {
+  var muted = '<span class="muted">';
+  var u = state.me.user;
+
+  $('vName').innerHTML = displayName()
+    ? '<span>' + esc(displayName()) + '</span>'
+    : muted + '还没有填写姓名</span>';
+  $('vUsername').innerHTML = '<span class="mono">' + esc(u.username) + '</span>';
+
+  var bd = '';
+  if (u.birthday_year) bd += u.birthday_year + '年';
+  if (u.birthday_month) bd += u.birthday_month + '月';
+  if (u.birthday_day) bd += u.birthday_day + '日';
+  $('vBirthday').innerHTML = bd ? esc(bd) : muted + '还没有填写</span>';
+
+  $('vRegion').innerHTML = u.region ? esc(u.region) : muted + '还没有填写</span>';
+  $('vBio').innerHTML = u.bio ? esc(u.bio) : muted + '还没有填写</span>';
+  $('vEmail').innerHTML = '<span class="mono">' + esc(u.email || '未绑定') + '</span>';
+  $('vMeta').innerHTML =
+    '<span class="kv">用户 ID <span class="mono">' + esc(u.id) + '</span></span>' +
+    '<span class="kv">注册于 ' + fmtDate(u.created_at) + '</span>';
+}
+
+function renderSecurity() {
+  var s = state.me.security;
+
+  $('vPassword').innerHTML = s.password_changed_at
+    ? '上次修改于 ' + fmtDate(s.password_changed_at)
+    : '<span class="muted">这个账户还没有改过密码</span>';
+
+  $('tglLoginCode').checked = !!s.require_login_code;
+  $('tglLoginCodeText').textContent = s.require_login_code ? '已开启' : '已关闭';
+
+  $('vEmailState').innerHTML = s.email_verified
+    ? '<span class="acc-tag is-on">已验证</span>'
+    : '<span class="acc-tag is-off">未验证</span>' +
+      '<span class="kv" style="margin-top:8px">没验证的话，找回密码这条路是走不通的。</span>';
+  $('btnVerifyEmail').hidden = !!s.email_verified;
+
+  $('vPasskeys').innerHTML = s.passkeys.length
+    ? s.passkeys.map(function (p) {
+        return '<span class="kv">' + esc(p.name || '通行密钥') + ' · ' + fmtDate(p.created_at) + '</span>';
+      }).join('')
+    : '<span class="muted">还没有添加通行密钥。在翱翔鸟 App 的「设置 → 通行密钥」里可以添加。</span>';
+
+  var advice = [];
+  if (!s.email_verified) advice.push('邮箱还没验证，验证之后才能用邮箱找回密码。');
+  if (!s.require_login_code) advice.push('开启登录验证码：密码即使泄露，别人也登不进你的账户。');
+  if (s.password_changed_at && (Date.now() / 1000 - s.password_changed_at) > 365 * 86400) {
+    advice.push('密码超过一年没换过了，建议换一个。');
+  }
+  var strangers = state.me.sessions.filter(function (x) { return x.active && !x.current; }).length;
+  if (strangers > 1) advice.push('有 ' + strangers + ' 台其他设备正登录着，不认识的话去「设备与登录历史」下线。');
+  $('vAdvice').innerHTML = advice.length
+    ? advice.map(function (t) { return '<span class="kv">· ' + esc(t) + '</span>'; }).join('')
+    : '该做的都做了，账户状态正常。';
+}
+
+function renderDevices() {
+  var list = state.me.sessions;
+  if (!list.length) {
+    $('vSessions').innerHTML = '<div class="acc-empty">暂时没有登录记录。</div>';
+    return;
+  }
+  $('vSessions').innerHTML = list.map(function (s) {
+    var tag = '';
+    if (s.current) tag = ' <span class="acc-tag is-on">当前设备</span>';
+    else if (!s.active) tag = ' <span class="acc-tag is-off">已下线</span>';
+    var meta = [];
+    if (s.ip) meta.push('IP ' + esc(s.ip));
+    meta.push('最近活动 ' + fmtWhen(s.last_seen));
+    meta.push('首次登录 ' + fmtDate(s.created_at));
+    return '<div class="acc-row">' +
+      '<div class="grow"><div class="t1">' + esc(s.device || '未知设备') + tag + '</div>' +
+      '<div class="t2">' + meta.join(' · ') + '</div></div>' +
+      ((s.current || !s.active) ? '' : '<div class="act"><button type="button" class="acct-btn-plain" data-revoke="' +
+        esc(s.id) + '">下线</button></div>') +
+    '</div>';
+  }).join('');
+}
+
+var SCOPE_LABELS = { userinfo: '读取你的基本信息（用户名、头像）' };
+
+function renderApps() {
+  var list = state.me.grants;
+  if (!list.length) {
+    $('vGrants').innerHTML = '<div class="acc-empty">目前没有任何应用获得你的授权。</div>';
+    return;
+  }
+  $('vGrants').innerHTML = list.map(function (g) {
+    var meta = ['授权于 ' + fmtDate(g.created_at)];
+    if (g.last_used_at) meta.push('最近使用 ' + fmtWhen(g.last_used_at));
+    var scopes = (g.scope || '').split(',').map(function (s) {
+      return SCOPE_LABELS[s.trim()] || s.trim();
+    }).filter(Boolean);
+    if (scopes.length) meta.push(scopes.join('、'));
+    return '<div class="acc-row">' +
+      '<div class="grow"><div class="t1">' + esc(g.app_name) + '</div>' +
+      '<div class="t2">' + esc(meta.join(' · ')) + '</div></div>' +
+      '<div class="act"><button type="button" class="acct-btn-plain" data-grant="' +
+        esc(g.client_id) + '">撤销授权</button></div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ============================================================
+   板块切换
+   ============================================================ */
+
+var SECTIONS = ['profile', 'security', 'devices', 'apps'];
+
+function showSection(name) {
+  if (SECTIONS.indexOf(name) === -1) name = 'profile';
+  state.section = name;
+  $('skelShell').hidden = true;
+  SECTIONS.forEach(function (n) { $('sec-' + n).hidden = (n !== name); });
+  var btns = document.querySelectorAll('#sideNav button');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('is-on', btns[i].getAttribute('data-sec') === name);
+  }
+  try { history.replaceState(null, '', '#' + name); } catch (e) {}
+  window.scrollTo(0, 0);
+}
+
+$('sideNav').addEventListener('click', function (e) {
+  var b = e.target.closest('button[data-sec]');
+  if (b) showSection(b.getAttribute('data-sec'));
+});
+
+/* ============================================================
+   弹层：一个弹层装下所有短流程，靠 SHEETS 描述每个流程的字段与提交
+   ============================================================ */
+
+var REGIONS = ['中国大陆', '中国香港', '中国澳门', '中国台湾', '新加坡', '马来西亚',
+               '日本', '韩国', '美国', '加拿大', '英国', '澳大利亚', '其他'];
+
+function curProfile() {
+  var u = state.me.user;
+  return {
+    username: u.username, bio: u.bio, region: u.region,
+    first_name: u.first_name, last_name: u.last_name,
+    birthday_year: u.birthday_year, birthday_month: u.birthday_month, birthday_day: u.birthday_day,
+    birthday_age: u.birthday_age, gender: u.gender
+  };
+}
+
+// /api/users/<id> 的 PUT 是整体覆盖，所以要先把没改的字段一起带回去，
+// 否则性别、年龄这些在页面上没露面的字段会被悄悄清空。
+function putProfile(patch) {
+  var body = Object.assign(curProfile(), patch);
+  return req('/api/users/' + encodeURIComponent(state.me.user.id), 'PUT', body);
+}
+
+function err(text) {
+  return Promise.resolve({ ok: false, data: { error: text } });
+}
+
+var SHEETS = {
+  name: {
+    title: '姓名',
+    sub: '姓名会展示在你的帖子和个人主页上，可以和用户名不一样。',
+    fields: [
+      { k: 'last_name', label: '姓氏', ph: '姓氏' },
+      { k: 'first_name', label: '名字', ph: '名字' }
+    ],
+    save: function (v) { return putProfile({ last_name: v.last_name, first_name: v.first_name }); }
+  },
+  username: {
+    title: '更改用户名',
+    sub: '用户名用来登录，也会显示在你发过的帖子和回复旁边。它必须是唯一的。',
+    fields: [{ k: 'username', label: '用户名', ph: '用户名' }],
+    save: function (v) {
+      if (!v.username) return err('用户名不能为空。');
+      return putProfile({ username: v.username });
+    }
+  },
+  birthday: {
+    title: '出生日期',
+    sub: '只有月日会公开用来判断今天是不是你的生日，年份不会展示给其他人。',
+    row: true,
+    fields: [
+      { k: 'birthday_year', label: '年', ph: '1998' },
+      { k: 'birthday_month', label: '月', ph: '9' },
+      { k: 'birthday_day', label: '日', ph: '17' }
+    ],
+    save: function (v) {
+      return putProfile({
+        birthday_year: v.birthday_year || 0,
+        birthday_month: v.birthday_month || 0,
+        birthday_day: v.birthday_day || 0
+      });
+    }
+  },
+  region: {
+    title: '国家或地区',
+    sub: '用来按地区显示内容和合规信息。',
+    fields: [{ k: 'region', label: '国家或地区', type: 'select', options: REGIONS }],
+    save: function (v) { return putProfile({ region: v.region }); }
+  },
+  bio: {
+    title: '个人简介',
+    sub: '一两句话介绍自己，会显示在你的个人主页上。',
+    fields: [{ k: 'bio', type: 'textarea', label: '简介', ph: '写点什么…' }],
+    save: function (v) { return putProfile({ bio: v.bio }); }
+  },
+  email: {
+    title: '更改邮箱',
+    sub: '改完之后邮箱会变回未验证状态，需要重新收一次验证码。3 天内没有验证的账号会被自动清理。',
+    fields: [{ k: 'email', label: '新的邮箱地址', ph: 'name@example.com' }],
+    save: function (v) {
+      var re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!re.test(v.email)) return err('邮箱地址格式不正确。');
+      return req('/api/user/change-email', 'POST', { email: v.email });
+    }
+  },
+  verifyEmail: {
+    title: '验证邮箱',
+    sub: '验证码会发到你当前的绑定邮箱，10 分钟内有效。',
+    fields: [{ k: 'code', type: 'code', label: '邮箱验证码' }],
+    save: function (v) {
+      if (!/^\d{4,6}$/.test(v.code)) return err('请填写收到的邮箱验证码。');
+      return req('/api/user/verify-email', 'POST', { code: v.code });
+    }
+  },
+  password: {
+    title: '更改密码',
+    sub: '改完之后，除当前设备以外的所有登录都会被下线。',
+    fields: [
+      { k: 'old_password', type: 'password', label: '当前密码' },
+      { k: 'new_password', type: 'password', label: '新密码', ph: '至少 4 位' },
+      { k: 'new_password2', type: 'password', label: '确认新密码' }
+    ],
+    save: function (v) {
+      if (!v.old_password || !v.new_password) return err('请填写当前密码和新密码。');
+      if (v.new_password.length < 4) return err('新密码至少 4 位。');
+      if (v.new_password !== v.new_password2) return err('两次输入的新密码不一致。');
+      return req('/api/account/password', 'POST', {
+        old_password: v.old_password,
+        new_password: v.new_password
+      });
+    }
+  }
+};
+
+// 打开弹层时预先填进去的当前值
+var SHEET_PREFILL = {
+  name: function (u) { return { last_name: u.last_name, first_name: u.first_name }; },
+  username: function (u) { return { username: u.username }; },
+  birthday: function (u) {
+    return { birthday_year: u.birthday_year, birthday_month: u.birthday_month, birthday_day: u.birthday_day };
+  },
+  region: function (u) { return { region: u.region }; },
+  bio: function (u) { return { bio: u.bio }; },
+  email: function (u) { return { email: u.email }; }
+};
+
+function fieldHtml(f) {
+  var id = 'sf-' + f.k;
+  var label = '<label class="sheet-lbl" for="' + id + '">' + esc(f.label) + '</label>';
+  if (f.type === 'textarea') {
+    return '<div class="acct-field">' + label
+         + '<textarea id="' + id + '" rows="3" placeholder="' + esc(f.ph || '') + '"></textarea></div>';
+  }
+  if (f.type === 'select') {
+    return '<div class="acct-field">' + label
+         + '<select id="' + id + '" class="acct-select">'
+         + (f.options || []).map(function (o) {
+             return '<option value="' + esc(o) + '">' + esc(o) + '</option>';
+           }).join('')
+         + '</select></div>';
+  }
+  if (f.type === 'code') {
+    return '<div class="acct-field">' + label
+         + '<div class="acct-code">'
+         + '<input type="text" id="' + id + '" inputmode="numeric" maxlength="6"'
+         + ' autocomplete="one-time-code" placeholder="邮箱验证码">'
+         + '<button type="button" id="sheetSendCode">发送验证码</button>'
+         + '</div><div class="acct-ts" id="sheetTs" hidden></div></div>';
+  }
+  return '<div class="acct-field">' + label
+       + '<input type="' + (f.type || 'text') + '" id="' + id + '" autocomplete="off"'
+       + ' placeholder="' + esc(f.ph || '') + '"></div>';
+}
+
+function openSheet(key) {
+  var s = SHEETS[key];
+  if (!s) return;
+  state.sheet = key;
+  $('sheetTitle').textContent = s.title;
+  $('sheetSub').textContent = s.sub || '';
+  $('sheetSub').hidden = !s.sub;
+
+  // 重画容器之前先丢掉旧的 widget 记录，否则 turnstile 里存的是一个已经不在文档里的 id
+  delete state.tsWidgets['sheetTs'];
+
+  var inner = s.fields.map(fieldHtml).join('');
+  if (s.row) inner = '<div class="acct-row acct-row-3">' + inner + '</div>';
+  $('sheetForm').innerHTML = inner;
+  clearMsg('sheetMsg');
+
+  var pre = SHEET_PREFILL[key] ? SHEET_PREFILL[key](state.me.user) : {};
+  Object.keys(pre).forEach(function (k) {
+    var el = $('sf-' + k);
+    if (!el) return;
+    var v = pre[k];
+    el.value = (v === null || v === undefined || v === 0) ? '' : String(v);
+  });
+
+  if ($('sheetSendCode')) {
+    $('sheetSendCode').addEventListener('click', sendSheetCode);
+    siteKey().then(function (k) { if (k) tsRender('sheetTs'); });
+  }
+
+  $('veil').classList.add('on');
+  setTimeout(function () {
+    var first = $('sheetForm').querySelector('input,select,textarea');
+    if (first) first.focus();
+  }, 80);
+}
+
+function closeSheet() {
+  $('veil').classList.remove('on');
+  state.sheet = '';
+}
+
+function sheetValues() {
+  var v = {};
+  SHEETS[state.sheet].fields.forEach(function (f) {
+    var el = $('sf-' + f.k);
+    v[f.k] = el ? el.value.trim() : '';
+  });
+  return v;
+}
+
+function sendSheetCode() {
+  var btn = $('sheetSendCode');
+  var label = btn.textContent.trim();
+  var email = state.me.user.email;
+  if (!email) { setMsg('sheetMsg', '这个账号还没有绑定邮箱。'); return; }
+  clearMsg('sheetMsg');
+  busy(btn, true, '发送中…');
+  getTurnstile('sheetTs').then(function (ts) {
+    if (ts.error) { busy(btn, false); btn.textContent = label; setMsg('sheetMsg', ts.error); return; }
+    return fetch('/api/send-verify-code', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, turnstile_token: ts.token })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (!r.ok) {
+          busy(btn, false);
+          btn.textContent = label;
+          tsReset('sheetTs');
+          setMsg('sheetMsg', d.error || '验证码发送失败。');
+          return;
+        }
+        $('sheetTs').hidden = true;
+        setMsg('sheetMsg', '验证码已发送，请查收邮箱。', 'ok');
+        var left = 120;
+        clearInterval(btn._t);
+        btn.disabled = true;
+        btn.textContent = left + ' 秒后可重发';
+        btn._t = setInterval(function () {
+          left--;
+          if (left <= 0) {
+            clearInterval(btn._t);
+            btn.disabled = false;
+            btn.textContent = label;
+            return;
+          }
+          btn.textContent = left + ' 秒后可重发';
+        }, 1000);
+      });
+    });
+  }).catch(function () {
+    busy(btn, false);
+    btn.textContent = label;
+    setMsg('sheetMsg', '网络连接中断，请稍后重试。');
+  });
+}
+
+$('sheetForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var key = state.sheet;
+  var s = SHEETS[key];
+  if (!s) return;
+  var btn = $('sheetOk');
+  clearMsg('sheetMsg');
+  busy(btn, true, '保存中…');
+
+  Promise.resolve(s.save(sheetValues())).then(function (r) {
+    if (!r || !r.ok) {
+      busy(btn, false);
+      setMsg('sheetMsg', (r && r.data && r.data.error) || '保存失败，请稍后重试。');
+      return;
+    }
+    closeSheet();
+    toast(key === 'password' ? '密码已更新，其他设备已下线' : '已保存');
+    return load();
+  }).catch(function (e2) {
+    if (e2 && e2.message === 'unauthorized') return;
+    busy(btn, false);
+    setMsg('sheetMsg', '网络连接中断，请稍后重试。');
+  });
+});
+
+$('sheetCancel').addEventListener('click', closeSheet);
+$('veil').addEventListener('click', function (e) { if (e.target === $('veil')) closeSheet(); });
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && $('veil').classList.contains('on')) closeSheet();
+});
+
+// 所有「打开弹层」的按钮走事件委托，不给每张卡都挂监听
+document.addEventListener('click', function (e) {
+  var b = e.target.closest ? e.target.closest('[data-sheet]') : null;
+  if (b) openSheet(b.getAttribute('data-sheet'));
+});
+
+/* ============================================================
+   行内动作：下线设备 / 撤销授权
+   ============================================================ */
+
+$('vSessions').addEventListener('click', function (e) {
+  var b = e.target.closest('button[data-revoke]');
+  if (!b) return;
+  busy(b, true, '下线中…');
+  req('/api/account/sessions/revoke', 'POST', { sid: b.getAttribute('data-revoke') }).then(function (r) {
+    if (!r.ok) { busy(b, false); toast(r.data.error || '下线失败', true); return; }
+    toast('该设备已下线');
+    return load();
+  }).catch(function () { busy(b, false); toast('网络连接中断', true); });
+});
+
+$('vGrants').addEventListener('click', function (e) {
+  var b = e.target.closest('button[data-grant]');
+  if (!b) return;
+  busy(b, true, '撤销中…');
+  req('/api/account/grants/revoke', 'POST', { client_id: b.getAttribute('data-grant') }).then(function (r) {
+    if (!r.ok) { busy(b, false); toast(r.data.error || '撤销失败', true); return; }
+    toast((r.data.app_name || '该应用') + ' 的授权已撤销');
+    return load();
+  }).catch(function () { busy(b, false); toast('网络连接中断', true); });
+});
+
+$('revokeOthers').addEventListener('click', function () {
+  var b = $('revokeOthers');
+  busy(b, true, '正在下线…');
+  req('/api/account/sessions/revoke', 'POST', {}).then(function (r) {
+    busy(b, false);
+    if (!r.ok) { toast(r.data.error || '操作失败', true); return; }
+    toast(r.data.revoked ? ('已下线 ' + r.data.revoked + ' 台设备') : '没有其他登录中的设备');
+    return load();
+  }).catch(function () { busy(b, false); toast('网络连接中断', true); });
+});
+
+/* ============================================================
+   登录验证码开关
+   ============================================================ */
+
+$('tglLoginCode').addEventListener('change', function () {
+  var box = $(this);
+  var want = box.checked;
+  box.disabled = true;
+  req('/api/user/security', 'POST', { require_login_code: want }).then(function (r) {
+    box.disabled = false;
+    if (!r.ok) {
+      box.checked = !want;
+      toast(r.data.error || '设置失败', true);
+      return;
+    }
+    $('tglLoginCodeText').textContent = want ? '已开启' : '已关闭';
+    toast(want ? '登录验证码已开启' : '登录验证码已关闭');
+    return load();
+  }).catch(function () {
+    box.disabled = false;
+    box.checked = !want;
+    toast('网络连接中断', true);
+  });
+});
+
+/* ============================================================
+   退出登录
+   ============================================================ */
+
+$('signOut').addEventListener('click', function () {
+  busy($('signOut'), true, '退出中…');
+  req('/api/logout', 'POST', {}).then(function () {
+    location.href = '/';
+  }).catch(function () {
+    location.href = '/';
+  });
+});
+
+/* ============================================================
+   启动
+   ============================================================ */
+
+(function boot() {
+  fillIcons();
+  var hash = (location.hash || '').replace('#', '');
+  state.section = SECTIONS.indexOf(hash) === -1 ? 'profile' : hash;
+  load().catch(function () { toast('账户信息加载失败', true); });
+})();
+</script>
+</body>
+</html>

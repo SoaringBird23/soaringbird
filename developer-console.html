@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>开发者控制台 · 翱翔鸟</title>
+<link rel="icon" href="/logo-light.png" type="image/png">
+<link rel="apple-touch-icon" href="/logo-light.png">
+<script>
+(function() {
+  try {
+    var t = localStorage.getItem('bird_theme') || 'light';
+    if (t !== 'light') document.documentElement.setAttribute('data-theme', t);
+  } catch(e) {}
+})();
+</script>
+<link rel="stylesheet" href="/account-ui.css?v=1">
+<style>
+/* ===== 控制台专用 ===== */
+.dc-shell {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 46px 22px 96px;
+}
+
+.dc-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  justify-content: space-between;
+}
+.dc-head h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+.dc-head p {
+  margin: 9px 0 0;
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.5;
+  max-width: 460px;
+}
+
+.dc-list { margin-top: 30px; display: flex; flex-direction: column; gap: 14px; }
+
+.dc-app {
+  padding: 20px 22px 18px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-card);
+  background: var(--card);
+}
+.dc-app-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  justify-content: space-between;
+}
+.dc-app-name {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.dc-app-desc {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+.dc-app-actions { display: flex; gap: 2px; flex: 0 0 auto; }
+
+.dc-fields { margin-top: 16px; border-top: 1px solid var(--line-soft); }
+.dc-field {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 0;
+  font-size: 13px;
+}
+.dc-field + .dc-field { border-top: 1px solid var(--line-soft); }
+.dc-field-label {
+  flex: 0 0 96px;
+  color: var(--text-3);
+  font-size: 12.5px;
+}
+.dc-field-value {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dc-field-value .txt {
+  min-width: 0;
+  word-break: break-all;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.dc-field-value .txt.mono {
+  font-family: var(--font);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.dc-field-acts { margin-left: auto; display: flex; gap: 8px; flex: 0 0 auto; }
+.dc-field-acts button {
+  font-size: 12.5px;
+  color: var(--accent);
+  padding: 2px 0;
+  transition: opacity 140ms var(--ease);
+}
+.dc-field-acts button:hover { opacity: 0.7; }
+.dc-app-actions .is-danger { color: var(--danger); }
+
+/* 密钥重置后的一次性提示 */
+.dc-flash {
+  margin-top: 14px;
+  padding: 13px 15px;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-field);
+  background: var(--accent-soft);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.dc-flash b { font-weight: 600; }
+.dc-flash .val {
+  display: block;
+  margin-top: 7px;
+  font-family: var(--font);
+  word-break: break-all;
+  font-size: 13px;
+}
+
+.dc-empty {
+  padding: 52px 0;
+  text-align: center;
+}
+.dc-empty p { margin: 0 0 18px; font-size: 15px; color: var(--text-2); }
+
+.dc-gate {
+  min-height: calc(100vh - var(--nav-h));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 22px 80px;
+  text-align: center;
+}
+.dc-gate h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.dc-gate p {
+  margin: 10px 0 26px;
+  font-size: 15px;
+  color: var(--text-2);
+  max-width: 340px;
+  line-height: 1.55;
+}
+
+@media (max-width: 620px) {
+  .dc-head { flex-direction: column; align-items: stretch; gap: 16px; }
+  .dc-field { flex-direction: column; align-items: stretch; gap: 5px; }
+  .dc-field-label { flex: none; }
+  .dc-field-value { flex-wrap: wrap; }
+  .dc-field-acts { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="globalnav">
+  <div class="globalnav-content">
+    <ul class="globalnav-list">
+      <li><a class="is-brand" href="/"><img src="/logo-light.png" alt="翱翔鸟"></a></li>
+      <li><a href="/">论坛</a></li>
+      <li><a href="/podcast">播客</a></li>
+      <li><a href="/peacenews">新闻</a></li>
+      <li><a href="/live">直播</a></li>
+      <li><a href="/apps">客户端</a></li>
+      <li><a href="/developer/console">开发者</a></li>
+      <li><a href="/account">账户</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="localnav">
+  <div class="localnav-content">
+    <a class="localnav-title" href="/developer">翱翔鸟开发者</a>
+    <ul class="localnav-menu">
+      <li><a href="/developer">接入文档</a></li>
+      <li><a href="/developer/console" class="is-current">控制台</a></li>
+      <li><a href="/account">账户</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- 未登录 -->
+<div class="dc-gate" id="gate" hidden>
+  <h1>开发者控制台</h1>
+  <p>用翱翔鸟账户登录之后，就可以注册并管理你的 OAuth 应用。</p>
+  <a class="acct-btn" href="/signin?redirect=%2Fdeveloper%2Fconsole">登录翱翔鸟账户</a>
+</div>
+
+<main class="dc-shell" id="console" hidden>
+  <div class="dc-head">
+    <div>
+      <h1>应用</h1>
+      <p>每个应用有一套 Client ID 与 Client Secret。Secret 只用来在服务端换取令牌，不要放进前端代码。</p>
+    </div>
+    <button type="button" class="acct-btn" id="btnCreate">创建应用</button>
+  </div>
+
+  <div class="dc-list" id="list"></div>
+</main>
+
+<!-- 通用弹层 -->
+<div class="acct-veil" id="veil">
+  <div class="acct-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h2 id="sheetTitle">标题</h2>
+    <p class="sheet-sub" id="sheetSub"></p>
+    <form class="acct-form" id="sheetForm" novalidate></form>
+    <p class="acct-msg" id="sheetMsg" role="alert" aria-live="polite"></p>
+    <div class="acct-sheet-actions">
+      <button type="button" class="acct-btn acct-btn-quiet" id="sheetCancel">取消</button>
+      <button type="submit" class="acct-btn" id="sheetOk" form="sheetForm">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="acct-toast" id="toast"></div>
+
+<script>
+'use strict';
+
+var $ = function (id) { return document.getElementById(id); };
+
+var state = {
+  me: null,
+  apps: [],
+  shown: {},      // 已经点开明文的密钥
+  sheet: '',
+  app: null,      // 弹层当前操作的应用
+  flash: null     // 刚重置出来的新密钥，只在内存里留一次
+};
+
+/* ============================================================
+   工具
+   ============================================================ */
+
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function toast(text, isErr) {
+  var el = $('toast');
+  el.textContent = text;
+  el.className = 'acct-toast on' + (isErr ? ' is-err' : '');
+  clearTimeout(el._t);
+  el._t = setTimeout(function () { el.className = 'acct-toast'; }, 2600);
+}
+
+function setMsg(id, text, kind) {
+  var el = $(id);
+  el.textContent = text || '';
+  el.className = 'acct-msg' + (kind ? ' is-' + kind : '');
+}
+
+function clearMsg(id) { setMsg(id, ''); }
+
+function busy(btn, on, label) {
+  if (on) {
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent.trim();
+    btn.disabled = true;
+    btn.textContent = label || '处理中…';
+  } else {
+    btn.disabled = false;
+    if (btn.dataset.label) { btn.textContent = btn.dataset.label; delete btn.dataset.label; }
+  }
+}
+
+function fmtDate(ts) {
+  if (!ts) return '—';
+  var d = new Date(ts * 1000);
+  return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+}
+
+function req(url, method, body) {
+  return fetch(url, {
+    method: method || 'GET',
+    credentials: 'include',
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined
+  }).then(function (r) {
+    return r.json().catch(function () { return {}; }).then(function (d) {
+      return { ok: r.ok, status: r.status, data: d };
+    });
+  });
+}
+
+// 非 HTTPS 环境下 navigator.clipboard 不存在，留一条退路
+function copy(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function () {
+      toast('已复制');
+    }).catch(function () {
+      toast('复制失败，请手动选中', true);
+    });
+    return;
+  }
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed';
+  ta.style.top = '-1000px';
+  document.body.appendChild(ta);
+  ta.select();
+  var ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+  toast(ok ? '已复制' : '复制失败，请手动选中', !ok);
+}
+
+/* ============================================================
+   渲染
+   ============================================================ */
+
+var MASK = '••••••••••••••••••••••••';
+
+function fieldHtml(label, value, opts) {
+  opts = opts || {};
+  var txt = opts.mono ? '<span class="txt mono">' + esc(value) + '</span>'
+                      : '<span class="txt">' + esc(value) + '</span>';
+  var acts = '';
+  if (opts.reveal) {
+    acts += '<button type="button" data-act="toggle" data-id="' + esc(opts.id) + '">'
+          + (state.shown[opts.id] ? '隐藏' : '显示') + '</button>';
+  }
+  if (opts.copy) {
+    acts += '<button type="button" data-act="copy" data-copy="' + esc(value) + '">复制</button>';
+  }
+  return '<div class="dc-field">'
+       + '<div class="dc-field-label">' + esc(label) + '</div>'
+       + '<div class="dc-field-value">' + txt
+       + (acts ? '<span class="dc-field-acts">' + acts + '</span>' : '')
+       + '</div></div>';
+}
+
+function render() {
+  if (!state.apps.length) {
+    $('list').innerHTML = '<div class="dc-empty">'
+      + '<p>还没有应用。</p>'
+      + '<button type="button" class="acct-btn" id="btnCreate2">创建第一个应用</button>'
+      + '</div>';
+    return;
+  }
+
+  $('list').innerHTML = state.apps.map(function (a) {
+    var id = a.id || '';
+    var secretShown = state.shown[id];
+    var secretValue = secretShown ? (a.client_secret || '') : MASK;
+    var flash = (state.flash && state.flash.id === id) ? state.flash : null;
+
+    return '<div class="dc-app">'
+      + '<div class="dc-app-top">'
+      +   '<div>'
+      +     '<div class="dc-app-name">' + esc(a.app_name || '未命名应用') + '</div>'
+      +     (a.app_description ? '<div class="dc-app-desc">' + esc(a.app_description) + '</div>' : '')
+      +   '</div>'
+      +   '<div class="dc-app-actions">'
+      +     '<button type="button" class="acct-btn-plain" data-act="edit" data-id="' + esc(id) + '">编辑</button>'
+      +     '<button type="button" class="acct-btn-plain" data-act="rotate" data-id="' + esc(id) + '">重置密钥</button>'
+      +     '<button type="button" class="acct-btn-plain is-danger" data-act="delete" data-id="' + esc(id) + '">删除</button>'
+      +   '</div>'
+      + '</div>'
+      + '<div class="dc-fields">'
+      +   fieldHtml('Client ID', a.client_id || '', { mono: true, copy: true })
+      +   fieldHtml('Client Secret', secretValue, { mono: true, copy: secretValue, reveal: true, id: id })
+      +   fieldHtml('回调地址', a.redirect_uri || '', { copy: true })
+      +   fieldHtml('主页地址', a.homepage_url || '—')
+      +   fieldHtml('创建时间', fmtDate(a.created_at))
+      + '</div>'
+      + (flash
+          ? '<div class="dc-flash">新的 Client Secret 只在这里显示这一次，请立刻保存。旧密钥签发的令牌已经全部作废。'
+            + '<span class="val">' + esc(flash.secret) + '</span>'
+            + '<span class="dc-field-acts" style="margin-top:8px"><button type="button" data-act="copy" data-copy="'
+            + esc(flash.secret) + '">复制新密钥</button></span></div>'
+          : '')
+      + '</div>';
+  }).join('');
+}
+
+// 事件委托：列表里的按钮都靠 data-act 分派，避免把 id 拼进 onclick 字符串
+$('list').addEventListener('click', function (e) {
+  var b = e.target.closest('button[data-act]');
+  if (!b) return;
+  var act = b.getAttribute('data-act');
+  var id = b.getAttribute('data-id') || '';
+
+  if (act === 'copy') { copy(b.getAttribute('data-copy') || ''); return; }
+  if (act === 'toggle') { state.shown[id] = !state.shown[id]; render(); return; }
+  if (act === 'edit') { openSheet('edit', findApp(id)); return; }
+  if (act === 'rotate') { openSheet('rotate', findApp(id)); return; }
+  if (act === 'delete') { openSheet('delete', findApp(id)); return; }
+});
+
+document.addEventListener('click', function (e) {
+  var b = e.target.closest ? e.target.closest('#btnCreate2') : null;
+  if (b) openSheet('create', null);
+});
+
+function findApp(id) {
+  for (var i = 0; i < state.apps.length; i++) {
+    if (state.apps[i].id === id) return state.apps[i];
+  }
+  return null;
+}
+
+/* ============================================================
+   弹层
+   ============================================================ */
+
+var SHEETS = {
+  create: {
+    title: '创建应用',
+    sub: '应用名称会显示在用户看到的授权确认页上。回调地址必须与你实际使用的完全一致。',
+    fields: [
+      { k: 'app_name', label: '应用名称', ph: '我的应用' },
+      { k: 'app_description', type: 'textarea', label: '应用描述', ph: '一句话说明你的应用是做什么的（选填）' },
+      { k: 'redirect_uri', label: '回调地址', ph: 'https://example.com/callback' },
+      { k: 'homepage_url', label: '主页地址', ph: 'https://example.com（选填）' }
+    ],
+    save: function (v) {
+      if (!v.app_name) return err('应用名称不能为空。');
+      if (!v.redirect_uri) return err('回调地址不能为空。');
+      return req('/api/developer/apps', 'POST', v);
+    }
+  },
+  edit: {
+    title: '编辑应用',
+    sub: '改回调地址不用删应用重建，Client ID 和 Secret 都不会变。',
+    fields: [
+      { k: 'app_name', label: '应用名称' },
+      { k: 'app_description', type: 'textarea', label: '应用描述' },
+      { k: 'redirect_uri', label: '回调地址' },
+      { k: 'homepage_url', label: '主页地址' }
+    ],
+    save: function (v, app) {
+      if (!v.app_name) return err('应用名称不能为空。');
+      if (!v.redirect_uri) return err('回调地址不能为空。');
+      return req('/api/developer/apps/' + encodeURIComponent(app.id), 'PUT', v);
+    }
+  },
+  rotate: {
+    title: '重置 Client Secret',
+    sub: '重置之后旧密钥立刻失效，已经签发的访问令牌与未使用的授权码会一起作废。你的应用需要换上新密钥才能继续换取令牌。',
+    confirmOnly: true,
+    okText: '重置密钥',
+    save: function (v, app) {
+      return req('/api/developer/apps/' + encodeURIComponent(app.id) + '/secret', 'POST', {});
+    }
+  },
+  delete: {
+    title: '删除应用',
+    sub: '删除之后，该应用的 Client ID 与 Secret 立即失效，所有用户的授权记录也会一并清除。此操作不可撤销。',
+    confirmOnly: true,
+    okText: '删除应用',
+    danger: true,
+    save: function (v, app) {
+      return req('/api/developer/apps/' + encodeURIComponent(app.id), 'DELETE');
+    }
+  }
+};
+
+function err(text) {
+  return Promise.resolve({ ok: false, data: { error: text } });
+}
+
+var PREFILL = {
+  edit: function (a) {
+    return {
+      app_name: a.app_name, app_description: a.app_description,
+      redirect_uri: a.redirect_uri, homepage_url: a.homepage_url
+    };
+  }
+};
+
+function fieldHtmlFor(f, value) {
+  var id = 'sf-' + f.k;
+  var label = '<label class="sheet-lbl" for="' + id + '">' + esc(f.label) + '</label>';
+  if (f.type === 'textarea') {
+    return '<div class="acct-field">' + label + '<textarea id="' + id + '" rows="3" placeholder="'
+         + esc(f.ph || '') + '">' + esc(value || '') + '</textarea></div>';
+  }
+  return '<div class="acct-field">' + label + '<input type="text" id="' + id + '" autocomplete="off"'
+       + ' placeholder="' + esc(f.ph || '') + '"></div>';
+}
+
+function openSheet(key, app) {
+  var s = SHEETS[key];
+  if (!s) return;
+  state.sheet = key;
+  state.app = app || null;
+
+  $('sheetTitle').textContent = s.title;
+  $('sheetSub').textContent = s.sub || '';
+  $('sheetSub').hidden = !s.sub;
+
+  if (s.confirmOnly) {
+    $('sheetForm').innerHTML = app
+      ? '<div class="dc-field"><div class="dc-field-label">应用</div>'
+        + '<div class="dc-field-value"><span class="txt">' + esc(app.app_name || '') + '</span></div></div>'
+      : '';
+  } else {
+    var pre = (PREFILL[key] && app) ? PREFILL[key](app) : {};
+    $('sheetForm').innerHTML = s.fields.map(function (f) {
+      return fieldHtmlFor(f, pre[f.k]);
+    }).join('');
+  }
+  clearMsg('sheetMsg');
+
+  var ok = $('sheetOk');
+  ok.textContent = s.okText || '保存';
+  if (s.danger) {
+    ok.style.background = 'var(--danger)';
+    ok.style.color = '#fff';
+  } else {
+    ok.style.background = '';
+    ok.style.color = '';
+  }
+
+  $('veil').classList.add('on');
+  setTimeout(function () {
+    var first = $('sheetForm').querySelector('input,textarea');
+    if (first) first.focus();
+  }, 80);
+}
+
+function closeSheet() {
+  $('veil').classList.remove('on');
+  state.sheet = '';
+  state.app = null;
+}
+
+function sheetValues() {
+  var s = SHEETS[state.sheet];
+  var v = {};
+  if (!s.fields) return v;
+  s.fields.forEach(function (f) {
+    var el = $('sf-' + f.k);
+    v[f.k] = el ? el.value.trim() : '';
+  });
+  return v;
+}
+
+$('sheetForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var key = state.sheet;
+  var s = SHEETS[key];
+  if (!s) return;
+  var app = state.app;
+  var btn = $('sheetOk');
+  clearMsg('sheetMsg');
+  busy(btn, true, '处理中…');
+
+  Promise.resolve(s.save(sheetValues(), app)).then(function (r) {
+    if (!r || !r.ok) {
+      busy(btn, false);
+      setMsg('sheetMsg', (r && r.data && r.data.error) || '操作失败，请稍后重试。');
+      return;
+    }
+    closeSheet();
+    if (key === 'rotate') {
+      // 新密钥只回这一次，留在内存里显示到用户刷新或再操作一次
+      state.flash = { id: app.id, secret: r.data.client_secret || '' };
+      state.shown[app.id] = true;
+      toast('密钥已重置');
+    } else if (key === 'delete') {
+      toast('应用已删除');
+    } else {
+      toast(key === 'create' ? '应用已创建' : '已保存');
+    }
+    return loadApps();
+  }).catch(function () {
+    busy(btn, false);
+    setMsg('sheetMsg', '网络连接中断，请稍后重试。');
+  });
+});
+
+$('sheetCancel').addEventListener('click', closeSheet);
+$('veil').addEventListener('click', function (e) { if (e.target === $('veil')) closeSheet(); });
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && $('veil').classList.contains('on')) closeSheet();
+});
+
+$('btnCreate').addEventListener('click', function () { openSheet('create', null); });
+
+/* ============================================================
+   加载
+   ============================================================ */
+
+function loadApps() {
+  return req('/api/developer/apps').then(function (r) {
+    if (r.status === 401) { showGate(); return; }
+    var d = r.data || {};
+    state.apps = Array.isArray(d) ? d : (d.apps || []);
+    render();
+  });
+}
+
+function showGate() {
+  $('console').hidden = true;
+  $('gate').hidden = false;
+}
+
+(function boot() {
+  // /api/me 返回 {user: {...}}，未登录时 user 是 null；
+  // 之前这里写了 data.user || data，未登录也拿到一个真值对象，永远进不去登录提示。
+  req('/api/me').then(function (r) {
+    var u = r.data && r.data.user;
+    if (!r.ok || !u || !u.id) { showGate(); return; }
+    state.me = u;
+    $('gate').hidden = true;
+    $('console').hidden = false;
+    loadApps();
+  }).catch(function () {
+    showGate();
+  });
+})();
+</script>
+</body>
+</html>

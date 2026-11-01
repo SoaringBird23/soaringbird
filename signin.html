@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>翱翔鸟账户</title>
+<link rel="icon" href="/logo-light.png" type="image/png">
+<link rel="apple-touch-icon" href="/logo-light.png">
+<link rel="stylesheet" href="/account-ui.css?v=2">
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+
+<div class="globalnav">
+  <div class="globalnav-content">
+    <ul class="globalnav-list">
+      <li><a class="is-brand" href="/"><img src="/logo-light.png" alt="翱翔鸟"></a></li>
+      <li><a href="/">论坛</a></li>
+      <li><a href="/podcast">播客</a></li>
+      <li><a href="/peacenews">新闻</a></li>
+      <li><a href="/live">直播</a></li>
+      <li><a href="/apps">客户端</a></li>
+      <li><a href="/developer">开发者</a></li>
+      <li><a href="/account">账户</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="localnav">
+  <div class="localnav-content">
+    <a class="localnav-title" href="/account">翱翔鸟账户</a>
+    <ul class="localnav-menu">
+      <li><a href="#" class="is-current" data-go="login">登录</a></li>
+      <li><a href="#" data-go="register">创建你的翱翔鸟账户</a></li>
+      <li><a href="/developer">常见问题解答</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="auth-main">
+
+  <!-- ================= 登录 ================= -->
+  <section class="auth-col" id="v-login">
+    <!-- 顶部品牌标：翱翔鸟 logo -->
+    <div class="auth-hero" aria-hidden="true">
+      <img class="auth-hero-logo" src="/logo-light.png" alt="" width="84" height="84">
+    </div>
+
+    <h1 class="auth-title" id="loginTitle">翱翔鸟账户</h1>
+    <p class="auth-sub" id="loginSub">管理你的翱翔鸟账户</p>
+
+    <div class="auth-oauth" id="oauthNote" hidden>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3 5 6v5.6c0 4.6 3 8.4 7 9.4 4-1 7-4.8 7-9.4V6l-7-3Z"/>
+        <path d="m9.2 11.8 2 2 3.6-3.8"/>
+      </svg>
+      <span class="who">你正在为 <b id="oauthApp">第三方应用</b> 登录</span>
+    </div>
+
+    <form class="auth-form" id="fLogin" novalidate>
+      <div class="form-textbox" id="loginNameBox">
+        <input class="form-textbox-input" type="text" id="loginName" placeholder=" "
+               autocomplete="username" spellcheck="false" autocapitalize="none">
+        <label class="form-textbox-label" for="loginName">用户名或邮箱</label>
+      </div>
+
+      <div class="form-textbox" id="loginPassBox" hidden>
+        <input class="form-textbox-input" type="password" id="loginPass" placeholder=" "
+               autocomplete="current-password">
+        <label class="form-textbox-label" for="loginPass">密码</label>
+      </div>
+
+      <div id="loginCodeWrap" hidden>
+        <div class="acct-code">
+          <div class="form-textbox" style="margin:0;flex:1 1 auto">
+            <input class="form-textbox-input" type="text" id="loginCode" placeholder=" "
+                   inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+            <label class="form-textbox-label" for="loginCode">邮箱验证码</label>
+          </div>
+          <button type="button" id="loginCodeBtn">发送验证码</button>
+        </div>
+        <div class="acct-ts" id="tsLoginCode" hidden></div>
+        <p class="acct-hint">这个账户开启了登录验证码，验证码会发到绑定的邮箱。</p>
+      </div>
+
+      <div class="auth-privacy" id="loginPrivacy">
+        <img class="fig" src="/icon-dataprivacy.png" alt="" width="33" height="31">
+        <p><b>您的翱翔鸟账户信息用于</b>让您安全登录和访问您的数据。翱翔鸟会出于安全、支持和报告目的记录某些数据。如果您同意，翱翔鸟还可能使用您的账户信息向您发送通知，包括基于您对翱翔鸟服务的使用情况。<a href="/privacy" target="_blank" rel="noopener">了解数据的管理方式…</a></p>
+      </div>
+
+      <p class="acct-msg" id="loginMsg" role="alert" aria-live="polite"></p>
+
+      <div class="auth-actions">
+        <div class="auth-actions-col">
+          <button type="submit" class="acct-btn acct-btn-block" id="loginGo" disabled>继续</button>
+        </div>
+        <div class="auth-actions-col">
+          <button type="button" class="acct-btn acct-btn-block acct-btn-neutral" id="passkeyBtn">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="9" cy="7.6" r="3.6"/>
+              <path d="M2.8 20c0-3.4 2.8-5.7 6.2-5.7 1 0 1.9.2 2.7.5"/>
+              <circle cx="16.6" cy="15" r="2.7"/>
+              <path d="M18.5 16.9 21.2 19.6M20 18.4l1-1"/>
+            </svg><span id="passkeyLbl">通过通行密钥登录</span>
+          </button>
+          <p class="auth-actions-note" id="passkeyNote">需要支持通行密钥的设备或浏览器。</p>
+        </div>
+      </div>
+    </form>
+
+    <p class="auth-foot" id="loginFoot2" hidden><a href="#" data-go="login-reset">使用其他翱翔鸟账户</a></p>
+    <p class="auth-foot" id="loginFoot">没有翱翔鸟账户？<a href="#" data-go="register">立即创建</a></p>
+    <p class="auth-alt" id="loginFoot3"><a href="#" data-go="forgot">忘记了密码或用户名？</a></p>
+  </section>
+
+  <!-- ================= 注册 ================= -->
+  <section class="auth-col is-wide" id="v-register" hidden>
+    <h1 class="auth-title">创建你的翱翔鸟账户</h1>
+    <p class="auth-sub">一个翱翔鸟账户即可使用论坛、播客、Team 与全部客户端服务。<br>已经有账户了？<a href="#" data-go="login">立即登录</a></p>
+
+    <form class="auth-form" id="fRegister" novalidate>
+      <div class="acct-row acct-row-2">
+        <div class="form-textbox">
+          <input class="form-textbox-input" type="text" id="rLast" placeholder=" " autocomplete="family-name">
+          <label class="form-textbox-label" for="rLast">姓氏</label>
+        </div>
+        <div class="form-textbox">
+          <input class="form-textbox-input" type="text" id="rFirst" placeholder=" " autocomplete="given-name">
+          <label class="form-textbox-label" for="rFirst">名字</label>
+        </div>
+      </div>
+
+      <div class="form-textbox form-textbox-with-righticon">
+        <select class="form-textbox-input form-textbox-entered" id="rRegion">
+          <option value="中国大陆">中国大陆</option>
+          <option value="中国香港">中国香港</option>
+          <option value="中国澳门">中国澳门</option>
+          <option value="中国台湾">中国台湾</option>
+          <option value="新加坡">新加坡</option>
+          <option value="马来西亚">马来西亚</option>
+          <option value="日本">日本</option>
+          <option value="韩国">韩国</option>
+          <option value="美国">美国</option>
+          <option value="加拿大">加拿大</option>
+          <option value="英国">英国</option>
+          <option value="澳大利亚">澳大利亚</option>
+          <option value="其他">其他</option>
+        </select>
+        <label class="form-textbox-label" for="rRegion">国家或地区</label>
+        <span class="form-textbox-righticon"></span>
+      </div>
+
+      <div class="acct-label">
+        出生日期
+        <span class="acct-help" tabindex="0" role="button"
+              title="用于在生日当天显示生日徽章。只有月日会公开用来判断今天是不是你的生日，年份不会展示给其他人。">?</span>
+      </div>
+      <div class="acct-row acct-row-3">
+        <div class="form-textbox form-textbox-with-righticon">
+          <select class="form-textbox-input" id="rYear" required>
+            <option value=""></option>
+          </select>
+          <label class="form-textbox-label" for="rYear">年</label>
+          <span class="form-textbox-righticon"></span>
+        </div>
+        <div class="form-textbox form-textbox-with-righticon">
+          <select class="form-textbox-input" id="rMonth" required>
+            <option value=""></option>
+          </select>
+          <label class="form-textbox-label" for="rMonth">月</label>
+          <span class="form-textbox-righticon"></span>
+        </div>
+        <div class="form-textbox form-textbox-with-righticon">
+          <select class="form-textbox-input" id="rDay" required>
+            <option value=""></option>
+          </select>
+          <label class="form-textbox-label" for="rDay">日</label>
+          <span class="form-textbox-righticon"></span>
+        </div>
+      </div>
+
+      <div class="acct-hr"></div>
+
+      <div class="form-textbox">
+        <input class="form-textbox-input" type="text" id="rUser" placeholder=" "
+               autocomplete="username" spellcheck="false" autocapitalize="none">
+        <label class="form-textbox-label" for="rUser">用户名</label>
+      </div>
+      <p class="acct-hint">用户名就是你登录用的名字，也会显示在你的帖子和回复旁边。</p>
+
+      <div class="form-textbox">
+        <input class="form-textbox-input" type="email" id="rEmail" placeholder=" "
+               autocomplete="email" spellcheck="false" autocapitalize="none">
+        <label class="form-textbox-label" for="rEmail">邮箱地址</label>
+      </div>
+
+      <div class="form-textbox">
+        <input class="form-textbox-input" type="password" id="rPass" placeholder=" "
+               autocomplete="new-password">
+        <label class="form-textbox-label" for="rPass">密码</label>
+      </div>
+
+      <div class="form-textbox">
+        <input class="form-textbox-input" type="password" id="rPass2" placeholder=" "
+               autocomplete="new-password">
+        <label class="form-textbox-label" for="rPass2">确认密码</label>
+      </div>
+
+      <div class="acct-code">
+        <div class="form-textbox" style="margin:0;flex:1 1 auto">
+          <input class="form-textbox-input" type="text" id="rCode" placeholder=" "
+                 inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+          <label class="form-textbox-label" for="rCode">邮箱验证码</label>
+        </div>
+        <button type="button" id="regCodeBtn">获取验证码</button>
+      </div>
+      <div class="acct-ts" id="tsRegister" hidden></div>
+
+      <label class="acct-agree">
+        <input type="checkbox" id="rAgree">
+        <span>我已阅读并同意 <a href="/terms" target="_blank" rel="noopener">服务条款</a> 与
+          <a href="/privacy" target="_blank" rel="noopener">隐私政策</a>。</span>
+      </label>
+
+      <p class="acct-msg" id="regMsg" role="alert" aria-live="polite"></p>
+
+      <button type="submit" class="acct-btn acct-btn-block" id="regGo">继续</button>
+    </form>
+  </section>
+
+  <!-- ================= 重设密码 ================= -->
+  <section class="auth-col" id="v-forgot" hidden>
+    <h1 class="auth-title">重设密码</h1>
+    <p class="auth-sub" id="forgotSub">输入你的账号，我们会把重设验证码发到绑定邮箱。</p>
+
+    <form class="auth-form" id="fForgot" novalidate>
+      <div class="form-textbox" id="gpNameBox">
+        <input class="form-textbox-input" type="text" id="gpName" placeholder=" "
+               autocomplete="username" spellcheck="false" autocapitalize="none">
+        <label class="form-textbox-label" for="gpName">用户名或邮箱</label>
+      </div>
+      <div class="acct-ts" id="tsForgot" hidden></div>
+
+      <div id="gpCodeWrap" hidden>
+        <div class="form-textbox">
+          <input class="form-textbox-input" type="text" id="gpCode" placeholder=" "
+                 inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+          <label class="form-textbox-label" for="gpCode">邮箱验证码</label>
+        </div>
+        <div class="form-textbox">
+          <input class="form-textbox-input" type="password" id="gpPass" placeholder=" "
+                 autocomplete="new-password">
+          <label class="form-textbox-label" for="gpPass">新密码</label>
+        </div>
+        <div class="form-textbox">
+          <input class="form-textbox-input" type="password" id="gpPass2" placeholder=" "
+                 autocomplete="new-password">
+          <label class="form-textbox-label" for="gpPass2">确认新密码</label>
+        </div>
+      </div>
+
+      <p class="acct-hint" id="gpHint" hidden></p>
+      <p class="acct-msg" id="gpMsg" role="alert" aria-live="polite"></p>
+
+      <button type="submit" class="acct-btn acct-btn-block" id="gpGo">继续</button>
+    </form>
+
+    <p class="auth-foot"><a href="#" data-go="login">返回登录</a></p>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <p>翱翔鸟是一个中文技术社区：论坛、播客、新闻与直播，以及 macOS、iOS、Android 客户端。</p>
+  <p>Copyright © 2026 SoaringBird. 保留所有权利。</p>
+  <p><a href="/terms">服务条款</a> · <a href="/privacy">隐私政策</a> · <a href="/podcast">播客</a> · <a href="/developer">开发者</a> · <a href="/">返回首页</a></p>
+</footer>
+
+<!-- 未验证邮箱被停用的账户：强制走一次邮箱验证 -->
+<div class="acct-veil" id="verifyVeil">
+  <div class="acct-sheet" role="dialog" aria-modal="true" aria-labelledby="verifyTitle">
+    <h2 id="verifyTitle">完成邮箱验证</h2>
+    <p class="sheet-sub">
+      这个账号因为还没完成邮箱验证被暂时停用。系统会把验证码发到
+      <b id="verifyMail">绑定邮箱</b>，填入下面的验证码即可恢复使用。
+    </p>
+    <div class="acct-code">
+      <div class="form-textbox" style="margin:0;flex:1 1 auto">
+        <input class="form-textbox-input" type="text" id="verifyCode" placeholder=" "
+               inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+        <label class="form-textbox-label" for="verifyCode">邮箱验证码</label>
+      </div>
+      <button type="button" id="verifySend">发送验证码</button>
+    </div>
+    <div class="acct-ts" id="tsVerify" hidden></div>
+    <p class="acct-msg" id="verifyMsg" role="alert" aria-live="polite"></p>
+    <div class="acct-sheet-actions">
+      <button type="button" class="acct-btn acct-btn-quiet" id="verifyBack">返回登录</button>
+      <button type="button" class="acct-btn" id="verifyGo" disabled>完成验证</button>
+    </div>
+  </div>
+</div>
+
+<!-- 被封禁账号：显示原因/时间并提供申诉 -->
+<div class="acct-veil" id="banVeil">
+  <div class="acct-sheet" role="dialog" aria-modal="true" aria-labelledby="banTitle">
+    <h2 id="banTitle">账号已被封禁</h2>
+    <p class="sheet-sub" id="banSub"></p>
+    <div class="form-textbox" style="margin:0 0 10px">
+      <input class="form-textbox-input" type="text" id="banUser" placeholder=" " readonly>
+      <label class="form-textbox-label" for="banUser">账号</label>
+    </div>
+    <div class="form-textbox" style="margin:0 0 10px">
+      <input class="form-textbox-input" type="password" id="banPass" placeholder=" " autocomplete="current-password">
+      <label class="form-textbox-label" for="banPass">密码（用于验证身份）</label>
+    </div>
+    <textarea id="banText" rows="3" maxlength="1000" placeholder="请说明情况，例如认为误封的理由…"
+      style="width:100%;box-sizing:border-box;border:1px solid var(--sep,#d2d2d7);border-radius:10px;padding:10px;font:inherit;background:transparent;color:inherit;resize:vertical"></textarea>
+    <p class="acct-msg" id="banMsg" role="alert" aria-live="polite"></p>
+    <div class="acct-sheet-actions">
+      <button type="button" class="acct-btn acct-btn-quiet" id="banBack">返回登录</button>
+      <button type="button" class="acct-btn" id="banGo">提交申诉</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+var $ = function (id) { return document.getElementById(id); };
+
+var state = {
+  redirect: '',
+  loginStep: 1,
+  loginAccount: '',
+  loginEmail: '',
+  forgotStep: 1,
+  forgotAccount: '',
+  verifyAccount: '',
+  verifyEmail: ''
+};
+
+/* ============================================================
+   焦点处理：鼠标点只变边框色，键盘 Tab 才加光圈
+   ============================================================ */
+(function () {
+  var root = document.documentElement;
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Tab') root.classList.add('form-keyboarduser');
+  }, true);
+  document.addEventListener('mousedown', function () {
+    root.classList.remove('form-keyboarduser');
+  }, true);
+  document.addEventListener('touchstart', function () {
+    root.classList.remove('form-keyboarduser');
+  }, true);
+})();
+
+/* ============================================================
+   工具
+   ============================================================ */
+
+function setMsg(id, text, kind) {
+  var el = $(id);
+  if (!el) return;
+  el.textContent = text || '';
+  el.className = 'acct-msg' + (kind ? ' is-' + kind : '');
+  if (text && (!kind || kind === 'err')) {
+    el.classList.add('shake');
+    setTimeout(function () { el.classList.remove('shake'); }, 400);
+  }
+}
+
+function clearMsg(id) { setMsg(id, ''); }
+
+function busy(btn, on, label) {
+  if (on) {
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent.trim();
+    btn.disabled = true;
+    btn.textContent = label || '处理中…';
+  } else {
+    btn.disabled = false;
+    if (btn.dataset.label) { btn.textContent = btn.dataset.label; delete btn.dataset.label; }
+  }
+}
+
+// 输入框有值时给标签用，浮动标签靠这个类上浮
+function markEntered(input) {
+  input.classList.toggle('form-textbox-entered', !!input.value);
+}
+
+function bindEntered(id) {
+  var el = $(id);
+  if (!el) return;
+  markEntered(el);
+  el.addEventListener('input', function () { markEntered(el); });
+  el.addEventListener('change', function () { markEntered(el); });
+}
+
+// 只放行站内相对路径；反斜杠变体也要挡，否则 /\evil.com 会被浏览器当成 //evil.com
+function safeInternal(raw) {
+  if (!raw) return '';
+  if (raw.charAt(0) !== '/') return '';
+  if (raw.charAt(1) === '/' || raw.charAt(1) === '\\') return '';
+  return raw;
+}
+
+function readRedirectParam() {
+  try {
+    return safeInternal(new URLSearchParams(location.search).get('redirect') || '');
+  } catch (e) { return ''; }
+}
+
+function goAfterAuth() { location.href = state.redirect || '/'; }
+
+/* ============================================================
+   视图切换
+   ============================================================ */
+
+var VIEWS = { login: 'v-login', register: 'v-register', forgot: 'v-forgot' };
+
+function showView(name) {
+  Object.keys(VIEWS).forEach(function (k) { $(VIEWS[k]).hidden = (k !== name); });
+  document.title = name === 'register' ? '创建你的翱翔鸟账户'
+                 : name === 'forgot' ? '重设密码 · 翱翔鸟账户'
+                 : '翱翔鸟账户';
+  window.scrollTo(0, 0);
+  if (name === 'register') {
+    $('rLast').focus();
+    warmTurnstile('tsRegister');
+  } else if (name === 'forgot') {
+    forgotToStep1();
+    warmTurnstile('tsForgot');
+  } else {
+    loginToStep1(true);
+  }
+}
+
+document.addEventListener('click', function (e) {
+  var a = e.target.closest ? e.target.closest('a[data-go]') : null;
+  if (!a) return;
+  e.preventDefault();
+  var go = a.getAttribute('data-go');
+  if (go === 'login-reset') loginToStep1(true);
+  else showView(go);
+});
+
+/* ============================================================
+   Turnstile
+   ============================================================ */
+
+var _siteKey;
+var _tsWidgets = {};
+
+function siteKey() {
+  if (_siteKey !== undefined) return Promise.resolve(_siteKey);
+  return fetch('/api/turnstile-site-key')
+    .then(function (r) { return r.json(); })
+    .then(function (d) { _siteKey = d.site_key || ''; return _siteKey; })
+    .catch(function () { _siteKey = ''; return _siteKey; });
+}
+
+function tsRender(hostId) {
+  var host = $(hostId);
+  if (!host || !_siteKey || typeof turnstile === 'undefined') return;
+  if (_tsWidgets[hostId] !== undefined) return;
+  host.hidden = false;
+  host.innerHTML = '';
+  try { _tsWidgets[hostId] = turnstile.render(host, { sitekey: _siteKey, theme: 'auto' }); } catch (e) {}
+}
+
+function tsToken(hostId) {
+  var w = _tsWidgets[hostId];
+  if (w === undefined) return '';
+  try { return turnstile.getResponse(w) || ''; } catch (e) { return ''; }
+}
+
+function tsReset(hostId) {
+  var w = _tsWidgets[hostId];
+  if (w === undefined) return;
+  try { turnstile.reset(w); } catch (e) {}
+}
+
+function warmTurnstile(hostId) {
+  siteKey().then(function (k) { if (k) tsRender(hostId); });
+}
+
+// 等 token 就绪，最多 6 秒（Turnstile 大多是自动通过的）
+function getTurnstile(hostId) {
+  return siteKey().then(function (key) {
+    if (!key) return { token: '' };
+    if (typeof turnstile === 'undefined') return { error: '人机验证组件没有加载成功，请刷新页面再试。' };
+    tsRender(hostId);
+    var tries = 0;
+    function poll() {
+      var t = tsToken(hostId);
+      if (t) return { token: t };
+      if (++tries >= 12) return { error: '请先完成人机验证。' };
+      return new Promise(function (res) { setTimeout(res, 500); }).then(poll);
+    }
+    return poll();
+  });
+}
+
+/* ============================================================
+   发验证码
+   ============================================================ */
+
+var _coolTimers = {};
+
+function startCooldown(btnId, label) {
+  var btn = $(btnId);
+  var left = 120;
+  clearInterval(_coolTimers[btnId]);
+  btn.disabled = true;
+  btn.textContent = left + ' 秒后可重发';
+  _coolTimers[btnId] = setInterval(function () {
+    left--;
+    if (left <= 0) {
+      clearInterval(_coolTimers[btnId]);
+      btn.disabled = false;
+      btn.textContent = label;
+      return;
+    }
+    btn.textContent = left + ' 秒后可重发';
+  }, 1000);
+}
+
+function sendEmailCode(opt) {
+  var btn = $(opt.btnId);
+  var label = btn.textContent.trim();
+  clearMsg(opt.msgId);
+  return getTurnstile(opt.hostId).then(function (ts) {
+    if (ts.error) { setMsg(opt.msgId, ts.error); return false; }
+    busy(btn, true, '发送中…');
+    return fetch('/api/send-verify-code', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: opt.email, turnstile_token: ts.token })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (!r.ok) {
+          busy(btn, false);
+          tsReset(opt.hostId);
+          setMsg(opt.msgId, d.error || '验证码发送失败，请稍后再试。');
+          return false;
+        }
+        startCooldown(opt.btnId, label);
+        setMsg(opt.msgId, '验证码已发送，请查收邮箱（也记得看一眼垃圾邮件）。', 'ok');
+        return true;
+      });
+    }).catch(function () {
+      busy(btn, false);
+      tsReset(opt.hostId);
+      setMsg(opt.msgId, '网络连接中断，请稍后重试。');
+      return false;
+    });
+  });
+}
+
+var EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+/* ============================================================
+   登录
+   ============================================================ */
+
+function loginToStep1(focus) {
+  state.loginStep = 1;
+  $('loginTitle').textContent = '翱翔鸟账户';
+  $('loginTitle').classList.remove('is-account');
+  $('loginSub').textContent = '管理你的翱翔鸟账户';
+  $('loginNameBox').hidden = false;
+  $('loginPassBox').hidden = true;
+  $('loginCodeWrap').hidden = true;
+  $('loginPass').value = '';
+  $('loginCode').value = '';
+  markEntered($('loginPass'));
+  markEntered($('loginCode'));
+  $('loginFoot').hidden = false;
+  $('loginFoot2').hidden = true;
+  clearMsg('loginMsg');
+  syncLoginBtn();
+  if (focus) $('loginName').focus();
+}
+
+function loginToStep2() {
+  state.loginStep = 2;
+  $('loginTitle').textContent = state.loginAccount;
+  $('loginTitle').classList.add('is-account');
+  $('loginSub').textContent = '输入密码以继续';
+  $('loginNameBox').hidden = true;
+  $('loginPassBox').hidden = false;
+  $('loginFoot').hidden = true;
+  $('loginFoot2').hidden = false;
+  clearMsg('loginMsg');
+  syncLoginBtn();
+  $('loginPass').focus();
+}
+
+function syncLoginBtn() {
+  var btn = $('loginGo');
+  if (btn.classList.contains('is-done')) return;
+  if (state.loginStep === 1) {
+    btn.disabled = !$('loginName').value.trim();
+  } else {
+    var ok = $('loginPass').value.length > 0;
+    if (!$('loginCodeWrap').hidden) ok = ok && $('loginCode').value.trim().length >= 4;
+    btn.disabled = !ok;
+  }
+}
+
+$('fLogin').addEventListener('submit', function (e) {
+  e.preventDefault();
+  if (state.loginStep === 1) {
+    var v = $('loginName').value.trim();
+    if (!v) { setMsg('loginMsg', '请输入用户名或邮箱。'); return; }
+    state.loginAccount = v;
+    loginToStep2();
+    return;
+  }
+  doLogin();
+});
+
+$('loginName').addEventListener('input', syncLoginBtn);
+$('loginPass').addEventListener('input', syncLoginBtn);
+$('loginCode').addEventListener('input', syncLoginBtn);
+
+$('loginCodeBtn').addEventListener('click', function () {
+  if (!state.loginEmail) { setMsg('loginMsg', '没能拿到这个账户的邮箱，请返回上一步重试。'); return; }
+  sendEmailCode({ hostId: 'tsLoginCode', btnId: 'loginCodeBtn', msgId: 'loginMsg', email: state.loginEmail });
+});
+
+function loginFail(text) {
+  busy($('loginGo'), false);
+  setMsg('loginMsg', text);
+}
+
+function doLogin() {
+  var btn = $('loginGo');
+  busy(btn, true, '正在登录…');
+
+  var payload = { username: state.loginAccount, password: $('loginPass').value };
+  if (!$('loginCodeWrap').hidden) payload.code = $('loginCode').value.trim();
+  if (state.redirect) payload.redirect = state.redirect;
+
+  fetch('/api/login', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function (r) {
+    var ct = r.headers.get('content-type') || '';
+    if (ct.indexOf('json') === -1) throw new Error('bad-response');
+    return r.json().then(function (d) { return { ok: r.ok, data: d }; });
+  }).then(function (res) {
+    var d = res.data || {};
+
+    if (d.require_code) {
+      state.loginEmail = d.email || state.loginEmail;
+      if ($('loginCodeWrap').hidden) {
+        $('loginCodeWrap').hidden = false;
+        warmTurnstile('tsLoginCode');
+      }
+      busy(btn, false);
+      $('loginGo').disabled = true;
+      clearMsg('loginMsg');
+      setMsg('loginMsg', '这个账户开启了登录验证码，点「发送验证码」拿一次邮箱验证码。', 'info');
+      $('loginCodeBtn').focus();
+      return;
+    }
+
+    if (!res.ok) {
+      if (d.require_email_verify) {
+        busy(btn, false);
+        openVerify(d.username || state.loginAccount, d.email || '');
+        return;
+      }
+      if (d.banned) {
+        busy(btn, false);
+        openBanAppeal(d);
+        return;
+      }
+      loginFail(d.error || '登录失败，请检查账号和密码。');
+      return;
+    }
+
+    if (d.redirect) state.redirect = safeInternal(d.redirect) || state.redirect;
+    if (d.user && d.user.background) {
+      try { localStorage.setItem('bird_bg', d.user.background); } catch (e) {}
+    }
+    btn.disabled = true;
+    btn.classList.add('is-done');
+    btn.textContent = '已登录';
+    setMsg('loginMsg', '欢迎回来，正在跳转…', 'ok');
+    setTimeout(goAfterAuth, 420);
+  }).catch(function () {
+    loginFail('服务器暂时没有响应，请稍后重试。');
+  });
+}
+
+/* ---------- 通行密钥 ---------- */
+
+function b64urlToBuf(b64url) {
+  var b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
+  var padded = b64 + '='.repeat((4 - b64.length % 4) % 4);
+  var bin = atob(padded);
+  var buf = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  return buf;
+}
+
+function bufToB64url(buf) {
+  var arr = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+  var bin = '';
+  for (var i = 0; i < arr.length; i++) bin += String.fromCharCode(arr[i]);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+var _webauthnPending = false;
+
+// 这个按钮里有图标，不能走 busy()——那个函数会连图标一起 textContent 抹掉
+function passkeyBusy(on) {
+  $('passkeyBtn').disabled = on;
+  $('passkeyLbl').textContent = on ? '等待验证…' : '通过通行密钥登录';
+}
+
+$('passkeyBtn').addEventListener('click', function () {
+  if (!window.PublicKeyCredential) return;
+  if (_webauthnPending) return;
+  _webauthnPending = true;
+  passkeyBusy(true);
+  clearMsg('loginMsg');
+
+  fetch('/api/passkeys/authenticate-begin', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ browserOrigin: location.origin, browserHostname: location.hostname })
+  }).then(function (r) { return r.json(); }).then(function (opts) {
+    if (opts.error) throw new Error(opts.error);
+    var publicKey = {
+      challenge: b64urlToBuf(opts.challenge),
+      rpId: opts.rpId || location.hostname,
+      timeout: opts.timeout || 60000,
+      userVerification: opts.userVerification || 'preferred'
+    };
+    if (opts.allowCredentials && opts.allowCredentials.length) {
+      publicKey.allowCredentials = opts.allowCredentials.map(function (c) {
+        return { id: b64urlToBuf(c.id), type: 'public-key' };
+      });
+    }
+    return navigator.credentials.get({ publicKey: publicKey });
+  }).then(function (assertion) {
+    return fetch('/api/passkeys/authenticate-finish', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        credential: {
+          id: assertion.id,
+          rawId: bufToB64url(assertion.rawId),
+          response: {
+            clientDataJSON: bufToB64url(assertion.response.clientDataJSON),
+            authenticatorData: bufToB64url(assertion.response.authenticatorData),
+            signature: bufToB64url(assertion.response.signature)
+          },
+          type: assertion.type
+        },
+        browserOrigin: location.origin,
+        browserHostname: location.hostname
+      })
+    });
+  }).then(function (r) {
+    return r.json().catch(function () { return {}; }).then(function (d) {
+      if (!r.ok) throw new Error(d.error || '通行密钥登录失败。');
+      if (d.user && d.user.background) {
+        try { localStorage.setItem('bird_bg', d.user.background); } catch (e) {}
+      }
+      passkeyBusy(false);
+      busy($('loginGo'), true, '已登录');
+      $('loginGo').classList.add('is-done');
+      setMsg('loginMsg', '欢迎回来，正在跳转…', 'ok');
+      setTimeout(goAfterAuth, 420);
+    });
+  }).catch(function (err) {
+    passkeyBusy(false);
+    if (err && err.name === 'NotAllowedError') return;   // 用户自己取消，不提示
+    setMsg('loginMsg', err && err.message ? err.message : '通行密钥登录失败。');
+  }).then(function () { _webauthnPending = false; });
+});
+
+if (!window.PublicKeyCredential) {
+  $('passkeyBtn').hidden = true;
+  $('passkeyNote').hidden = true;
+}
+
+/* ============================================================
+   注册
+   ============================================================ */
+
+// 年 / 月 / 日 三个下拉的选项
+(function fillBirthday() {
+  var thisYear = new Date().getFullYear();
+  var y = $('rYear'), m = $('rMonth'), d = $('rDay');
+  var i;
+  for (i = thisYear; i >= thisYear - 110; i--) y.add(new Option(i + ' 年', i));
+  for (i = 1; i <= 12; i++) m.add(new Option(i + ' 月', i));
+  for (i = 1; i <= 31; i++) d.add(new Option(i + ' 日', i));
+  markEntered(y); markEntered(m); markEntered(d);
+})();
+
+['rLast', 'rFirst', 'rUser', 'rEmail', 'rPass', 'rPass2', 'rCode',
+ 'loginName', 'loginPass', 'loginCode', 'gpName', 'gpCode', 'gpPass', 'gpPass2', 'verifyCode']
+  .forEach(bindEntered);
+
+['rYear', 'rMonth', 'rDay'].forEach(function (id) {
+  $(id).addEventListener('change', function () { markEntered(this); });
+});
+
+$('regCodeBtn').addEventListener('click', function () {
+  var email = $('rEmail').value.trim();
+  if (!email) { setMsg('regMsg', '请先填写邮箱地址。'); $('rEmail').focus(); return; }
+  if (!EMAIL_RE.test(email)) { setMsg('regMsg', '邮箱地址格式不正确。'); $('rEmail').focus(); return; }
+  sendEmailCode({ hostId: 'tsRegister', btnId: 'regCodeBtn', msgId: 'regMsg', email: email });
+});
+
+$('fRegister').addEventListener('submit', function (e) {
+  e.preventDefault();
+  clearMsg('regMsg');
+
+  var username = $('rUser').value.trim();
+  var email = $('rEmail').value.trim();
+  var pw = $('rPass').value;
+  var pw2 = $('rPass2').value;
+  var code = $('rCode').value.trim();
+
+  if (!username) { setMsg('regMsg', '请填写用户名。'); $('rUser').focus(); return; }
+  if (username.length > 24) { setMsg('regMsg', '用户名请控制在 24 个字符以内。'); $('rUser').focus(); return; }
+  if (!EMAIL_RE.test(email)) { setMsg('regMsg', '邮箱地址格式不正确。'); $('rEmail').focus(); return; }
+  if (pw.length < 4) { setMsg('regMsg', '密码至少 4 位。'); $('rPass').focus(); return; }
+  if (pw !== pw2) { setMsg('regMsg', '两次输入的密码不一致。'); $('rPass2').focus(); return; }
+  if (!/^\d{4,6}$/.test(code)) { setMsg('regMsg', '请填写收到的邮箱验证码。'); $('rCode').focus(); return; }
+  if (!$('rAgree').checked) { setMsg('regMsg', '请先阅读并同意服务条款与隐私政策。'); return; }
+
+  var btn = $('regGo');
+  busy(btn, true, '正在创建…');
+
+  fetch('/api/register', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: username,
+      email: email,
+      password: pw,
+      code: code,
+      first_name: $('rFirst').value.trim(),
+      last_name: $('rLast').value.trim(),
+      region: $('rRegion').value,
+      birthday_year: $('rYear').value,
+      birthday_month: $('rMonth').value,
+      birthday_day: $('rDay').value,
+      redirect: state.redirect || undefined
+    })
+  }).then(function (r) {
+    return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, data: d }; });
+  }).then(function (res) {
+    var d = res.data || {};
+    if (!res.ok) {
+      busy(btn, false);
+      setMsg('regMsg', d.error || '注册失败，请稍后再试。');
+      return;
+    }
+    if (d.redirect) state.redirect = safeInternal(d.redirect) || state.redirect;
+    btn.disabled = true;
+    btn.classList.add('is-done');
+    btn.textContent = '已创建';
+    setMsg('regMsg', '账户已创建，正在进入翱翔鸟…', 'ok');
+    setTimeout(goAfterAuth, 480);
+  }).catch(function () {
+    busy(btn, false);
+    setMsg('regMsg', '服务器暂时没有响应，请稍后重试。');
+  });
+});
+
+/* ============================================================
+   重设密码
+   ============================================================ */
+
+function forgotToStep1() {
+  state.forgotStep = 1;
+  $('fForgot').reset();
+  ['gpName', 'gpCode', 'gpPass', 'gpPass2'].forEach(function (id) { markEntered($(id)); });
+  $('forgotSub').textContent = '输入你的账号，我们会把重设验证码发到绑定邮箱。';
+  $('gpNameBox').hidden = false;
+  $('gpCodeWrap').hidden = true;
+  $('gpHint').hidden = true;
+  $('gpGo').textContent = '继续';
+  clearMsg('gpMsg');
+  $('gpName').focus();
+}
+
+$('fForgot').addEventListener('submit', function (e) {
+  e.preventDefault();
+  if (state.forgotStep === 1) forgotSend();
+  else forgotSubmit();
+});
+
+function forgotSend() {
+  var account = $('gpName').value.trim();
+  if (!account) { setMsg('gpMsg', '请输入用户名或邮箱。'); return; }
+  state.forgotAccount = account;
+  var btn = $('gpGo');
+  clearMsg('gpMsg');
+  busy(btn, true, '发送中…');
+
+  getTurnstile('tsForgot').then(function (ts) {
+    if (ts.error) { busy(btn, false); btn.textContent = '继续'; setMsg('gpMsg', ts.error); return; }
+    return fetch('/api/send-reset-code', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: account, turnstile_token: ts.token })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        busy(btn, false);
+        btn.textContent = '继续';
+        if (!r.ok) {
+          tsReset('tsForgot');
+          setMsg('gpMsg', d.error || '验证码发送失败，请稍后再试。');
+          return;
+        }
+        state.forgotStep = 2;
+        $('forgotSub').textContent = '输入邮箱验证码并设置新密码。';
+        $('gpNameBox').hidden = true;
+        $('gpCodeWrap').hidden = false;
+        $('tsForgot').hidden = true;
+        $('gpHint').hidden = false;
+        $('gpHint').textContent = d.email_hint
+          ? '验证码已发送至 ' + d.email_hint + '，10 分钟内有效。'
+          : '验证码已发送至账号绑定的邮箱，10 分钟内有效。';
+        $('gpGo').textContent = '重设密码';
+        $('gpCode').focus();
+      });
+    });
+  }).catch(function () {
+    busy(btn, false);
+    btn.textContent = '继续';
+    setMsg('gpMsg', '网络连接中断，请稍后重试。');
+  });
+}
+
+function forgotSubmit() {
+  var code = $('gpCode').value.trim();
+  var pw = $('gpPass').value;
+  var pw2 = $('gpPass2').value;
+  if (!/^\d{4,6}$/.test(code)) { setMsg('gpMsg', '请填写收到的邮箱验证码。'); $('gpCode').focus(); return; }
+  if (pw.length < 4) { setMsg('gpMsg', '新密码至少 4 位。'); $('gpPass').focus(); return; }
+  if (pw !== pw2) { setMsg('gpMsg', '两次输入的新密码不一致。'); $('gpPass2').focus(); return; }
+
+  var btn = $('gpGo');
+  busy(btn, true, '正在重设…');
+  fetch('/api/reset-password', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: state.forgotAccount, code: code, password: pw })
+  }).then(function (r) {
+    return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, data: d }; });
+  }).then(function (res) {
+    if (!res.ok) {
+      busy(btn, false);
+      btn.textContent = '重设密码';
+      setMsg('gpMsg', (res.data && res.data.error) || '重设失败，请稍后再试。');
+      return;
+    }
+    btn.disabled = true;
+    btn.classList.add('is-done');
+    btn.textContent = '已重设';
+    setMsg('gpMsg', '密码已重设，请用新密码登录。', 'ok');
+    setTimeout(function () { showView('login'); }, 900);
+  }).catch(function () {
+    busy(btn, false);
+    btn.textContent = '重设密码';
+    setMsg('gpMsg', '网络连接中断，请稍后重试。');
+  });
+}
+
+/* ============================================================
+   强制邮箱验证（未验证邮箱被停用的账户）
+   ============================================================ */
+
+function openVerify(account, email) {
+  state.verifyAccount = account;
+  state.verifyEmail = email;
+  $('verifyMail').textContent = email || '账号绑定的邮箱';
+  $('verifyCode').value = '';
+  markEntered($('verifyCode'));
+  clearMsg('verifyMsg');
+  $('verifyGo').disabled = true;
+  $('verifySend').disabled = false;
+  $('verifySend').textContent = '发送验证码';
+  $('verifyVeil').classList.add('on');
+  warmTurnstile('tsVerify');
+  setTimeout(function () { $('verifyCode').focus(); }, 80);
+  try { history.pushState({ verify: true }, ''); } catch (e) {}
+}
+
+window.addEventListener('popstate', function () {
+  if ($('verifyVeil').classList.contains('on')) {
+    try { history.pushState({ verify: true }, ''); } catch (e) {}
+  }
+});
+
+/* ---------- 封禁申诉 ---------- */
+
+function openBanAppeal(d) {
+  var until = (d.ban_until && d.ban_until < 9999999999)
+    ? ('至 ' + new Date(d.ban_until * 1000).toLocaleString())
+    : '永久';
+  $('banSub').textContent = '封禁原因：' + (d.ban_reason || '未注明') + '；解除时间：' + until +
+    '。如认为处理有误，请填写密码验证身份后提交申诉。';
+  $('banUser').value = d.username || state.loginAccount || '';
+  $('banPass').value = $('loginPass') ? $('loginPass').value : '';
+  $('banText').value = '';
+  clearMsg('banMsg');
+  $('banVeil').classList.add('on');
+  setTimeout(function () { ($('banPass').value ? $('banText') : $('banPass')).focus(); }, 80);
+}
+
+$('banBack').addEventListener('click', function () { $('banVeil').classList.remove('on'); });
+
+$('banGo').addEventListener('click', function () {
+  var user = $('banUser').value.trim();
+  var pass = $('banPass').value;
+  var text = $('banText').value.trim();
+  if (!pass) { setMsg('banMsg', '请输入密码以验证身份。'); return; }
+  if (text.length < 5) { setMsg('banMsg', '请把情况说明白一点（至少 5 个字）。'); return; }
+  var btn = $('banGo');
+  busy(btn, true, '提交中…');
+  fetch('/api/appeal', {
+    method: 'POST', credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: user, password: pass, content: text })
+  }).then(function (r) {
+    return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, data: d }; });
+  }).then(function (res) {
+    busy(btn, false);
+    if (!res.ok) { setMsg('banMsg', (res.data && res.data.error) || '提交失败，请稍后重试。'); return; }
+    $('banText').value = '';
+    setMsg('banMsg', '申诉已提交，我们会尽快处理。', 'ok');
+  }).catch(function () {
+    busy(btn, false);
+    setMsg('banMsg', '网络异常，请稍后重试。');
+  });
+});
+
+$('verifySend').addEventListener('click', function () {
+  if (!state.verifyEmail) { setMsg('verifyMsg', '没拿到邮箱信息，请返回登录页重试。'); return; }
+  var btn = $('verifySend');
+  var label = btn.textContent.trim();
+  clearMsg('verifyMsg');
+  $('tsVerify').hidden = false;
+  busy(btn, true, '发送中…');
+  getTurnstile('tsVerify').then(function (ts) {
+    if (ts.error) { busy(btn, false); btn.textContent = label; setMsg('verifyMsg', ts.error); return; }
+    return fetch('/api/send-verify-code', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: state.verifyEmail, turnstile_token: ts.token })
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (!r.ok) {
+          busy(btn, false);
+          btn.textContent = label;
+          tsReset('tsVerify');
+          setMsg('verifyMsg', d.error || '验证码发送失败。');
+          return;
+        }
+        startCooldown('verifySend', label);
+        $('tsVerify').hidden = true;
+        setMsg('verifyMsg', '验证码已发送，10 分钟内有效。', 'ok');
+      });
+    });
+  }).catch(function () {
+    busy(btn, false);
+    btn.textContent = label;
+    setMsg('verifyMsg', '网络连接中断，请稍后重试。');
+  });
+});
+
+$('verifyCode').addEventListener('input', function () {
+  $('verifyGo').disabled = this.value.trim().length < 4;
+  clearMsg('verifyMsg');
+});
+
+$('verifyBack').addEventListener('click', function () {
+  $('verifyVeil').classList.remove('on');
+  try { if (history.state && history.state.verify) history.back(); } catch (e) {}
+  loginToStep1(true);
+});
+
+$('verifyGo').addEventListener('click', function () {
+  var code = $('verifyCode').value.trim();
+  if (!code) { setMsg('verifyMsg', '请输入验证码。'); return; }
+  var btn = $('verifyGo');
+  busy(btn, true, '验证中…');
+  fetch('/api/verify-email-and-login', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: state.verifyAccount, code: code })
+  }).then(function (r) {
+    return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, data: d }; });
+  }).then(function (res) {
+    var d = res.data || {};
+    if (!res.ok) {
+      busy(btn, false);
+      btn.textContent = '完成验证';
+      setMsg('verifyMsg', d.error || '验证失败。');
+      if (d.code_expired) {
+        $('verifyGo').disabled = true;
+        $('verifySend').disabled = false;
+        $('verifySend').textContent = '重新发送';
+        clearInterval(_coolTimers['verifySend']);
+      } else {
+        $('verifyGo').disabled = false;
+      }
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = '已验证';
+    setMsg('verifyMsg', '验证成功，正在登录…', 'ok');
+    $('verifyVeil').classList.remove('on');
+    try { if (history.state && history.state.verify) history.back(); } catch (e) {}
+    setTimeout(goAfterAuth, 600);
+  }).catch(function () {
+    busy(btn, false);
+    btn.textContent = '完成验证';
+    setMsg('verifyMsg', '网络连接中断，请稍后重试。');
+  });
+});
+
+/* ============================================================
+   第三方应用：告诉用户「正在为谁登录」
+   ============================================================ */
+
+function oauthClientId(redirect) {
+  if (!redirect || redirect.indexOf('/oauth/authorize') !== 0) return '';
+  var q = redirect.split('?')[1];
+  if (!q) return '';
+  try { return new URLSearchParams(q).get('client_id') || ''; }
+  catch (e) { return ''; }
+}
+
+function loadOauthApp() {
+  var cid = oauthClientId(state.redirect);
+  if (!cid) return;
+  fetch('/api/oauth/app-info?client_id=' + encodeURIComponent(cid))
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d.app_name) return;
+      $('oauthApp').textContent = d.app_name;
+      $('oauthNote').hidden = false;
+    })
+    .catch(function () {});
+}
+
+/* ============================================================
+   启动
+   ============================================================ */
+
+(function boot() {
+  state.redirect = readRedirectParam();
+
+  var params = new URLSearchParams(location.search);
+  var err = params.get('error');
+  var tab = params.get('tab');
+
+  if (err) {
+    showView(tab === 'register' ? 'register' : 'login');
+    setMsg(tab === 'register' ? 'regMsg' : 'loginMsg', err);
+  } else if (tab === 'register') {
+    showView('register');
+  } else {
+    showView('login');
+  }
+
+  loadOauthApp();
+})();
+</script>
+</body>
+</html>

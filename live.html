@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Live - 翱翔鸟</title>
+    <link rel="icon" href="/logo-light.png" type="image/png">
+    <link rel="apple-touch-icon" href="/logo-light.png">
+    <link rel="stylesheet" href="/styles29.css?v=20260827-report">
+    <link rel="stylesheet" href="/live.css?v=20260816-1">
+    <script>
+    (function(){
+        var t = localStorage.getItem('bird_theme') || 'light';
+        if (t === 'light') document.documentElement.removeAttribute('data-theme');
+        else document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
+</head>
+<body>
+    <div class="lv-app" id="lvApp">
+        <!-- 浮动毛玻璃顶栏 -->
+        <nav class="lv-nav">
+            <div class="lv-nav-inner">
+                <div class="lv-nav-left">
+                    <a class="lv-nav-back" href="/" title="返回论坛" data-i18n-title="nav_back">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+                    </a>
+                    <span class="lv-nav-label">Live</span>
+                </div>
+                <div class="lv-nav-right">
+                    <a class="lv-nav-link" href="/signin" id="navLoginBtn" data-i18n="nav_login">登录</a>
+                    <div class="lv-nav-user" id="navUser" style="display:none">
+                        <img class="lv-nav-avatar" id="navAvatar" alt="">
+                    </div>
+                    <button class="lv-nav-icon-btn" id="faqNavBtn" type="button" title="常见问题" aria-label="常见问题" data-i18n-title="nav_faq" data-i18n-aria="nav_faq">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </button>
+                    <button class="lv-nav-icon-btn" id="myChannelsNavBtn" type="button" title="我的直播间" aria-label="我的直播间" data-i18n-title="nav_my_channels" data-i18n-aria="nav_my_channels">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </button>
+                    <button class="lv-nav-icon-btn" id="settingsNavBtn" type="button" title="直播设置" aria-label="直播设置" data-i18n-title="nav_settings" data-i18n-aria="nav_settings">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </button>
+                    <button class="lv-nav-icon-btn" id="menuNavBtn" type="button" title="菜单" aria-label="菜单">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                    </button>
+                    <button class="lv-go-live" id="goLiveBtn">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M6.34 6.34a8 8 0 0 0 0 11.32M17.66 17.66a8 8 0 0 0 0-11.32M3.51 3.51a12 12 0 0 0 0 16.97M20.49 20.49a12 12 0 0 0 0-16.97"/></svg>
+                        <span data-i18n="nav_go_live">开播</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="lv-content">
+            <!-- 列表视图 -->
+            <section id="listView">
+                <!-- Hero 精选（沉浸式大图） -->
+                <div class="lv-hero" id="heroSection" style="display:none">
+                    <div class="lv-hero-bg" id="heroBg"></div>
+                    <div class="lv-hero-overlay"></div>
+                    <div class="lv-hero-info">
+                        <div class="lv-live-badge lg"><span class="lv-live-dot"></span><span data-i18n="badge_live"></span></div>
+                        <h1 class="lv-hero-title" id="heroTitle"></h1>
+                        <div class="lv-hero-meta" id="heroMeta"></div>
+                        <button class="lv-hero-watch" id="heroWatch">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                            <span data-i18n="btn_watch"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 精选直播（横向 carousel） -->
+                <div class="lv-shelf lv-featured" id="featuredSection" style="display:none">
+                    <div class="lv-bar">
+                        <h2 class="lv-section-title" data-i18n="section_featured">精选直播</h2>
+                        <span class="lv-section-sub" data-i18n="section_featured_sub">优质主播 · 优先围观</span>
+                    </div>
+                    <div class="lv-featured-row" id="featuredGrid"></div>
+                </div>
+
+                <!-- 横向货架（carousel） -->
+                <div class="lv-shelf">
+                    <div class="lv-bar">
+                        <h2 class="lv-section-title" data-i18n="section_live">正在直播</h2>
+                        <button class="lv-refresh" id="refreshBtn">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                        </button>
+                    </div>
+                    <div class="lv-row" id="liveGrid"></div>
+                    <div class="lv-empty" id="liveEmpty">
+                        <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M6.34 6.34a8 8 0 0 0 0 11.32M17.66 17.66a8 8 0 0 0 0-11.32M3.51 3.51a12 12 0 0 0 0 16.97M20.49 20.49a12 12 0 0 0 0-16.97"/></svg>
+                        <p class="lv-empty-text" data-i18n="empty_live">当前没有直播</p>
+                        <p class="lv-empty-sub" data-i18n="empty_live_sub">点击右上角「开播」开始你的直播</p>
+                    </div>
+                </div>
+
+                <!-- 全部直播间（含离线频道） -->
+                <div class="lv-shelf all-channels" id="allChannelsSection">
+                    <div class="lv-bar">
+                        <h2 class="lv-section-title" data-i18n="section_all_channels">全部直播间</h2>
+                        <span class="lv-section-sub" id="allChannelsCount">0 个直播间</span>
+                    </div>
+                    <div class="lv-row" id="allChannelsGrid"></div>
+                </div>
+            </section>
+
+            <!-- 主播视图 -->
+            <section id="hostView" style="display:none">
+                <div class="lv-host-screen" id="hostScreen">
+                    <video class="lv-host-preview" id="hostPreview" autoplay muted playsinline></video>
+                    <div class="lv-host-overlay">
+                        <div class="lv-host-top">
+                            <span class="lv-live-badge"><span class="lv-live-dot"></span>LIVE</span>
+                            <span class="lv-timer" id="hostTimer">00:00</span>
+                            <span class="lv-viewer-pill">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <span id="hostViewerCount">0</span> 观看
+                            </span>
+                            <span class="lv-peak-pill" title="峰值观看">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                                峰值 <span id="hostPeakCount">0</span>
+                            </span>
+                            <span class="lv-quality-pill" id="hostQualityPill" title="推流画质">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                                <span id="hostQualityText">—</span>
+                            </span>
+                            <span class="lv-status-pill" id="hostMicPill" title="麦克风状态"><span class="lv-status-dot"></span>MIC OFF</span>
+                            <span class="lv-status-pill" id="hostCamPill" title="摄像头状态"><span class="lv-status-dot"></span>CAM ON</span>
+                            <span class="lv-latency-pill" id="hostLatencyPill" title="观众平均延迟" style="display:none">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span id="hostLatencyText">—</span>
+                            </span>
+                        </div>
+                        <!-- 主播控制坞 -->
+                        <div class="lv-host-dock">
+                            <button class="lv-dock-btn" id="micToggleBtn" type="button" title="麦克风" data-i18n-title="dock_mic">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                            </button>
+                            <button class="lv-dock-btn" id="camToggleBtn" type="button" title="摄像头" data-i18n-title="dock_cam">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                            </button>
+                            <button class="lv-dock-btn" id="camOverlayBtn" type="button" title="摄像头小窗" data-i18n-title="dock_cam_overlay" style="display:none">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="12" y="11" width="8" height="6" rx="1"/><circle cx="16" cy="14" r="1.2"/></svg>
+                            </button>
+                            <button class="lv-dock-btn" id="titleEditBtn" type="button" title="修改标题" data-i18n-title="dock_title">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            </button>
+                            <button class="lv-dock-btn" id="pipToggleBtn" type="button" title="画中画" data-i18n-title="dock_pip">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="12" y="11" width="8" height="6" rx="1"/></svg>
+                            </button>
+                            <button class="lv-dock-btn" id="snapshotBtn" type="button" title="截图" data-i18n-title="dock_snapshot">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                            </button>
+                            <button class="lv-dock-btn" id="fullscreenBtn" type="button" title="全屏" data-i18n-title="dock_fullscreen">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg>
+                            </button>
+                        </div>
+                        <div class="lv-host-bottom">
+                            <div class="lv-host-title" id="hostTitle"></div>
+                            <button class="lv-end-btn" id="endLiveBtn">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>
+                                <span data-i18n="btn_end_live">结束直播</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 直播聊天 -->
+                    <aside class="lv-chat" id="hostChat">
+                        <div class="lv-chat-head">
+                            <span class="lv-chat-title" data-i18n="chat_title">聊天</span>
+                            <button class="lv-chat-toggle" id="hostChatToggle" type="button">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
+                        <div class="lv-chat-list" id="hostChatList"><div class="lv-chat-empty" data-i18n="chat_empty">暂无消息</div></div>
+                        <div class="lv-chat-input">
+                            <input type="text" id="hostChatInput" data-i18n-placeholder="placeholder_host_chat" placeholder="和观众聊天…" maxlength="500">
+                            <button class="lv-chat-send" id="hostChatSend" type="button">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                            </button>
+                        </div>
+                    </aside>
+                    <button class="lv-chat-open-btn" id="hostChatOpen" type="button">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 观众视图 -->
+            <section id="viewerView" style="display:none">
+                <div class="lv-viewer-screen" id="viewerScreen">
+                    <button class="lv-viewer-close" id="leaveBtn">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+                    </button>
+                    <video class="lv-viewer-player" id="viewerPlayer" autoplay playsinline muted webkit-playsinline></video>
+                    <div class="lv-viewer-loading" id="viewerLoading">
+                        <div class="lv-spinner"></div>
+                        <p data-i18n="status_connecting">正在连接直播…</p>
+                    </div>
+                    <!-- 飘心动画层 -->
+                    <div class="lv-hearts-layer" id="heartsLayer"></div>
+                    <div class="lv-viewer-overlay">
+                        <div class="lv-viewer-top">
+                            <span class="lv-live-badge"><span class="lv-live-dot"></span>LIVE</span>
+                            <span class="lv-viewer-pill">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <span id="viewerCount">0</span> 观看
+                            </span>
+                            <span class="lv-latency-pill" id="viewerLatencyPill" title="延迟" style="display:none">
+                                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span id="viewerLatencyText">—</span>
+                            </span>
+                            <span class="lv-viewer-spacer"></span>
+                            <div class="lv-player-select" id="playerSelect">
+                                <button class="lv-player-select-btn" id="playerSelectBtn" type="button" title="切换播放器">
+                                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                    <span id="playerSelectLabel" data-i18n="player_direct">直连</span>
+                                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                </button>
+                                <div class="lv-player-dropdown" id="playerDropdown" style="display:none">
+                                    <button class="lv-player-option active" data-mode="webrtc" type="button">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                        <span data-i18n="player_direct">直连</span>
+                                        <span class="lv-player-status" data-i18n="player_direct_status">P2P 低延迟</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="lv-volume-ctrl" id="volumeCtrl">
+                                <button class="lv-mute-btn" id="muteBtn" type="button">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                                </button>
+                                <input type="range" class="lv-volume-slider" id="volumeSlider" min="0" max="100" value="100">
+                            </div>
+                            <button class="lv-mute-btn" id="muteBtnStatic" style="display:none">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                            </button>
+                        </div>
+                        <!-- 右侧操作栏：点赞 / 分享 / 画中画 -->
+                        <div class="lv-action-rail">
+                            <button class="lv-rail-btn" id="likeBtn" type="button" title="点赞">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                                <span class="lv-rail-label" id="likeCount">0</span>
+                            </button>
+                            <button class="lv-rail-btn" id="shareBtn" type="button" title="分享" data-i18n-title="rail_share">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                                <span class="lv-rail-label" data-i18n="rail_share">分享</span>
+                            </button>
+                            <button class="lv-rail-btn" id="pipBtn" type="button" title="画中画" data-i18n-title="rail_pip">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="12" y="11" width="8" height="6" rx="1"/></svg>
+                                <span class="lv-rail-label" data-i18n="rail_pip">画中画</span>
+                            </button>
+                            <button class="lv-rail-btn" id="viewerSnapBtn" type="button" title="截图" data-i18n-title="rail_snapshot">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                <span class="lv-rail-label" data-i18n="rail_snapshot">截图</span>
+                            </button>
+                        </div>
+                        <div class="lv-viewer-bottom">
+                            <img class="lv-viewer-avatar" id="vAvatar" alt="">
+                            <div class="lv-viewer-info">
+                                <div class="lv-viewer-title" id="vTitle"></div>
+                                <div class="lv-viewer-name" id="vName"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 直播聊天 -->
+                    <aside class="lv-chat" id="viewerChat">
+                        <div class="lv-chat-head">
+                            <span class="lv-chat-title" data-i18n="chat_title">聊天</span>
+                            <button class="lv-chat-toggle" id="viewerChatToggle" type="button">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
+                        <div class="lv-chat-list" id="viewerChatList"><div class="lv-chat-empty" data-i18n="chat_empty">暂无消息</div></div>
+                        <div class="lv-chat-input">
+                            <input type="text" id="viewerChatInput" data-i18n-placeholder="placeholder_viewer_chat" placeholder="发送消息…" maxlength="500">
+                            <button class="lv-chat-send" id="viewerChatSend" type="button">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                            </button>
+                        </div>
+                    </aside>
+                    <button class="lv-chat-open-btn" id="viewerChatOpen" type="button">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- 开播模态（选源+标题） -->
+        <div class="lv-modal-overlay" id="goLiveModal">
+            <div class="lv-modal">
+                <div class="lv-modal-bar">
+                    <h2 class="lv-modal-title" data-i18n="modal_go_live">开始直播</h2>
+                    <button class="lv-modal-x" id="goLiveCancel">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="lv-modal-body">
+                    <div class="lv-source-section">
+                        <label class="lv-field-label" data-i18n="field_source">直播来源</label>
+                        <div class="lv-source-grid">
+                            <button class="lv-source-card active" data-source="camera" type="button">
+                                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                                <span data-i18n="source_camera">摄像头</span>
+                            </button>
+                            <button class="lv-source-card" data-source="screen" type="button">
+                                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg>
+                                <span data-i18n="source_screen">屏幕共享</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="lv-field">
+                        <label class="lv-field-label" data-i18n="field_title">直播标题</label>
+                        <input type="text" class="lv-input" id="liveTitleInput" data-i18n-placeholder="placeholder_title" placeholder="给直播起个名字（选填）" maxlength="60">
+                    </div>
+                    <div class="lv-field">
+                        <label class="lv-field-label" data-i18n="field_quality">画质</label>
+                        <div class="lv-seg" id="qualitySeg">
+                            <button class="lv-seg-btn" data-quality="720p" type="button">720p</button>
+                            <button class="lv-seg-btn active" data-quality="auto" type="button">Auto</button>
+                            <button class="lv-seg-btn" data-quality="1080p" type="button">1080p</button>
+                        </div>
+                        <p class="lv-modal-hint" data-i18n="hint_quality">720p 1.5Mbps · 1080p 3.5Mbps · Auto 自适应 2.5Mbps。屏幕共享默认 1080p。</p>
+                    </div>
+                    <p class="lv-modal-hint" data-i18n="hint_p2p">直播基于 P2P，视频流来自你的电脑，观众多时取决于你的上传带宽。</p>
+                </div>
+                <div class="lv-modal-foot">
+                    <button class="lv-btn-ghost" id="goLiveCancel2" data-i18n="btn_cancel">取消</button>
+                    <button class="lv-btn-primary" id="startLiveBtn" data-i18n="btn_preview_start">预览并开播</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 预览确认模态 -->
+        <div class="lv-modal-overlay" id="previewModal">
+            <div class="lv-modal" style="width:min(560px,calc(100vw - 32px))">
+                <div class="lv-modal-bar">
+                    <h2 class="lv-modal-title" data-i18n="modal_preview">预览确认</h2>
+                    <button class="lv-modal-x" id="previewCancel">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="lv-modal-body">
+                    <div class="lv-preview-wrap">
+                        <video class="lv-preview-video" id="previewVideo" autoplay muted playsinline></video>
+                        <div class="lv-preview-status" id="previewStatus" data-i18n="status_getting_preview">正在获取预览…</div>
+                    </div>
+                </div>
+                <div class="lv-modal-foot">
+                    <button class="lv-btn-ghost" id="previewReselect" data-i18n="btn_reselect">重新选择</button>
+                    <button class="lv-btn-primary" id="previewConfirm" disabled data-i18n="btn_confirm_start">确认开播</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 直播结束页 -->
+        <div class="lv-modal-overlay" id="endModal">
+            <div class="lv-modal lv-end-modal" style="text-align:center">
+                <div class="lv-end-icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h2 class="lv-end-title" data-i18n="end_title">直播已结束</h2>
+                <p class="lv-end-sub" data-i18n="end_sub">感谢你的直播</p>
+                <div class="lv-end-stats">
+                    <div class="lv-end-stat">
+                        <div class="lv-end-stat-val" id="endDuration">00:00</div>
+                        <div class="lv-end-stat-label" data-i18n="end_duration">直播时长</div>
+                    </div>
+                    <div class="lv-end-stat">
+                        <div class="lv-end-stat-val" id="endPeak">0</div>
+                        <div class="lv-end-stat-label" data-i18n="end_peak">峰值观看</div>
+                    </div>
+                </div>
+                <div class="lv-end-actions">
+                    <button class="lv-btn-ghost" id="endCloseBtn" data-i18n="btn_done">完成</button>
+                    <button class="lv-btn-primary" id="endAgainBtn" data-i18n="btn_again">再次开播</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 修改标题 -->
+        <div class="lv-modal-overlay" id="titleEditModal">
+            <div class="lv-modal modal-sm">
+                <div class="lv-modal-bar">
+                    <h2 class="lv-modal-title" data-i18n="modal_edit_title">修改直播标题</h2>
+                    <button class="lv-modal-x" id="titleEditCancel">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="lv-modal-body">
+                    <div class="lv-field">
+                        <input type="text" class="lv-input" id="titleEditInput" data-i18n-placeholder="placeholder_title_short" placeholder="给直播起个名字" maxlength="40">
+                    </div>
+                </div>
+                <div class="lv-modal-foot">
+                    <button class="lv-btn-ghost" id="titleEditCancel2" data-i18n="btn_cancel">取消</button>
+                    <button class="lv-btn-primary" id="titleEditSave" data-i18n="btn_save">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主播信息卡（点头像看） -->
+        <div class="lv-modal-overlay" id="hostCardModal">
+            <div class="lv-modal modal-sm">
+                <div class="lv-modal-bar">
+                    <h2 class="lv-modal-title">主播信息</h2>
+                    <button class="lv-modal-x" id="hostCardClose">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="lv-modal-body" style="text-align:center">
+                    <img class="lv-hostcard-avatar" id="hcAvatar" alt="">
+                    <h3 class="lv-hc-name" id="hcName">主播</h3>
+                    <p class="lv-hc-meta" id="hcMeta">直播中</p>
+                    <div class="lv-hc-stats" id="hcStats" style="display:none">
+                        <div class="lv-hc-stat">
+                            <div class="lv-hc-stat-val" id="hcStatTotal">0</div>
+                            <div class="lv-hc-stat-label" id="hcStatTotalLabel">历史直播</div>
+                        </div>
+                        <div class="lv-hc-stat">
+                            <div class="lv-hc-stat-val" id="hcStatDur">0</div>
+                            <div class="lv-hc-stat-label" id="hcStatDurLabel">累计时长</div>
+                        </div>
+                    </div>
+                    <a class="lv-btn-primary lv-hc-profile" id="hcProfile" href="/">查看主页</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自定义确认弹窗 -->
+        <div class="lv-modal-overlay" id="confirmModal">
+            <div class="lv-modal modal-sm" style="text-align:center">
+                <h2 class="lv-confirm-title" id="confirmTitle">确认</h2>
+                <p class="lv-confirm-msg" id="confirmMsg">确定吗？</p>
+                <div class="lv-confirm-actions">
+                    <button class="lv-btn-ghost" id="confirmCancel">取消</button>
+                    <button class="lv-btn-primary" id="confirmOk">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 直播间已满提示 -->
+        <div class="lv-modal-overlay" id="fullModal">
+            <div class="lv-modal modal-sm" style="text-align:center">
+                <div class="lv-full-icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </div>
+                <h2 class="lv-full-title">直播间已满</h2>
+                <p class="lv-full-msg" id="fullMsg">直播间已满，请稍后再试</p>
+                <button class="lv-btn-primary" id="fullClose" style="width:100%">知道了</button>
+            </div>
+        </div>
+
+        <!-- 申请直播权限 -->
+        <div class="lv-modal-overlay" id="applyModal">
+            <div class="lv-modal" style="width:min(520px,calc(100vw - 32px))">
+                <div class="lv-modal-bar">
+                    <h2 class="lv-modal-title" id="applyTitle">申请直播权限</h2>
+                    <button class="lv-modal-x" id="applyCancel">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="lv-modal-body">
+                    <div class="lv-apply-status" id="applyStatus" style="display:none"></div>
+                    <!-- 隐私须知 -->
+                    <div class="lv-privacy-notice">
+                        <div class="lv-privacy-icon">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <div class="lv-privacy-text">
+                            <h4>隐私保护说明</h4>
+                            <p>我们深知隐私对你至关重要。直播采用点对点（P2P）技术，音视频数据直接从你的设备传输至观众设备，<strong>不经过服务器存储或中转</strong>。你的直播内容不会被录制或保存。</p>
+                        </div>
+                    </div>
+                    <div class="lv-field">
+                        <label class="lv-field-label">直播间封面</label>
+                        <div class="lv-cover-drop" id="coverDrop">
+                            <input type="file" id="coverInput" accept="image/jpeg,image/png,image/gif,image/webp" hidden>
+                            <div class="lv-cover-preview" id="coverPreview" style="display:none">
+                                <img id="coverPreviewImg" alt="">
+                                <button class="lv-cover-change" id="coverChangeBtn" type="button">更换</button>
+                            </div>
+                            <div class="lv-cover-placeholder" id="coverPlaceholder">
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                <span>点击上传封面</span>
+                                <span class="lv-cover-hint">建议 16:9 · 最大 7MB</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lv-field">
+                        <label class="lv-field-label">直播间名字</label>
+                        <input type="text" class="lv-input" id="channelNameInput" placeholder="给你的直播间起个名字" maxlength="40">
+                    </div>
+                    <!-- 直播须知 -->
+                    <div class="lv-terms-box">
+                        <h5>直播须知</h5>
+                        <ul>
+                            <li>不直播违法、侵权、淫秽或暴力内容</li>
+                            <li>不侵犯他人知识产权、隐私及肖像权</li>
+                            <li>你对直播内容的合法性负全部责任</li>
+                            <li>管理员有权随时终止违规直播</li>
+                        </ul>
+                    </div>
+                    <label class="lv-consent-check">
+                        <input type="checkbox" id="applyAgreeCheck">
+                        <span>我已阅读并同意 <a href="/terms" target="_blank">《用户协议》</a> 与 <a href="/privacy" target="_blank">《隐私政策》</a></span>
+                    </label>
+                </div>
+                <div class="lv-modal-foot">
+                    <button class="lv-btn-ghost" id="applyCancel2">取消</button>
+                    <button class="lv-btn-primary" id="applySubmit">提交申请</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 直播条款同意弹窗（首次进入显示） -->
+        <div class="lv-consent-overlay" id="liveConsent">
+            <div class="lv-consent">
+                <h2 class="lv-consent-title">直播与隐私</h2>
+                <p class="lv-consent-body">我们深知隐私对你至关重要。直播采用点对点（P2P）技术，音视频数据直接从你的设备传输至观众设备，不经过服务器存储或中转。你的直播内容不会被录制或保存。</p>
+                <ul class="lv-consent-list">
+                    <li>不直播违法、侵权、淫秽或暴力内容</li>
+                    <li>不侵犯他人知识产权、隐私、肖像权</li>
+                    <li>你对直播内容的合法性负全部责任</li>
+                    <li>管理员有权随时终止违规直播</li>
+                </ul>
+                <p class="lv-consent-links">详情见 <a href="/terms" target="_blank">《用户协议》</a> 与 <a href="/privacy" target="_blank">《隐私政策》</a></p>
+                <div class="lv-consent-btns">
+                    <button class="lv-consent-deny" id="consentDeny" type="button" data-i18n="btn_disagree">不同意</button>
+                    <button class="lv-consent-agree" id="consentAgree" type="button" data-i18n="btn_agree_continue">同意并继续</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 常见问题 -->
+        <div class="lv-modal-overlay" id="faqModal">
+            <div class="lv-modal" style="width:min(560px,calc(100vw - 32px))">
+                <div class="lv-modal-bar">
+                    <h2 class="lv-modal-title" data-i18n="modal_faq">常见问题</h2>
+                    <button class="lv-modal-x" id="faqClose">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="lv-modal-body">
+                    <div class="lv-faq-item">
+                        <div class="lv-faq-q"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>观众看不到画面（黑屏）</div>
+                        <div class="lv-faq-a">主播确认已点「确认开播」并选择了正确的摄像头/屏幕。检查浏览器地址栏的相机权限是否允许。观众刷新页面重试。WebRTC 是 P2P，主播上传带宽不足时观众会黑屏。</div>
+                    </div>
+                    <div class="lv-faq-item">
+                        <div class="lv-faq-q"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>没有声音</div>
+                        <div class="lv-faq-a">主播检查麦克风是否已开启（控制坞麦克风按钮不为红色）。观众检查播放器是否静音（点击音量按钮取消静音）。屏幕共享需在共享对话框勾选「分享音频」。</div>
+                    </div>
+                    <div class="lv-faq-item">
+                        <div class="lv-faq-q"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>画面卡顿</div>
+                        <div class="lv-faq-a">主播降低画质到 720p，关闭其他占带宽的应用。观众关闭下载任务。单主播 P2P 架构上限 10 观众，超过会显示「直播间已满」。</div>
+                    </div>
+                    <div class="lv-faq-item">
+                        <div class="lv-faq-q"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>延迟太高</div>
+                        <div class="lv-faq-a">P2P 通常 200ms-1s。如延迟超 2s，主播降低画质，观众刷新重连。直播设置中可开启「低延迟模式」。</div>
+                    </div>
+                </div>
+                <div class="lv-modal-foot">
+                    <button class="lv-btn-primary" id="faqDone" style="flex:1" data-i18n="btn_done">完成</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 直播设置 -->
+        <div class="lv-modal-overlay" id="settingsModal">
+            <div class="lv-modal" style="width:min(460px,calc(100vw - 32px))">
+                <div class="lv-modal-bar">
+                    <h2 class="lv-modal-title" data-i18n="modal_settings">直播设置</h2>
+                    <button class="lv-modal-x" id="settingsClose">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="lv-modal-body">
+                    <div class="lv-field">
+                        <label class="lv-field-label" data-i18n="settings_language">语言</label>
+                        <div class="lv-seg" id="langSeg">
+                            <button class="lv-seg-btn" data-lang="zh-CN" type="button">简体中文</button>
+                            <button class="lv-seg-btn" data-lang="zh-TW" type="button">繁體中文</button>
+                            <button class="lv-seg-btn" data-lang="en" type="button">English</button>
+                            <button class="lv-seg-btn" data-lang="ja" type="button">日本語</button>
+                        </div>
+                    </div>
+                    <div class="lv-field">
+                        <label class="lv-field-label" data-i18n="settings_quality">默认画质</label>
+                        <div class="lv-seg" id="defaultQualitySeg">
+                            <button class="lv-seg-btn" data-quality="720p" type="button">720p</button>
+                            <button class="lv-seg-btn active" data-quality="auto" type="button">Auto</button>
+                            <button class="lv-seg-btn" data-quality="1080p" type="button">1080p</button>
+                        </div>
+                    </div>
+                    <div class="lv-setting-row">
+                        <div>
+                            <div class="lv-setting-label" data-i18n="settings_notif">直播通知</div>
+                            <div class="lv-setting-sub" data-i18n="settings_notif_sub">关注的主播开播时提醒</div>
+                        </div>
+                        <div class="lv-switch" id="notifSwitch" role="switch" aria-checked="false"></div>
+                    </div>
+                    <div class="lv-setting-row">
+                        <div>
+                            <div class="lv-setting-label" data-i18n="settings_lowlatency">低延迟模式</div>
+                            <div class="lv-setting-sub" data-i18n="settings_lowlatency_sub">降低延迟，但可能增加卡顿</div>
+                        </div>
+                        <div class="lv-switch" id="lowLatencySwitch" role="switch" aria-checked="false"></div>
+                    </div>
+                </div>
+                <div class="lv-modal-foot">
+                    <button class="lv-btn-primary" id="settingsDone" style="flex:1" data-i18n="btn_done">完成</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 我的直播间管理 -->
+        <div class="lv-modal-overlay" id="myChannelsModal">
+            <div class="lv-modal" style="width:min(560px,calc(100vw - 32px))">
+                <div class="lv-modal-bar">
+                    <h2 class="lv-modal-title" data-i18n="modal_my_channels">我的直播间</h2>
+                    <button class="lv-modal-x" id="myChannelsClose">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="lv-modal-body">
+                    <div class="lv-my-channels-list" id="myChannelsList"></div>
+                </div>
+                <div class="lv-modal-foot">
+                    <button class="lv-btn-ghost" id="myChannelsClose2" data-i18n="btn_close">关闭</button>
+                    <button class="lv-btn-primary" id="myChannelsApply" data-i18n="btn_apply_channel">申请新直播间</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑直播间（改名/换封面） -->
+        <div class="lv-modal-overlay" id="editChannelModal">
+            <div class="lv-modal" style="width:min(520px,calc(100vw - 32px))">
+                <div class="lv-modal-bar">
+                    <h2 class="lv-modal-title" data-i18n="modal_edit_channel">编辑直播间</h2>
+                    <button class="lv-modal-x" id="editChannelClose">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="lv-modal-body">
+                    <div class="lv-field">
+                        <label class="lv-field-label" data-i18n="field_channel_cover">直播间封面</label>
+                        <div class="lv-cover-drop" id="editCoverDrop">
+                            <input type="file" id="editCoverInput" accept="image/jpeg,image/png,image/gif,image/webp" hidden>
+                            <div class="lv-cover-preview" id="editCoverPreview" style="display:none">
+                                <img id="editCoverPreviewImg" alt="">
+                                <button class="lv-cover-change" id="editCoverChangeBtn" type="button" data-i18n="btn_change">更换</button>
+                            </div>
+                            <div class="lv-cover-placeholder" id="editCoverPlaceholder">
+                                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                <span data-i18n="cover_click_upload">点击上传封面</span>
+                                <span class="lv-cover-hint" data-i18n="cover_hint">建议 16:9 · 最大 7MB</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lv-field">
+                        <label class="lv-field-label" data-i18n="field_channel_name">直播间名字</label>
+                        <input type="text" class="lv-input" id="editChannelNameInput" data-i18n-placeholder="placeholder_channel_name" placeholder="给你的直播间起个名字" maxlength="40">
+                    </div>
+                </div>
+                <div class="lv-modal-foot">
+                    <button class="lv-btn-ghost" id="editChannelCancel" data-i18n="btn_cancel">取消</button>
+                    <button class="lv-btn-primary" id="editChannelSave" data-i18n="btn_save">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 选择直播间（多频道用户开播时） -->
+        <div class="lv-modal-overlay" id="pickChannelModal">
+            <div class="lv-modal" style="width:min(460px,calc(100vw - 32px))">
+                <div class="lv-modal-bar">
+                    <h2 class="lv-modal-title" data-i18n="modal_pick_channel">选择直播间</h2>
+                    <button class="lv-modal-x" id="pickChannelClose">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+                <div class="lv-modal-body">
+                    <div class="lv-channel-picker" id="pickChannelList"></div>
+                </div>
+                <div class="lv-modal-foot">
+                    <button class="lv-btn-ghost" id="pickChannelCancel" data-i18n="btn_cancel">取消</button>
+                    <button class="lv-btn-primary" id="pickChannelConfirm" disabled data-i18n="btn_next">下一步</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="lv-toast" id="toast"></div>
+    </div>
+
+    <!-- 九宫格菜单（版块 + AI + 设置） -->
+    <div class="section-menu" id="sectionMenu">
+        <button class="sm-item" onclick="smNavigate('home')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></svg></span>
+            <span class="sm-label" data-i18n="nav_home">首页</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('live')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10 4.5 18.5c-.8.6-2-.03-2-1.06V6.56c0-1.03 1.2-1.66 2-1.06L15 14"/><circle cx="17" cy="12" r="4.5"/><path d="M20.5 8.5a6.5 6.5 0 0 1 0 7"/></svg></span>
+            <span class="sm-label" data-i18n="nav_live">直播</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('news')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 6h8v5H8zM8 13h8M8 17h5"/></svg></span>
+            <span class="sm-label" data-i18n="nav_news">新闻</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('ai')">
+            <span class="sm-icon-wrap sm-icon-ai"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.8 2.8M14.9 14.9l2.8 2.8M17.7 6.3l-2.8 2.8M9.1 14.9l-2.8 2.8"/></svg></span>
+            <span class="sm-label">AI</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('msg')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+            <span class="sm-label" data-i18n="nav_msg">消息</span>
+            <span class="sm-badge" id="smMsgBadge" hidden></span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('me')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg></span>
+            <span class="sm-label" data-i18n="profile">我的</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('settings')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+            <span class="sm-label" data-i18n="settings">设置</span>
+        </button>
+    </div>
+
+    <script>
+    (function () {
+        var CURRENT = 'live';
+        function toggleSectionMenu(e) {
+            if (e) e.stopPropagation();
+            var menu = document.getElementById('sectionMenu');
+            if (!menu) return;
+            var willOpen = !menu.classList.contains('open');
+            closeSectionMenu();
+            if (willOpen) {
+                menu.classList.add('open');
+                setTimeout(function () { document.addEventListener('click', closeSectionMenu); }, 0);
+            }
+        }
+        function closeSectionMenu() {
+            var menu = document.getElementById('sectionMenu');
+            if (menu) menu.classList.remove('open');
+            document.removeEventListener('click', closeSectionMenu);
+        }
+        window.smNavigate = function (page) {
+            closeSectionMenu();
+            if (page === 'home') window.location.href = '/';
+            else if (page === 'live') window.location.href = '/live';
+            else if (page === 'news') window.location.href = '/peacenews';
+            else if (page === 'ai') window.location.href = '/ai';
+            else if (page === 'msg') window.location.href = '/?open=msg';
+            else if (page === 'me') window.location.href = '/?open=me';
+            else if (page === 'settings') window.location.href = '/?open=settings';
+        };
+        var menuBtn = document.getElementById('menuNavBtn');
+        if (menuBtn) menuBtn.addEventListener('click', toggleSectionMenu);
+        // 同步消息未读角标
+        function updateSmBadge() {
+            var badge = document.getElementById('smMsgBadge');
+            if (!badge) return;
+            if (window.userId) {
+                try {
+                    fetch('/api/notifications').then(function (r) { return r.json(); }).then(function (data) {
+                        var unread = (data.notifications || []).filter(function (n) { return !n.read; }).length;
+                        badge.hidden = !(unread > 0);
+                    }).catch(function () {});
+                } catch (e) {}
+            } else {
+                badge.hidden = true;
+            }
+        }
+        updateSmBadge();
+        setInterval(updateSmBadge, 60000);
+    })();
+    </script>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="/report.js?v=20260827-report"></script>
+    <script src="/live.js?v=20260913-ja"></script>
+</body>
+</html>

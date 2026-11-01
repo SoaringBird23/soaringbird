@@ -1,0 +1,6 @@
+flask
+cbor2
+ecdsa
+psycopg2-binary
+Pillow
+aiortc

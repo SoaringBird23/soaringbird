@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="翱翔鸟社区 PeaceNews 新闻中心：多信源新闻聚合，支持分类浏览、点赞评论与投稿发布。">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="翱翔鸟">
+    <meta property="og:title" content="PeaceNews 新闻中心 - 翱翔鸟">
+    <meta property="og:description" content="翱翔鸟社区 PeaceNews 新闻中心：多信源新闻聚合，支持分类浏览、点赞评论与投稿发布。">
+    <title>PeaceNews 新闻中心 - 翱翔鸟</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23000000'/%3E%3Cpath d='M18 41V23l14 11 14-11v18' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23000000'/%3E%3C/svg%3E">
+        <link rel="stylesheet" href="peacenews.css?v=20261011-paper1">
+    <script>
+    (function(){
+        var t = localStorage.getItem('bird_theme') || 'light';
+        if (t === 'light') document.documentElement.removeAttribute('data-theme');
+        else document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
+</head>
+<body class="pn-paper">
+    <!-- ============ 左侧导航栏（与论坛首页一致：方格纸设计语言） ============ -->
+    <aside class="sb-side">
+        <a class="sb-brand" href="/" title="翱翔鸟 论坛" aria-label="翱翔鸟 论坛"><img class="sb-logo" src="logo-light.png" alt="翱翔鸟" width="34" height="34"></a>
+        <nav class="sb-nav">
+            <button class="sb-item" onclick="smNavigate('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.4 12 3.6l8.5 6.8"/><path d="M5.8 9.4V20.4h12.4V9.4"/><path d="M9.8 20.4v-5.2h4.4v5.2"/></svg><span>首页</span></button>
+            <button class="sb-item" onclick="smNavigate('live')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.7"/><path d="M7.6 16.4a6.2 6.2 0 0 0 0-8.8M16.4 16.4a6.2 6.2 0 0 1 0-8.8"/></svg><span>直播</span></button>
+            <button class="sb-item" onclick="window.location.href='/podcast'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.8" width="6" height="10.4" rx="3"/><path d="M5.8 11.4a6.2 6.2 0 0 0 12.4 0"/><path d="M12 17.6v3.6M8.6 21.2h6.8"/></svg><span>播客</span></button>
+            <button class="sb-item is-on" onclick="smNavigate('news')" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.2h7.6L18 7.6V20.8H6z"/><path d="M13.4 3.2v4.6H18"/><path d="M9 12.2h6M9 15.6h6M9 8.8h2.6"/></svg><span>新闻</span></button>
+            <button class="sb-item" onclick="smNavigate('ai')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 3.2c.5 3.9 2.2 5.6 6.1 6.1-3.9.5-5.6 2.2-6.1 6.1-.5-3.9-2.2-5.6-6.1-6.1 3.9-.5 5.6-2.2 6.1-6.1z"/><path d="M6.6 13.9c.26 2 1.14 2.88 3.14 3.14-2 .26-2.88 1.14-3.14 3.14-.26-2-1.14-2.88-3.14-3.14 2-.26 2.88-1.14 3.14-3.14z"/></svg><span>AI</span></button>
+            <button class="sb-item" onclick="smNavigate('msg')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 7.4A2.4 2.4 0 0 1 6.9 5h10.2a2.4 2.4 0 0 1 2.4 2.4v6.2a2.4 2.4 0 0 1-2.4 2.4H9.4L4.5 19.6z"/></svg><span>消息</span><span class="sb-badge" id="smMsgBadge" hidden></span></button>
+            <button class="sb-item" onclick="smNavigate('me')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.7"/><path d="M4.9 20.4c.55-3.75 3.65-5.9 7.1-5.9s6.55 2.15 7.1 5.9"/></svg><span>我的</span></button>
+            <button class="sb-item" onclick="window.location.href='/account'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.8" width="18" height="14.4" rx="2.6"/><circle cx="8.6" cy="11" r="2.2"/><path d="M5.1 16.6c.5-1.4 1.9-2.2 3.5-2.2s3 .8 3.5 2.2"/><path d="M14.6 10.4h4M14.6 13.8h4"/></svg><span>翱翔鸟账户</span></button>
+            <button class="sb-item" onclick="smNavigate('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></svg><span>设置</span></button>
+        </nav>
+        <div class="sb-foot">
+            <a class="sb-account" id="sbUser" href="/account" style="display:none" title="账户" aria-label="账户"><span class="sb-avatar" id="sbAvatar">?</span></a>
+            <a class="sb-login" id="sbLogin" href="/signin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4.5H5.8A1.8 1.8 0 0 0 4 6.3v11.4a1.8 1.8 0 0 0 1.8 1.8H10"/><path d="M11 12h9M16.6 8.6 20 12l-3.4 3.4"/></svg><span>登录</span></a>
+            <a class="sb-dl" href="/download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6v10"/><path d="M7.7 9.5 12 13.8l4.3-4.3"/><path d="M4.6 16v2.6A1.8 1.8 0 0 0 6.4 20.4h11.2a1.8 1.8 0 0 0 1.8-1.8V16"/></svg><span>下载客户端</span></a>
+            <button class="sb-theme" onclick="pnToggleTheme()" aria-label="切换明暗主题" title="切换明暗主题">
+                <svg class="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.4A8.4 8.4 0 0 1 9.6 4 8.4 8.4 0 1 0 20 14.4z"/></svg>
+                <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.6v2.1M12 19.3v2.1M2.6 12h2.1M19.3 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5"/></svg>
+            </button>
+        </div>
+    </aside>
+
+    <!-- 顶部公告条 -->
+    <div class="pn-annbar" id="annBar">
+        <span class="pn-annbar-badge">公告</span>
+        <div class="pn-annbar-text" id="annBarText">翱翔鸟·新闻中心：聚合 66+ 权威信源，每 10 分钟自动刷新；内容仅供学习交流，观点归原作者所有，不代表本站立场。</div>
+        <button class="pn-annbar-close" id="annBarClose" type="button" title="关闭公告" aria-label="关闭公告">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </div>
+
+    <nav class="nav-bar">
+        <div class="nav-inner">
+            <a class="pn-back-forum" href="/" title="返回论坛">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+                <span>论坛</span>
+            </a>
+            <div class="nav-spacer"></div>
+            <div class="nav-actions">
+                <button class="pn-icon-btn" id="menuNavBtn" type="button" title="菜单" aria-label="菜单">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                </button>
+                <a class="btn-login" href="/signin" id="navLoginBtn" style="text-decoration:none;display:inline-block">登录</a>
+                <div class="pn-user" id="navUser" style="display:none">
+                    <img class="pn-avatar" id="navAvatar" alt="" src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='20' fill='%23e8ebef'/%3E%3Ccircle cx='20' cy='16' r='6.5' fill='%23a9b3c0'/%3E%3Cpath d='M7.5 36c1.6-7 6.3-10.5 12.5-10.5S30.9 29 32.5 36z' fill='%23a9b3c0'/%3E%3C/svg%3E">
+                    <span class="pn-username" id="navUsername"></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pn-main">
+        <!-- 站点标题行（body 上端）：标题黑字 + 日期在标题右侧 + 发帖按钮最右（橙底白字，与标题基线对齐） -->
+        <div class="pn-site-head">
+            <h1 class="pn-site-title">Peacenews.<span class="pn-site-title-sub">新闻中心</span></h1>
+            <div class="pn-site-date" id="siteDate"></div>
+            <div class="site-head-spacer"></div>
+            <button class="pn-publish-btn pn-site-publish" id="publishBtn" type="button">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>发布新闻
+            </button>
+        </div>
+        <!-- 列表视图 -->
+        <section id="listView">
+            <!-- 顶栏：股市、天气各自一个圆角矩形容器（仅内部内容滚动，外框不动）；下方快讯一行一条 -->
+            <div class="pn-topbar" id="topbar">
+                <div class="pn-tb-row pn-tb-panel" id="tbRowStock">
+                    <div class="pn-tb-track" id="tbStockTrack"></div>
+                </div>
+                <div class="pn-tb-row pn-tb-panel" id="tbRowWeather">
+                    <div class="pn-tb-track" id="tbWeatherTrack"></div>
+                </div>
+                <div class="pn-tb-row pn-tb-flash-row" id="tbRowFlash">
+                    <div class="pn-tb-track pn-tb-flash-track" id="tbFlashTrack"></div>
+                </div>
+            </div>
+            <!-- 核心内容区：左轮播大图 + 右头条列表 -->
+            <div class="pn-headline" id="headline" style="display:none">
+                <div class="pn-carousel" id="carousel"></div>
+                <aside class="pn-hlist" id="hlist"></aside>
+            </div>
+
+            <!-- 筛选区：时间下拉 + 分类标签，整体居中对齐；时间筛选为非原生下拉，位于"全部"标签左侧 -->
+            <div class="pn-filterbar" id="filterBar">
+                <div class="pn-category-bar" id="categoryBar" role="tablist" aria-label="分类筛选">
+                    <div class="pn-time-drop" id="timeDrop">
+                        <button class="pn-time-trigger" id="timeDropBtn" type="button" aria-haspopup="true" aria-expanded="false">全部时间</button>
+                        <div class="pn-time-menu" id="timeMenu" role="menu">
+                            <button class="pn-time-opt" data-days="0" type="button" role="menuitem">全部时间</button>
+                            <button class="pn-time-opt" data-days="1" type="button" role="menuitem">今天</button>
+                            <button class="pn-time-opt" data-days="3" type="button" role="menuitem">近3天</button>
+                            <button class="pn-time-opt active" data-days="7" type="button" role="menuitem">近7天</button>
+                            <button class="pn-time-opt" data-days="30" type="button" role="menuitem">近30天</button>
+                        </div>
+                    </div>
+                    <button class="pn-cat-chip active" data-cat="">全部</button>
+                    <button class="pn-cat-chip" data-cat="时事">时事</button>
+                    <button class="pn-cat-chip" data-cat="社会">社会</button>
+                    <button class="pn-cat-chip" data-cat="经济">经济</button>
+                    <button class="pn-cat-chip" data-cat="体育">体育</button>
+                    <button class="pn-cat-chip" data-cat="科技">科技</button>
+                    <button class="pn-cat-chip" data-cat="娱乐">娱乐</button>
+                    <button class="pn-cat-chip" data-cat="人文">人文</button>
+                    <button class="pn-cat-chip" data-cat="生活">生活</button>
+                    <button class="pn-cat-chip" data-cat="环境">环境</button>
+                    <button class="pn-cat-chip pn-cat-green" data-cat="社群">社群</button>
+                </div>
+            </div>
+
+            <div class="pn-grid" id="newsGrid"></div>
+            <div class="pn-empty" id="newsEmpty" style="display:none">
+                <div class="pn-empty-title" id="emptyTitle">暂无新闻</div>
+                <div class="pn-empty-hint" id="emptyHint">换个分类或时间范围试试</div>
+            </div>
+            <!-- 瀑布流无限加载占位 -->
+            <div class="pn-more" id="moreBox"><span id="moreText">加载中…</span></div>
+        </section>
+
+        <!-- 详情视图 -->
+        <section id="detailView" style="display:none">
+            <button class="pn-back" id="backBtn">← 返回列表</button>
+            <div class="pn-detail-layout">
+            <div class="pn-detail-main">
+            <article class="pn-detail">
+                <h2 class="pn-detail-title" id="dTitle"></h2>
+                <div class="pn-detail-orig" id="dOrigTitle" style="display:none"></div>
+                <div class="pn-detail-meta">
+                    <img class="pn-avatar" id="dAvatar" alt="" src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='20' fill='%23e8ebef'/%3E%3Ccircle cx='20' cy='16' r='6.5' fill='%23a9b3c0'/%3E%3Cpath d='M7.5 36c1.6-7 6.3-10.5 12.5-10.5S30.9 29 32.5 36z' fill='%23a9b3c0'/%3E%3C/svg%3E">
+                    <span class="pn-author" id="dAuthor"></span>
+                    <span class="pn-time" id="dTime"></span>
+                    <button class="pn-edit-btn" id="dEditBtn" style="display:none">编辑</button>
+                    <button class="pn-delete-btn" id="dDeleteBtn" style="display:none">删除</button>
+                </div>
+                <img class="pn-detail-cover" id="dCover" alt="" style="display:none">
+                <video class="pn-detail-cover" id="dVideo" controls preload="metadata" playsinline style="display:none"></video>
+                <div class="pn-detail-content" id="dContent"></div>
+                <div class="pn-detail-trans" id="dTranslateArea" style="display:none">
+                    <button class="pn-edit-btn" id="dTranslateBtn">实时翻译</button>
+                    <div class="pn-detail-trans-box" id="dTranslateBox" style="display:none"></div>
+                </div>
+                <div class="pn-detail-actions">
+                    <button class="pn-like-btn" id="dLikeBtn">
+                        <svg class="pn-icon-heart" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span id="dLikeCount">0</span>
+                    </button>
+                    <button class="pn-like-btn pn-report-btn" id="dReportBtn" title="举报" onclick="reportNews()">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21V4"/><path d="M6 4c3-1 6.5-1 9 0v9c-2.5-1-6-1-9 0"/></svg>
+                    </button>
+                </div>
+            </article>
+
+            <div class="pn-related" id="relatedSection" style="display:none">
+                <h2 class="pn-related-title">相关新闻 · 多信源聚合</h2>
+                <div class="pn-related-note" id="relatedNote"></div>
+                <div class="pn-related-list" id="relatedList"></div>
+            </div>
+
+            <div class="pn-comments">
+                <h2 class="pn-comments-title">评论 <span id="cCount">0</span></h2>
+                <div class="pn-stance-panel" id="stancePanel" style="display:none">
+                    <div class="pn-stance-head">
+                        <span class="pn-stance-title">观点对撞</span>
+                        <span class="pn-stance-note">同一事件，不同看法 · 真实评论按立场归位</span>
+                    </div>
+                    <div class="pn-stance-cols">
+                        <div class="pn-stance-col pn-stance-pro">
+                            <div class="pn-stance-col-title">赞成 · 支持</div>
+                            <div class="pn-stance-list" id="stanceProList"></div>
+                            <div class="pn-stance-empty" id="stanceProEmpty">暂无「赞成」观点评论</div>
+                        </div>
+                        <div class="pn-stance-col pn-stance-anti">
+                            <div class="pn-stance-col-title">反对 · 质疑</div>
+                            <div class="pn-stance-list" id="stanceAntiList"></div>
+                            <div class="pn-stance-empty" id="stanceAntiEmpty">暂无「反对」观点评论</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="commentList"></div>
+                <button class="pn-page-btn pn-comment-more" id="commentMore" style="display:none">加载更多评论</button>
+                <div class="pn-comment-box">
+                    <div class="pn-stance-picker" id="stancePicker" style="display:none">
+                        <span class="pn-stance-picker-label">我的观点：</span>
+                        <button class="pn-stance-opt active" data-stance="中立" type="button">中立</button>
+                        <button class="pn-stance-opt" data-stance="赞成" type="button">赞成</button>
+                        <button class="pn-stance-opt" data-stance="反对" type="button">反对</button>
+                    </div>
+                    <textarea id="commentInput" class="pn-textarea" placeholder="写下你的评论…（国际/社会类新闻可选择立场，观点将按立场归入对撞栏）" rows="3"></textarea>
+                    <div class="pn-comment-tools">
+                        <button class="btn-login" id="commentSubmit">发表评论</button>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <aside class="pn-agent-side" id="agentSide">
+                <div class="pn-agent-card">
+                    <div class="pn-agent-head">
+                        <span class="pn-agent-title">AI 分析</span>
+                    </div>
+                    <div class="pn-agent-summary-pane" id="agentSummaryPane"></div>
+                    <div class="pn-agent-analysis-pane" id="agentAnalysisPane"></div>
+                    <div class="pn-agent-body" id="agentBody">
+                        <p class="pn-agent-tip">正在评估本条新闻适合哪些智能体视角…</p>
+                    </div>
+                </div>
+            </aside>
+            </div>
+        </section>
+    </main>
+
+    <!-- 发布模态框 -->
+    <div class="modal-overlay" id="publishModal">
+        <div class="pn-modal">
+            <div class="pn-modal-head">
+                <h2 class="pn-modal-title" id="mModalTitle">发布新闻</h2>
+                <button class="pn-fullscreen-btn" id="mFullscreenBtn" title="全屏编辑">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                </button>
+            </div>
+            <input type="text" id="mTitle" class="pn-input" placeholder="标题" maxlength="120">
+            <input type="text" id="mSummary" class="pn-input" placeholder="摘要（选填，用于列表展示，留空自动截取）" maxlength="200" style="margin-bottom:14px">
+            <div class="pn-edit-tabs">
+                <button class="pn-edit-tab active" id="mTabEdit" type="button">编辑</button>
+                <button class="pn-edit-tab" id="mTabPreview" type="button">预览</button>
+            </div>
+            <!-- 工具栏 -->
+            <div class="pn-toolbar" id="mToolbar">
+                <button class="pn-tool-btn" data-action="bold" title="粗体 ⌘B"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg></button>
+                <button class="pn-tool-btn" data-action="italic" title="斜体 ⌘I"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="12" y1="4" x2="8" y2="20"/></svg></button>
+                <button class="pn-tool-btn" data-action="strikethrough" title="删除线 ⌘D"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H8"/><line x1="4" y1="12" x2="20" y2="12"/></svg></button>
+                <span class="pn-tool-sep"></span>
+                <button class="pn-tool-btn" data-action="h2" title="标题 H2"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16"/><path d="M20 4v16"/><path d="M4 12h16"/><path d="M22 20h-2c0-1.5 2-2 2-3.5s-1-2-2-2c-.67 0-1.33.33-1.67.67" opacity=".5"/></svg></button>
+                <button class="pn-tool-btn" data-action="quote" title="引用"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1-1-2-2-2H4c-1 0-2 1-2 2v5c0 1 1 2 2 2 0 3-1 6-3 7"/><path d="M15 21c3 0 7-1 7-8V5c0-1-1-2-2-2h-4c-1 0-2 1-2 2v5c0 1 1 2 2 2 0 3-1 6-3 7"/></svg></button>
+                <button class="pn-tool-btn" data-action="code" title="代码 ⌘K"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></button>
+                <span class="pn-tool-sep"></span>
+                <button class="pn-tool-btn" data-action="ul" title="无序列表"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg></button>
+                <button class="pn-tool-btn" data-action="ol" title="有序列表"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="3" y="8" font-size="7" fill="currentColor" stroke="none" font-family="var(--font)" font-weight="600">1</text><text x="3" y="14" font-size="7" fill="currentColor" stroke="none" font-family="var(--font)" font-weight="600">2</text><text x="3" y="20" font-size="7" fill="currentColor" stroke="none" font-family="var(--font)" font-weight="600">3</text></svg></button>
+                <span class="pn-tool-sep"></span>
+                <button class="pn-tool-btn" data-action="link" title="链接 ⌘L"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+                <button class="pn-tool-btn" data-action="image" title="插入图片"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+                <button class="pn-tool-btn" data-action="video" title="上传视频"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="13" height="14" rx="2"/><polyline points="15 10 22 7 22 17 15 14"/></svg></button>
+                <button class="pn-tool-btn" data-action="divider" title="分隔线"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/></svg></button>
+            </div>
+            <textarea id="mContent" class="pn-textarea" placeholder="正文（支持 Markdown）" rows="10"></textarea>
+            <div class="pn-preview-box" id="mPreviewBox" style="display:none"></div>
+            <!-- 封面图 + 视频（视频由工具栏"上传视频"触发，预览与封面并排） -->
+            <div class="pn-modal-row">
+                <label class="pn-upload-label">
+                    选择封面图
+                    <input type="file" id="mImage" accept=".jpg,.jpeg,.png,.gif,.webp" hidden>
+                </label>
+                <img class="pn-modal-preview" id="mPreview" style="display:none" alt="">
+                <input type="file" id="mVideoInput" accept=".mp4,.webm,.mov,.m4v,video/mp4,video/webm,video/quicktime" hidden>
+                <div class="pn-video-preview-wrap" id="mVideoWrap" style="display:none">
+                    <video class="pn-modal-video" id="mVideoPreview" controls preload="metadata"></video>
+                    <button type="button" class="pn-video-remove" id="mVideoRemove" title="移除视频">×</button>
+                </div>
+            </div>
+            <!-- 插图管理 -->
+            <div class="pn-gallery-section">
+                <div class="pn-gallery-head">
+                    <span class="pn-gallery-title">插图</span>
+                    <label class="pn-upload-label pn-gallery-add">
+                        + 添加插图
+                        <input type="file" id="mGalleryInput" accept=".jpg,.jpeg,.png,.gif,.webp" multiple hidden>
+                    </label>
+                </div>
+                <div class="pn-gallery-list" id="mGalleryList"></div>
+                <p class="pn-gallery-hint">拖拽排序 · 点击插图设置说明和位置 · 在正文中使用 [img:序号] 插入</p>
+            </div>
+            <div class="pn-modal-row" style="align-items:center;gap:10px">
+                <span style="font-size:13px;color:var(--text2);flex-shrink:0">分类</span>
+                <select id="mCategory" class="pn-input" style="flex:1;margin:0;padding:8px 12px">
+                    <option value="">无分类</option>
+                    <option value="时事">时事</option>
+                    <option value="社会">社会</option>
+                    <option value="经济">经济</option>
+                    <option value="体育">体育</option>
+                    <option value="科技">科技</option>
+                    <option value="娱乐">娱乐</option>
+                    <option value="人文">人文</option>
+                    <option value="生活">生活</option>
+                    <option value="环境">环境</option>
+                    <option value="社群">社群</option>
+                    <option value="其他">其他</option>
+                </select>
+                <label class="pn-toggle-mini" title="允许 AI 解读该帖子">
+                    <input type="checkbox" id="mAiAllowed" checked>
+                    <span class="pn-toggle-mini-slider"></span>
+                    <span style="font-size:12px;color:var(--text2)">允许 AI 解读</span>
+                </label>
+                <label class="pn-toggle-mini" title="置顶">
+                    <input type="checkbox" id="mPinned">
+                    <span class="pn-toggle-mini-slider"></span>
+                    <span style="font-size:12px;color:var(--text2)">置顶</span>
+                </label>
+            </div>
+            <div class="pn-progress" id="mProgress">
+                <div class="pn-progress-text" id="mProgressText">正在上传…</div>
+                <div class="pn-progress-track"><div class="pn-progress-bar" id="mProgressBar"></div></div>
+            </div>
+            <div class="pn-modal-actions">
+                <button class="pn-cancel-btn" id="mCancel">取消</button>
+                <button class="btn-login" id="mSubmit">发布</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="pn-toast" id="toast"></div>
+
+    <!-- 插图编辑弹层 -->
+    <div class="pn-image-edit" id="imageEditModal">
+        <div class="pn-image-edit-box">
+            <img class="pn-image-edit-preview" id="iePreview" alt="">
+            <div class="pn-image-edit-row">
+                <label>说明</label>
+                <input type="text" id="ieCaption" placeholder="图片说明（选填）" maxlength="120">
+            </div>
+            <div class="pn-image-edit-row">
+                <label>位置</label>
+                <div class="pn-pos-seg" id="iePosition">
+                    <button class="pn-pos-btn active" data-pos="center" type="button">居中</button>
+                    <button class="pn-pos-btn" data-pos="left" type="button">居左</button>
+                    <button class="pn-pos-btn" data-pos="right" type="button">居右</button>
+                    <button class="pn-pos-btn" data-pos="full" type="button">全宽</button>
+                </div>
+            </div>
+            <div class="pn-image-edit-row">
+                <label>插入正文</label>
+                <button class="btn-login pn-ie-insert-btn" id="ieInsert" type="button" style="flex:1;padding:8px 16px;font-size:13px">在光标处插入 [img:序号]</button>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+                <button class="pn-cancel-btn" id="ieCancel" style="flex:1">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+    <script src="report.js?v=20260827-report"></script>
+
+    <!-- 九宫格菜单（版块 + AI + 设置） -->
+    <div class="section-menu" id="sectionMenu">
+        <button class="sm-item" onclick="smNavigate('home')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h5v-6h4v6h5V9.5"/></svg></span>
+            <span class="sm-label" data-i18n="nav_home">首页</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('live')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 10 4.5 18.5c-.8.6-2-.03-2-1.06V6.56c0-1.03 1.2-1.66 2-1.06L15 14"/><circle cx="17" cy="12" r="4.5"/><path d="M20.5 8.5a6.5 6.5 0 0 1 0 7"/></svg></span>
+            <span class="sm-label" data-i18n="nav_live">直播</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('news')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 6h8v5H8zM8 13h8M8 17h5"/></svg></span>
+            <span class="sm-label" data-i18n="nav_news">新闻</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('ai')">
+            <span class="sm-icon-wrap sm-icon-ai"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.8 2.8M14.9 14.9l2.8 2.8M17.7 6.3l-2.8 2.8M9.1 14.9l-2.8 2.8"/></svg></span>
+            <span class="sm-label">AI</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('msg')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+            <span class="sm-label" data-i18n="nav_msg">消息</span>
+            <span class="sm-badge" hidden></span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('me')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg></span>
+            <span class="sm-label" data-i18n="profile">我的</span>
+        </button>
+        <button class="sm-item" onclick="smNavigate('settings')">
+            <span class="sm-icon-wrap"><svg class="sm-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+            <span class="sm-label" data-i18n="settings">设置</span>
+        </button>
+    </div>
+
+    <script>
+    (function () {
+        function toggleSectionMenu(e) {
+            if (e) e.stopPropagation();
+            var menu = document.getElementById('sectionMenu');
+            if (!menu) return;
+            var willOpen = !menu.classList.contains('open');
+            closeSectionMenu();
+            if (willOpen) {
+                menu.classList.add('open');
+                setTimeout(function () { document.addEventListener('click', closeSectionMenu); }, 0);
+            }
+        }
+        function closeSectionMenu() {
+            var menu = document.getElementById('sectionMenu');
+            if (menu) menu.classList.remove('open');
+            document.removeEventListener('click', closeSectionMenu);
+        }
+        window.smNavigate = function (page) {
+            closeSectionMenu();
+            if (page === 'home') window.location.href = '/';
+            else if (page === 'live') window.location.href = '/live';
+            else if (page === 'news') window.location.href = '/peacenews';
+            else if (page === 'ai') window.location.href = '/ai';
+            else if (page === 'msg') window.location.href = '/?open=msg';
+            else if (page === 'me') window.location.href = '/?open=me';
+            else if (page === 'settings') window.location.href = '/?open=settings';
+        };
+        var menuBtn = document.getElementById('menuNavBtn');
+        if (menuBtn) menuBtn.addEventListener('click', toggleSectionMenu);
+        // 同步消息未读角标
+        function updateSmBadge() {
+            var badge = document.getElementById('smMsgBadge');
+            if (!badge) return;
+            if (window.userId) {
+                try {
+                    fetch('/api/notifications').then(function (r) { return r.json(); }).then(function (data) {
+                        var unread = (data.notifications || []).filter(function (n) { return !n.read; }).length;
+                        badge.hidden = !(unread > 0);
+                    }).catch(function () {});
+                } catch (e) {}
+            } else {
+                badge.hidden = true;
+            }
+        }
+        updateSmBadge();
+        setInterval(updateSmBadge, 60000);
+    })();
+    </script>
+
+    <script src="peacenews.js?v=20260919-07"></script>
+
+    <!-- 文本选中悬浮菜单（块三）：选区附近出现，四模式调用 /api/text-analysis -->
+    <div class="pn-text-menu" id="textMenu" style="display:none">
+        <button type="button" data-mode="explain">词语解释</button>
+        <button type="button" data-mode="viewpoint">分析视角</button>
+        <button type="button" data-mode="verify">辨别真伪</button>
+        <button type="button" data-mode="evaluate">事实评价</button>
+    </div>
+    <div class="pn-text-menu-result" id="textMenuResult" style="display:none"></div>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"34a863f6b0e94fd0be23646c8fe8c0ba","r":1,"spa":2}' crossorigin="anonymous"></script>
+<script>
+/* ============ 方格纸版侧栏：明暗主题切换 + 登录态 ============ */
+function pnToggleTheme() {
+    var d = document.documentElement;
+    var toDark = d.getAttribute('data-theme') !== 'dark';
+    if (toDark) d.setAttribute('data-theme', 'dark');
+    else d.removeAttribute('data-theme');
+    try { localStorage.setItem('bird_theme', toDark ? 'dark' : 'light'); } catch (e) {}
+    var logo = document.querySelector('.sb-brand .sb-logo');
+    if (logo) logo.src = toDark ? 'logo-dark.png' : 'logo-light.png';
+}
+(function () {
+    // 首屏同步 logo（内联脚本已在 <head> 设置 data-theme）
+    if (document.documentElement.getAttribute('data-theme') === 'dark') {
+        var l = document.querySelector('.sb-brand .sb-logo');
+        if (l) l.src = 'logo-dark.png';
+    }
+    // 侧栏底部：登录态（未登录→登录按钮；已登录→头像）
+    fetch('/api/me', { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+            var u = (d && d.user) || d;
+            if (!u || !u.id) return;
+            window.userId = u.id;
+            var login = document.getElementById('sbLogin');
+            var box = document.getElementById('sbUser');
+            if (login) login.style.display = 'none';
+            if (box) {
+                box.style.display = 'flex';
+                box.title = u.username || '账户';
+                var av = document.getElementById('sbAvatar');
+                if (av) {
+                    if (u.avatar) {
+                        av.style.backgroundImage = 'url(' + u.avatar + ')';
+                        av.style.backgroundSize = 'cover';
+                        av.style.backgroundPosition = 'center';
+                        av.textContent = '';
+                    } else {
+                        av.textContent = (u.username || '?').slice(0, 1).toUpperCase();
+                    }
+                }
+            }
+        })
+        .catch(function () {});
+})();
+</script>
+</body>
+</html>

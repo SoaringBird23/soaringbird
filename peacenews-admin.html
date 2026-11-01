@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="翱翔鸟 PeaceNews 新闻管理后台：栏目配置、布局区块设置与新闻内容维护。">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="翱翔鸟">
+    <meta property="og:title" content="PeaceNews 管理 - SoaringBird">
+    <meta property="og:description" content="翱翔鸟 PeaceNews 新闻管理后台：栏目配置、布局区块设置与新闻内容维护。">
+    <title>PeaceNews 管理 - SoaringBird</title>
+    <link rel="icon" href="/logo-light.png" type="image/png">
+    <link rel="stylesheet" href="/styles29.css">
+    <link rel="stylesheet" href="/peacenews.css?v=20260914-1">
+    <style>
+        .pna-main { max-width: 1000px; margin: 0 auto; padding: calc(var(--nav-h) + 40px) 24px 80px; }
+        .pna-title { font-size: 32px; font-weight: 700; letter-spacing: -0.025em; margin: 0 0 32px; color: var(--text); }
+        .pna-section { margin-bottom: 48px; }
+        .pna-section-title { font-size: 17px; font-weight: 600; color: var(--text); margin: 0 0 16px; }
+        .pna-config-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+        .pna-config-label { font-size: 14px; color: var(--text2); min-width: 100px; }
+        .pna-config-row select, .pna-config-row input[type="number"] {
+            background: var(--bg-fill); border: 0.5px solid var(--border); border-radius: 10px;
+            padding: 8px 14px; font-size: 14px; color: var(--text); outline: none;
+        }
+        .pna-config-row select:focus, .pna-config-row input:focus { border-color: var(--accent); }
+        .pna-toggle { position: relative; width: 44px; height: 26px; cursor: pointer; }
+        .pna-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .pna-toggle-slider { position: absolute; inset: 0; background: var(--bg-fill); border: 0.5px solid var(--border); border-radius: 980px; transition: .2s; }
+        .pna-toggle-slider::before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: var(--text3); border-radius: 50%; transition: .2s; }
+        .pna-toggle input:checked + .pna-toggle-slider { background: var(--accent); border-color: var(--accent); }
+        .pna-toggle input:checked + .pna-toggle-slider::before { transform: translateX(18px); background: #fff; }
+        .pna-save-btn { margin-top: 8px; }
+        .pna-news-list { display: flex; flex-direction: column; gap: 12px; }
+        .pna-news-item { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 14px; }
+        .pna-news-item img { width: 64px; height: 48px; object-fit: cover; border-radius: 8px; flex-shrink: 0; background: var(--bg-fill); }
+        .pna-news-info { flex: 1; min-width: 0; }
+        .pna-news-info h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pna-news-info p { margin: 0; font-size: 12px; color: var(--text3); }
+        .pna-news-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .pna-news-actions button { padding: 6px 16px; border-radius: 980px; font-size: 13px; cursor: pointer; border: 0.5px solid var(--border); background: var(--bg-fill); color: var(--text2); transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease), transform .15s var(--spring); }
+        .pna-news-actions button:hover { background: var(--bg-hover); color: var(--text); }
+        .pna-news-actions button:active { transform: scale(.96); }
+        .pna-news-actions .del-btn { border-color: var(--red); color: var(--red); }
+        .pna-news-actions .del-btn:hover { background: var(--red); color: #fff; }
+        .pna-login-hint { text-align: center; padding: 120px 20px; color: var(--text3); font-size: 15px; }
+        .pna-login-hint a { color: var(--accent); }
+        /* 排版编辑器 */
+        .pna-layout-editor { display: flex; flex-direction: column; gap: 8px; }
+        .pna-layout-block {
+            background: var(--bg-card); border: 0.5px solid var(--border); border-radius: 12px;
+            cursor: grab; transition: border-color .15s var(--ease), box-shadow .15s var(--ease), opacity .15s var(--ease);
+        }
+        .pna-layout-block:hover { border-color: var(--accent); box-shadow: var(--shadow-sm); }
+        .pna-layout-block.dragging { opacity: .4; cursor: grabbing; }
+        .pna-layout-block.drag-over { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+        .pna-layout-block-head {
+            display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+            border-bottom: 0.5px solid var(--border-light); color: var(--text); font-size: 13px; font-weight: 600;
+        }
+        .pna-layout-block-head svg { color: var(--text3); flex-shrink: 0; }
+        .pna-layout-drag-hint { margin-left: auto; font-size: 11px; color: var(--text3); font-weight: 400; }
+        .pna-layout-block-body { padding: 10px 16px; font-size: 12px; color: var(--text3); }
+        .pna-news-actions button.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+        .pna-pager { display: flex; gap: 6px; justify-content: center; margin-top: 24px; }
+        @media (max-width: 768px) {
+            .pna-main { padding: calc(var(--nav-h) + 20px) 14px 40px; }
+            .pna-title { font-size: 24px; }
+            .pna-news-item { flex-wrap: wrap; }
+        }
+    </style>
+    <script>
+    (function(){
+        var t = localStorage.getItem('bird_theme') || 'light';
+        if (t === 'light') document.documentElement.removeAttribute('data-theme');
+        else document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-inner">
+            <div class="nav-spacer"></div>
+            <div class="nav-actions">
+                <a class="nav-download" href="/peacenews">返回新闻</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pna-main">
+        <div id="adminContent" style="display:none">
+            <h1 class="pna-title">新闻管理 <span class="pna-title-sub">翱翔鸟</span></h1>
+
+            <div class="pna-section">
+                <h2 class="pna-section-title">排版设置</h2>
+                <div class="pna-config-row">
+                    <span class="pna-config-label">头条新闻</span>
+                    <label class="pna-toggle">
+                        <input type="checkbox" id="cfgHero" checked>
+                        <span class="pna-toggle-slider"></span>
+                    </label>
+                    <span style="font-size:12px;color:var(--text3)">首页首条带图新闻全宽展示</span>
+                </div>
+                <div class="pna-config-row">
+                    <span class="pna-config-label">列表列数</span>
+                    <select id="cfgColumns">
+                        <option value="2">2 列</option>
+                        <option value="3" selected>3 列</option>
+                        <option value="4">4 列</option>
+                    </select>
+                </div>
+                <div class="pna-config-row">
+                    <span class="pna-config-label">每页条数</span>
+                    <input type="number" id="cfgPerPage" min="5" max="50" value="20" style="width:80px">
+                </div>
+                <button class="btn-login pna-save-btn" id="saveConfigBtn">保存设置</button>
+            </div>
+
+            <div class="pna-section">
+                <h2 class="pna-section-title">首页排版预览</h2>
+                <p style="font-size:13px;color:var(--text3);margin-bottom:16px">拖拽调整区块顺序，实时预览首页布局</p>
+                <div class="pna-layout-editor" id="layoutEditor">
+                    <div class="pna-layout-block" data-block="hero" draggable="true">
+                        <div class="pna-layout-block-head">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                            <span>头条区域</span>
+                            <span class="pna-layout-drag-hint">拖拽</span>
+                        </div>
+                        <div class="pna-layout-block-body">首条带图新闻全宽展示</div>
+                    </div>
+                    <div class="pna-layout-block" data-block="recommend" draggable="true">
+                        <div class="pna-layout-block-head">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <span>为你推荐</span>
+                            <span class="pna-layout-drag-hint">拖拽</span>
+                        </div>
+                        <div class="pna-layout-block-body">横向滚动推荐卡片</div>
+                    </div>
+                    <div class="pna-layout-block" data-block="featured" draggable="true">
+                        <div class="pna-layout-block-head">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <span>精选</span>
+                            <span class="pna-layout-drag-hint">拖拽</span>
+                        </div>
+                        <div class="pna-layout-block-body">精选新闻网格展示</div>
+                    </div>
+                    <div class="pna-layout-block" data-block="grid" draggable="true">
+                        <div class="pna-layout-block-head">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                            <span>新闻列表</span>
+                            <span class="pna-layout-drag-hint">拖拽</span>
+                        </div>
+                        <div class="pna-layout-block-body">按列数排列的新闻卡片</div>
+                    </div>
+                </div>
+                <button class="btn-login pna-save-btn" id="saveLayoutBtn" style="margin-top:12px">保存排版</button>
+            </div>
+
+            <div class="pna-section">
+                <h2 class="pna-section-title">新闻列表</h2>
+                <div class="pna-news-list" id="newsList"></div>
+                <div class="pna-pager" id="pager"></div>
+            </div>
+        </div>
+        <div class="pna-login-hint" id="loginHint">
+            <p>需要管理员权限</p>
+            <p style="margin-top:12px"><a href="/signin?redirect=/peacenews/admin">前往登录</a></p>
+        </div>
+    </main>
+
+    <div class="pn-toast" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
+    <script src="/peacenews-admin.js?v=20260914-1"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"34a863f6b0e94fd0be23646c8fe8c0ba","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

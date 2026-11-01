@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>SoaringBird 论坛 - 管理后台</title>
+    <link rel="stylesheet" href="admin.css?v=20261029-closing1">
+    <link rel="stylesheet" href="peacenews.css?v=20260802-5">
+</head>
+<body class="admin-paper">
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img class="sidebar-brand-icon" src="logo-light.png" alt="SoaringBird Admin" width="20" height="20">
+            <span>SoaringBird Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                仪表盘
+            </a>
+            <a class="nav-item" data-tab="users" onclick="switchTab('users')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                用户管理
+            </a>
+            <a class="nav-item" data-tab="posts" onclick="switchTab('posts')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                帖子管理
+            </a>
+            <a class="nav-item" data-tab="replies" onclick="switchTab('replies')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                回复管理
+            </a>
+            <a class="nav-item" data-tab="bugs" onclick="switchTab('bugs')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/></svg>
+                Bug 反馈
+            </a>
+            <a class="nav-item" data-tab="announcements" onclick="switchTab('announcements')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                消息 / 公告
+            </a>
+            <a class="nav-item" data-tab="closing" onclick="switchTab('closing')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+                关站通知
+            </a>
+            <a class="nav-item" data-tab="ipbans" onclick="switchTab('ipbans')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                IP 封禁
+            </a>
+            <a class="nav-item" data-tab="bannedwords" onclick="switchTab('bannedwords')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                违禁词
+            </a>
+            <a class="nav-item" data-tab="aiconfig" onclick="switchTab('aiconfig')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>
+                AI配置
+            </a>
+            <a class="nav-item" data-tab="video" onclick="switchTab('video')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                视频管理
+            </a>
+            <a class="nav-item" data-tab="live" onclick="switchTab('live')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M6.34 6.34a8 8 0 0 0 0 11.32M17.66 17.66a8 8 0 0 0 0-11.32M3.51 3.51a12 12 0 0 0 0 16.97M20.49 20.49a12 12 0 0 0 0-16.97"/></svg>
+                直播审核
+            </a>
+            <a class="nav-item" data-tab="reports" onclick="switchTab('reports')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg>
+                举报留存
+            </a>
+            <a class="nav-item" data-tab="appeals" onclick="switchTab('appeals')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>
+                申诉管理
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item" href="/" target="_blank">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                访问论坛
+            </a>
+            <a class="nav-item" onclick="handleLogout()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                退出登录
+            </a>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+            </button>
+            <h1 class="topbar-title" id="pageTitle">仪表盘</h1>
+            <div class="topbar-right">
+                <button class="menu-toggle" onclick="toggleAdminTheme()" style="display:flex;width:34px;height:34px;border:none;background:none;cursor:pointer;color:var(--text);border-radius:var(--radius-sm);align-items:center;justify-content:center;transition:background .15s" title="切换主题">
+                    <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+                <span class="admin-badge">管理员</span>
+                <div class="avatar" id="adminAvatar">A</div>
+            </div>
+        </header>
+
+        <!-- 仪表盘 -->
+        <div class="tab-content active" id="tab-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(0,113,227,0.1);color:#0071E3">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    </div>
+                    <div class="stat-info"><div class="stat-num" id="statUsers">-</div><div class="stat-label">总用户</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(191,90,242,0.1);color:#BF5AF2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <div class="stat-info"><div class="stat-num" id="statPosts">-</div><div class="stat-label">总帖子</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(48,209,88,0.1);color:#30D158">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <div class="stat-info"><div class="stat-num" id="statReplies">-</div><div class="stat-label">总回复</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background:rgba(255,159,10,0.1);color:#FF9F0A">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    </div>
+                    <div class="stat-info"><div class="stat-num" id="statToday">-</div><div class="stat-label">今日新增</div></div>
+                </div>
+            </div>
+            <div class="ext-stats" id="extStats"></div>
+            <div class="dashboard-section">
+                <div class="recent-activity" id="recentActivity"></div>
+            </div>
+        </div>
+
+        <!-- 用户管理 -->
+        <div class="tab-content" id="tab-users">
+            <div class="toolbar">
+                <input type="text" class="search-input" placeholder="搜索用户名或邮箱…" id="userSearch" oninput="debounce(loadUsers, 400)()" onkeydown="if(event.key==='Enter')loadUsers()">
+                <select class="filter-select" id="userStatusFilter" onchange="loadUsers()">
+                    <option value="">全部状态</option>
+                    <option value="active">正常</option>
+                    <option value="muted">已禁言</option>
+                    <option value="banned">已封号</option>
+                    <option value="admin">管理员</option>
+                    <option value="unverified">邮箱未验证</option>
+                </select>
+                <button class="btn-refresh" onclick="loadUsers()">刷新</button>
+            </div>
+            <div class="table-wrap table-wrap-scroll">
+                <table class="user-table">
+                    <thead><tr><th>用户</th><th>邮箱</th><th>帖子</th><th>角色/状态</th><th>安全</th><th>注册时间</th><th>最近上线</th><th>操作</th></tr></thead>
+                    <tbody id="userTableBody"><tr><td colspan="8" class="empty-cell">加载中…</td></tr></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="userPagination"></div>
+        </div>
+
+        <!-- 帖子管理 -->
+        <div class="tab-content" id="tab-posts">
+            <div class="toolbar">
+                <input type="text" class="search-input" placeholder="搜索标题或内容…" id="postSearch" oninput="debounce(loadPosts, 400)()">
+                <select class="filter-select" id="postCategoryFilter" onchange="loadPosts()">
+                    <option value="">全部分类</option>
+                    <option value="tech">技术</option>
+                    <option value="design">设计</option>
+                    <option value="product">产品</option>
+                    <option value="career">职场</option>
+                    <option value="resource">资源</option>
+                    <option value="casual">闲聊</option>
+                </select>
+                <button class="btn-refresh" onclick="loadPosts()">刷新</button>
+            </div>
+            <div class="batch-bar" id="batchBar" style="display:none">
+                <span>已选 <strong id="batchCount">0</strong> 篇</span>
+                <button class="btn-sm danger" onclick="batchDeletePosts()">批量删除</button>
+                <button class="btn-sm" onclick="selectedPosts.clear();loadPosts()">取消选择</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th style="width:36px"><input type="checkbox" id="selectAllPosts" onchange="selectAllPosts(this)"></th><th>标题</th><th>作者</th><th>分类</th><th>赞/回复</th><th>发布时间</th><th>操作</th></tr></thead>
+                    <tbody id="postTableBody"><tr><td colspan="7" class="empty-cell">加载中…</td></tr></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="postPagination"></div>
+        </div>
+
+        <!-- 回复管理 -->
+        <div class="tab-content" id="tab-replies">
+            <div class="toolbar">
+                <input type="text" class="search-input" placeholder="按帖子ID筛选…" id="replyPostId" oninput="debounce(loadReplies, 400)()" onkeydown="if(event.key==='Enter')loadReplies()">
+                <input type="text" class="search-input" placeholder="搜索回复内容…" id="replySearch" oninput="debounce(loadReplies, 400)()" onkeydown="if(event.key==='Enter')loadReplies()">
+                <button class="btn-refresh" onclick="loadReplies()">刷新</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>内容</th><th>作者</th><th>所属帖子</th><th>赞</th><th>时间</th><th>操作</th></tr></thead>
+                    <tbody id="replyTableBody"><tr><td colspan="6" class="empty-cell">加载中…</td></tr></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="replyPagination"></div>
+        </div>
+        <!-- Bug 反馈 -->
+        <div class="tab-content" id="tab-bugs">
+            <div class="toolbar">
+                <button class="btn-refresh" onclick="loadBugReports()">刷新</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>内容</th><th>用户</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+                    <tbody id="bugTableBody"><tr><td colspan="5" class="empty-cell">加载中…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+        <!-- 消息 / 公告 -->
+        <div class="tab-content" id="tab-announcements">
+            <div class="toolbar">
+                <button class="btn-primary" onclick="openAnnouncementModal()">发布消息</button>
+                <button class="btn-refresh" onclick="loadAnnouncements()">刷新</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>标题</th><th>类型</th><th>展示位置</th><th>接收对象</th><th>有效期</th><th>发布时间</th><th>操作</th></tr></thead>
+                    <tbody id="announcementTableBody"><tr><td colspan="7" class="empty-cell">加载中…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+        <!-- 关站通知 -->
+        <div class="tab-content" id="tab-closing">
+            <h2 class="page-heading">关站通知邮件</h2>
+            <p class="page-subtitle">仅发送给已验证邮箱的用户。发送前请先给自己发一封测试邮件确认排版，群发需要两次确认。</p>
+
+            <div class="closing-stats">
+                <div class="closing-stat"><div class="closing-stat-num" id="closingTotal">-</div><div class="closing-stat-label">收件人（已验证邮箱）</div></div>
+                <div class="closing-stat"><div class="closing-stat-num" id="closingSent">-</div><div class="closing-stat-label">已发送</div></div>
+                <div class="closing-stat"><div class="closing-stat-num" id="closingFail">-</div><div class="closing-stat-label">最近一次失败</div></div>
+            </div>
+
+            <div class="closing-layout">
+                <div class="closing-preview">
+                    <div class="closing-preview-head">
+                        <span>邮件预览</span>
+                        <button class="btn-ghost btn-sm" onclick="toggleClosingText()">查看纯文本版</button>
+                    </div>
+                    <div class="closing-preview-subject" id="closingSubject">—</div>
+                    <div class="closing-preview-frame-wrap">
+                        <iframe id="closingPreviewFrame" title="邮件预览"></iframe>
+                    </div>
+                    <pre class="closing-text-preview" id="closingTextPreview" hidden></pre>
+                </div>
+
+                <div class="closing-side">
+                    <div class="closing-block">
+                        <div class="closing-block-title">测试发送</div>
+                        <p class="closing-block-desc">先发一封到你自己的邮箱，确认排版与链接无误。</p>
+                        <div class="closing-test-row">
+                            <input type="email" id="closingTestEmail" placeholder="你的邮箱">
+                            <button class="btn-refresh" onclick="sendClosingTest()" id="closingTestBtn">发送测试</button>
+                        </div>
+                    </div>
+
+                    <div class="closing-block">
+                        <div class="closing-block-title">正式群发</div>
+                        <p class="closing-block-desc">只发给已验证邮箱用户。已成功发送过的地址会自动跳过，不会重复打扰。</p>
+                        <button class="btn-primary closing-send-btn" onclick="openClosingConfirm(1)" id="closingSendBtn">开始群发</button>
+                        <div class="closing-hint">发送后无法撤回，需要输入确认词 + 再次确认。</div>
+                    </div>
+
+                    <div class="closing-block">
+                        <div class="closing-block-title">发送记录</div>
+                        <div class="closing-log" id="closingLog">暂无记录</div>
+                        <button class="btn-ghost btn-sm" onclick="loadClosing()">刷新</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-wrap closing-recipients">
+                <table>
+                    <thead><tr><th>#</th><th>用户名</th><th>邮箱</th><th>状态</th></tr></thead>
+                    <tbody id="closingRecipientBody"><tr><td colspan="4" class="empty-cell">加载中…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+        <!-- IP 封禁 -->
+        <div class="tab-content" id="tab-ipbans">
+            <div class="toolbar">
+                <button class="btn-primary" onclick="openBanIpModal('')">封禁 IP</button>
+                <button class="btn-refresh" onclick="loadIpBans()">刷新</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>IP 地址</th><th>原因</th><th>操作人</th><th>封禁时间</th><th>操作</th></tr></thead>
+                    <tbody id="ipBanTableBody"><tr><td colspan="5" class="empty-cell">加载中…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 违禁词管理 -->
+        <div class="tab-content" id="tab-bannedwords">
+            <div class="toolbar">
+                <button class="btn-primary" onclick="openAddBannedWordModal()">添加违禁词</button>
+                <button class="btn-primary" onclick="openBatchAddBannedWordModal()">批量添加</button>
+                <button class="btn-refresh" onclick="loadBannedWords()">刷新</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>违禁词</th><th>添加人</th><th>添加时间</th><th>操作</th></tr></thead>
+                    <tbody id="bannedWordTableBody"><tr><td colspan="4" class="empty-cell">加载中…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AI 配置 -->
+        <div class="tab-content" id="tab-aiconfig">
+            <h2 class="page-heading">AI 配置</h2>
+            <p class="page-subtitle">AI 接口地址、模型、密钥通过服务器环境变量配置；此处仅控制审核开关</p>
+            <div class="config-form">
+                <div class="fg">
+                    <div class="switch-row">
+                        <div class="switch-text">
+                            <div class="switch-title">AI 内容审核</div>
+                            <div class="switch-sub">开启后，发帖/评论/直播标题/视频评论/新闻/频道名称将在违禁词检查后额外经过 AI 审核同步过滤（超时 15 秒，失败放行）</div>
+                        </div>
+                        <label class="permission-switch">
+                            <input type="checkbox" id="aiModerationEnabled">
+                            <span class="permission-switch-track"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="config-actions">
+                    <button class="btn-primary" onclick="saveAiConfig()">保存配置</button>
+                    <button class="btn-refresh" onclick="loadAiConfig()">重新加载</button>
+                </div>
+                <div id="aiConfigMsg" class="config-msg"></div>
+            </div>
+        </div>
+
+        <!-- 视频管理 -->
+        <div class="tab-content" id="tab-video">
+            <div class="video-review-section">
+                <h2 class="page-heading">视频审核</h2>
+                <p class="page-subtitle">审核视频投稿；只有已通过的视频会在公开版块显示</p>
+                <div class="video-review-toolbar">
+                    <div class="seg-control" id="videoStatusSeg">
+                        <button class="seg-item active" data-status="" onclick="filterVideos('')">全部</button>
+                        <button class="seg-item" data-status="pending" onclick="filterVideos('pending')">待审核</button>
+                        <button class="seg-item" data-status="approved" onclick="filterVideos('approved')">已通过</button>
+                        <button class="seg-item" data-status="rejected" onclick="filterVideos('rejected')">已拒绝</button>
+                    </div>
+                    <button class="btn-refresh" onclick="loadVideoReviews()">刷新</button>
+                </div>
+                <div class="video-card-grid" id="videoCardGrid">
+                    <div class="video-empty-state">加载中…</div>
+                </div>
+                <div class="pagination" id="videoPagination"></div>
+            </div>
+        </div>
+
+        <!-- 直播审核 -->
+        <div class="tab-content" id="tab-live">
+            <div class="video-review-section">
+                <h2 class="page-heading">直播权限审核</h2>
+                <p class="page-subtitle">审核用户的直播权限申请；只有已通过的直播间可开播</p>
+                <div class="video-review-toolbar">
+                    <div class="seg-control" id="liveStatusSeg">
+                        <button class="seg-item active" data-status="" onclick="filterLiveChannels('')">全部</button>
+                        <button class="seg-item" data-status="pending" onclick="filterLiveChannels('pending')">待审核</button>
+                        <button class="seg-item" data-status="approved" onclick="filterLiveChannels('approved')">已通过</button>
+                        <button class="seg-item" data-status="rejected" onclick="filterLiveChannels('rejected')">已拒绝</button>
+                    </div>
+                    <button class="btn-refresh" onclick="loadLiveChannels()">刷新</button>
+                </div>
+                <div class="video-card-grid" id="liveChannelGrid">
+                    <div class="video-empty-state">加载中…</div>
+                </div>
+                <div class="pagination" id="liveChannelPagination"></div>
+            </div>
+        </div>
+
+        <!-- 举报留存 -->
+        <div class="tab-content" id="tab-reports">
+            <div class="toolbar">
+                <p class="page-subtitle" style="margin:0;padding-right:12px">内容被 <span id="reportThreshold">5</span> 人以上举报后会<strong>自动下架</strong>并留存于此，管理员可恢复。</p>
+                <button class="btn-refresh" onclick="loadReports()">刷新</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>类型</th><th>内容标题</th><th>作者</th><th>内容摘要</th><th>举报理由</th><th>举报数</th><th>最新举报时间</th><th>状态</th><th>操作</th></tr></thead>
+                    <tbody id="reportTableBody"><tr><td colspan="9" class="empty-cell">加载中…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 申诉管理 -->
+        <div class="tab-content" id="tab-appeals">
+            <div class="toolbar">
+                <p class="page-subtitle" style="margin:0;padding-right:12px">用户对<strong>禁言/封号</strong>的申诉会出现在这里；「接受」将自动解除对应处罚。</p>
+                <select class="filter-select" id="appealStatusFilter" onchange="loadAppeals(1)">
+                    <option value="pending">待处理</option>
+                    <option value="">全部</option>
+                    <option value="accepted">已通过</option>
+                    <option value="rejected">已驳回</option>
+                </select>
+                <button class="btn-refresh" onclick="loadAppeals()">刷新</button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>用户</th><th>类型</th><th>申诉内容</th><th>提交时间</th><th>状态</th><th>处理人 / 回复</th><th>操作</th></tr></thead>
+                    <tbody id="appealTableBody"><tr><td colspan="7" class="empty-cell">加载中…</td></tr></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="appealPagination"></div>
+        </div>
+
+        <!-- 举报查看/判断弹窗 -->
+        <div class="modal-overlay" id="reportViewModal" onclick="if(event.target===this)closeReportView()">
+            <div class="modal">
+                <div class="modal-head"><h2 id="reportViewTitle">查看详情</h2><button class="modal-x" onclick="closeReportView()">✕</button></div>
+                <div class="modal-body" style="max-height:60vh;overflow-y:auto">
+                    <div class="fg-item"><label>作者</label><div id="reportViewMeta" class="modal-value"></div></div>
+                    <div class="fg-item"><label>正文内容</label><div id="reportViewBody" class="report-view-body"></div></div>
+                    <div class="fg-item"><label>举报理由</label><div id="reportViewReasons" class="report-view-reasons"></div></div>
+                </div>
+                <div class="modal-foot" style="display:flex;gap:8px;justify-content:flex-end">
+                    <button class="btn-ghost" id="reportViewRestore" style="color:var(--green)" onclick="restoreReport(_reportView.target_type,_reportView.target_id)">判定无违规 · 恢复</button>
+                    <button class="btn-danger" id="reportViewRemove" onclick="judgeRemove()">判定违规 · 删除</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 编辑帖子弹窗 -->
+    <div class="modal-overlay" id="editPostModal" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal">
+            <div class="modal-head"><h2>编辑帖子</h2><button class="modal-x" onclick="closeEditPostModal()">✕</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="editPostId">
+                <div class="fg"><label>标题</label><input type="text" id="editPostTitle"></div>
+                <div class="fg"><label>分类</label>
+                    <select id="editPostCategory">
+                        <option value="tech">技术</option><option value="design">设计</option>
+                        <option value="product">产品</option><option value="career">职场</option>
+                        <option value="resource">资源</option><option value="casual">闲聊</option>
+                    </select>
+                </div>
+                <div class="fg"><label>内容</label><textarea id="editPostContent" rows="6"></textarea></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeEditPostModal()">取消</button>
+                <button class="btn-primary" onclick="saveEditPost()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 重置密码弹窗 -->
+    <div class="modal-overlay" id="resetPwModal" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal modal-sm">
+            <div class="modal-head"><h2>重置密码</h2><button class="modal-x" onclick="closeResetPwModal()">✕</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="resetPwUserId">
+                <div class="fg"><label>新密码</label><input type="text" id="resetPwValue" placeholder="至少4位"></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeResetPwModal()">取消</button>
+                <button class="btn-primary" onclick="saveResetPw()">确认重置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 认证设置弹窗（蓝色认证 + 黄色优质主播标识） -->
+    <div class="modal-overlay" id="verifyModal" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal modal-sm">
+            <div class="modal-head"><h2>认证设置</h2><button class="modal-x" onclick="closeVerifyModal()">✕</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="verifyUserId">
+                <div class="fg"><label>用户</label><div id="verifyUserName" class="modal-value"></div></div>
+                <div class="fg"><label class="checkbox-label"><input type="checkbox" id="verifyCheckbox"> 开启蓝色官方认证标识</label></div>
+                <div class="fg"><label>认证内容（显示在个人主页，如：翱翔鸟论坛创始人）</label><input type="text" id="verifyTextInput" placeholder="如：翱翔鸟论坛创始人" maxlength="50"></div>
+                <div class="fg"><label class="checkbox-label"><input type="checkbox" id="verifyQualityCheckbox"> 开启黄色优质主播标识</label></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeVerifyModal()">取消</button>
+                <button class="btn-primary" onclick="saveVerify()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 发布 / 编辑消息弹窗 -->
+    <div class="modal-overlay" id="announcementModal" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal">
+            <div class="modal-head"><h2 id="annModalTitle">发布消息</h2><button class="modal-x" onclick="closeAnnouncementModal()">✕</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="annEditId">
+                <div class="fg"><label>类型</label>
+                    <div class="seg-control" id="annTypeSeg">
+                        <button type="button" class="seg-item active" data-v="notice" onclick="annPick('type','notice')">通知</button>
+                        <button type="button" class="seg-item" data-v="important" onclick="annPick('type','important')">重要消息</button>
+                    </div>
+                </div>
+                <div class="fg"><label>标题</label><input type="text" id="annTitle" placeholder="消息标题"></div>
+                <div class="fg"><label>内容</label><textarea id="annContent" rows="4" placeholder="消息内容…"></textarea></div>
+                <div class="fg"><label>展示位置</label>
+                    <div>
+                        <label class="ann-chk"><input type="checkbox" id="annSplash" checked> 开屏弹窗</label>
+                        <label class="ann-chk"><input type="checkbox" id="annHome" checked> 首页展示</label>
+                    </div>
+                </div>
+                <div class="fg"><label>接收对象</label>
+                    <div class="seg-control" id="annTargetSeg">
+                        <button type="button" class="seg-item active" data-v="all" onclick="annPick('target','all')">全体用户</button>
+                        <button type="button" class="seg-item" data-v="users" onclick="annPick('target','users')">指定用户</button>
+                    </div>
+                </div>
+                <div class="fg" id="annUserBox" style="display:none">
+                    <label>选择用户 <span id="annUserCount" style="color:var(--text3);font-weight:400">已选 0</span></label>
+                    <input type="text" id="annUserSearch" placeholder="搜索用户名 / 邮箱" oninput="annSearchUsers(this.value)">
+                    <div id="annUserList" class="ann-user-list"><div class="ann-user-empty">输入关键词搜索用户</div></div>
+                </div>
+                <div class="fg"><label>有效期</label>
+                    <select id="annExpires">
+                        <option value="0">永久有效</option>
+                        <option value="24">1 天</option>
+                        <option value="72">3 天</option>
+                        <option value="168">7 天</option>
+                        <option value="720">30 天</option>
+                    </select>
+                </div>
+                <div class="fg"><label>置顶</label>
+                    <div><label class="ann-chk"><input type="checkbox" id="annPinned"> 置顶（始终排在最前）</label></div>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeAnnouncementModal()">取消</button>
+                <button class="btn-primary" onclick="createAnnouncement()">发布</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 禁言弹窗 -->
+    <div class="modal-overlay" id="muteModal" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal modal-sm">
+            <div class="modal-head"><h2>禁言用户</h2><button class="modal-x" onclick="closeMuteModal()">✕</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="muteUserId">
+                <div class="fg"><label>禁言时长</label>
+                    <select id="muteDuration">
+                        <option value="3600">1 小时</option>
+                        <option value="86400">1 天</option>
+                        <option value="604800">7 天</option>
+                        <option value="2592000">30 天</option>
+                        <option value="0">永久</option>
+                    </select>
+                </div>
+                <div class="fg"><label>原因（会展示给用户）</label><textarea id="muteReason" rows="2" maxlength="200" placeholder="如：发布违规内容 / 恶意刷屏"></textarea></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeMuteModal()">取消</button>
+                <button class="btn-primary" onclick="confirmMute()">确认禁言</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 封号弹窗 -->
+    <div class="modal-overlay" id="banModal" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal modal-sm">
+            <div class="modal-head"><h2>封禁用户</h2><button class="modal-x" onclick="closeBanModal()">✕</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="banUserId">
+                <div class="fg"><label>用户</label><div id="banUserName" class="modal-value"></div></div>
+                <div class="fg"><label>封禁时长</label>
+                    <select id="banDuration">
+                        <option value="86400">1 天</option>
+                        <option value="604800">7 天</option>
+                        <option value="2592000">30 天</option>
+                        <option value="7776000">90 天</option>
+                        <option value="0">永久</option>
+                    </select>
+                </div>
+                <div class="fg"><label>原因（会展示给用户）</label><textarea id="banReason" rows="2" maxlength="200" placeholder="如：严重违规 / 发布违法内容"></textarea></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeBanModal()">取消</button>
+                <button class="btn-danger" onclick="confirmBan()">确认封号</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 封 IP 弹窗 -->
+    <div class="modal-overlay" id="banIpModal" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal modal-sm">
+            <div class="modal-head"><h2>封禁 IP</h2><button class="modal-x" onclick="closeBanIpModal()">✕</button></div>
+            <div class="modal-body">
+                <div class="fg"><label>IP 地址</label><input type="text" id="banIpValue" placeholder="例如 192.168.1.1"></div>
+                <div class="fg"><label>封禁原因</label><input type="text" id="banIpReason" placeholder="可选"></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeBanIpModal()">取消</button>
+                <button class="btn-primary" onclick="confirmBanIp()">确认封禁</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加违禁词弹窗 -->
+    <div class="modal-overlay" id="addBannedWordModal" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal modal-sm">
+            <div class="modal-head"><h2>添加违禁词</h2><button class="modal-x" onclick="closeAddBannedWordModal()">✕</button></div>
+            <div class="modal-body">
+                <div class="fg"><label>违禁词</label><input type="text" id="bannedWordInput" placeholder="输入违禁词"></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeAddBannedWordModal()">取消</button>
+                <button class="btn-primary" onclick="confirmAddBannedWord()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 批量添加违禁词弹窗 -->
+    <div class="modal-overlay" id="batchBannedWordModal" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal">
+            <div class="modal-head"><h2>批量添加违禁词</h2><button class="modal-x" onclick="closeBatchBannedWordModal()">✕</button></div>
+            <div class="modal-body">
+                <div class="fg"><label>违禁词列表（每行一个）</label><textarea id="batchBannedWordInput" rows="10" placeholder="违禁词1&#10;违禁词2&#10;违禁词3"></textarea></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeBatchBannedWordModal()">取消</button>
+                <button class="btn-primary" onclick="confirmBatchAddBannedWord()">批量添加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 额度弹窗 -->
+    <div class="modal-overlay" id="aiQuotaModal" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal">
+            <div class="modal-head"><h2>AI 使用额度 - <span id="aiQuotaUserName"></span></h2><button class="modal-x" onclick="closeAiQuotaModal()">✕</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="aiQuotaUserId">
+                <div class="fg"><label>每日额度</label><input type="number" id="aiQuotaDaily" min="0" placeholder="50"></div>
+                <div class="fg"><label>每月额度</label><input type="number" id="aiQuotaMonthly" min="0" placeholder="500"></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeAiQuotaModal()">取消</button>
+                <button class="btn-primary" onclick="confirmAiQuota()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-wrap" id="toastContainer"></div>
+    <!-- 直播拒绝原因弹窗 -->
+    <div class="modal-overlay" id="liveRejectModal" onclick="if(event.target===this)this.classList.remove('show')">
+        <div class="modal modal-sm">
+            <div class="modal-head"><h2>拒绝直播申请</h2><button class="modal-x" onclick="closeLiveRejectModal()">✕</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="liveRejectId">
+                <div class="fg"><label>拒绝原因（可选，将展示给申请人）</label><input type="text" id="liveRejectReason" placeholder="如：封面不合规，请更换后重新申请"></div>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeLiveRejectModal()">取消</button>
+                <button class="btn-primary" onclick="confirmRejectLiveChannel()">确认拒绝</button>
+            </div>
+        </div>
+    </div>
+    <!-- 编辑声望弹窗 -->
+    <div class="modal-overlay" id="boostModal" onclick="if(event.target===this)closeBoostModal()">
+        <div class="modal modal-sm">
+            <div class="modal-head"><h2>编辑声望</h2><button class="modal-x" onclick="closeBoostModal()">✕</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="boostUserId">
+                <p style="font-size:14px;margin-bottom:16px;color:var(--text1)">用户：<strong id="boostUserName"></strong></p>
+                <div class="fg"><label>关注者增幅</label><input type="number" id="boostFollower" min="-999999" placeholder="+1000 或 -500"></div>
+                <div class="fg"><label>获赞增幅</label><input type="number" id="boostLike" min="-999999" placeholder="+1000"></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:4px">注：此为叠加值，实际显示 = 真实数据 + 增幅</p>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeBoostModal()">取消</button>
+                <button class="btn-danger" onclick="openResetBoostModal()">归零</button>
+                <button class="btn-primary" onclick="confirmBoost()">保存</button>
+            </div>
+        </div>
+    </div>
+    <!-- 点赞调整弹窗 -->
+    <div class="modal-overlay" id="postBoostModal" onclick="if(event.target===this)closePostBoostModal()">
+        <div class="modal modal-sm">
+            <div class="modal-head"><h2>点赞调整</h2><button class="modal-x" onclick="closePostBoostModal()">✕</button></div>
+            <div class="modal-body">
+                <input type="hidden" id="postBoostPostId">
+                <p style="font-size:14px;margin-bottom:16px;color:var(--text1)">帖子：<strong id="postBoostPostTitle"></strong></p>
+                <div class="fg"><label>当前点赞</label><input type="number" id="postBoostCurrent" readonly style="background:var(--bg-fill)"></div>
+                <div class="fg"><label>增幅（可填负数）</label><input type="number" id="postBoostAdd" placeholder="+100 或 -50"></div>
+                <p style="font-size:12px;color:var(--muted);margin-top:4px">注：此为叠加值，实际显示 = 真实点赞 + 增幅</p>
+            </div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closePostBoostModal()">取消</button>
+                <button class="btn-danger" onclick="openResetPostBoostModal()">归零</button>
+                <button class="btn-primary" onclick="confirmPostBoost()">保存</button>
+            </div>
+        </div>
+    </div>
+    <!-- 关站邮件两次确认弹窗 -->
+    <div class="modal-overlay" id="closingConfirmModal" onclick="if(event.target===this)closeClosingConfirm()">
+        <div class="modal modal-sm">
+            <div class="modal-head"><h2 id="closingConfirmTitle">第一次确认</h2><button class="modal-x" onclick="closeClosingConfirm()">✕</button></div>
+            <div class="modal-body" id="closingConfirmBody"></div>
+            <div class="modal-foot">
+                <button class="btn-ghost" onclick="closeClosingConfirm()">取消</button>
+                <button class="btn-primary" id="closingConfirmNextBtn" onclick="closingConfirmNext()">下一步</button>
+            </div>
+        </div>
+    </div>
+    <script src="admin.js?v=20261029-closing1"></script>
+</body>
+</html>

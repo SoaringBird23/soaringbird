@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>翱翔鸟论坛 — 介绍</title>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<style>
+  :root{
+    --bg:#0A0A0A;
+    --white:#FFFFFF;
+    --gray:#86868B;
+    --gray2:#A1A1A6;
+    --foot:#48484A;
+    --hair:rgba(255,255,255,0.12);
+    --g1:#6EB1FF;
+    --g2:#B48CFF;
+    --g3:#FF9FCC;
+    --ease:cubic-bezier(.25,.1,.25,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--white);
+    font-family:-apple-system,"SF Pro Display","Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+  canvas#particles{position:fixed;inset:0;z-index:0;display:block;pointer-events:none}
+
+  /* ===== 顶栏 ===== */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;z-index:20;
+    background:var(--bg);
+    border-bottom:1px solid var(--hair);
+  }
+  .tb-inner{
+    height:52px;display:flex;align-items:center;gap:32px;
+    padding:0 clamp(40px,8vw,120px) 0 clamp(120px,12vw,220px);
+  }
+  .tb-brand{font-size:14px;font-weight:600;color:var(--white);text-decoration:none;letter-spacing:.01em}
+  .tb-brand em{font-style:normal;color:var(--gray)}
+  .tb-nav{display:flex;gap:26px;margin-left:auto}
+  .tb-nav a{
+    position:relative;font-size:13px;font-weight:400;color:var(--gray2);
+    text-decoration:none;padding:4px 0;transition:color .25s var(--ease);
+  }
+  .tb-nav a::after{
+    content:'';position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--white);
+    transform:scaleX(0);transform-origin:left center;transition:transform .35s var(--ease);
+  }
+  .tb-nav a:hover{color:var(--white)}
+  .tb-nav a:hover::after{transform:scaleX(1)}
+
+  .content{
+    position:relative;z-index:1;
+    padding:0 clamp(40px,8vw,120px) 0 clamp(120px,12vw,220px);
+  }
+  section.sec{scroll-margin-top:80px;padding-top:clamp(88px,12vh,150px)}
+  section.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:clamp(140px,20vh,240px)}
+
+  /* 首屏 */
+  h1.hero-title{
+    font-size:clamp(46px,7vw,92px);
+    font-weight:700;line-height:1.05;letter-spacing:-.02em;
+    color:var(--white);max-width:13em;
+  }
+  .grad{
+    background:linear-gradient(135deg,var(--g1),var(--g2),var(--g3));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero-sub{
+    margin-top:28px;font-size:clamp(17px,1.6vw,21px);font-weight:400;line-height:1.6;
+    color:var(--gray);max-width:34em;
+  }
+  .join{
+    margin-top:44px;display:inline-block;align-self:flex-start;
+    font-size:20px;font-weight:400;color:var(--white);text-decoration:none;position:relative;
+  }
+  .join::after{
+    content:'';position:absolute;left:0;bottom:-4px;width:100%;height:1px;background:var(--white);
+    transform:scaleX(0);transform-origin:left center;transition:transform .45s var(--ease);
+  }
+  .join:hover::after{transform:scaleX(1)}
+
+  /* 通用区块标题 */
+  h2.section-title{
+    font-size:clamp(20px,2vw,28px);font-weight:700;letter-spacing:-.01em;color:var(--white);
+    margin-bottom:clamp(28px,4vh,44px);
+  }
+
+  /* 简介 */
+  .lead p{
+    font-size:clamp(18px,1.9vw,24px);font-weight:400;line-height:1.6;color:var(--white);max-width:30em;
+  }
+  .lead p.muted{color:var(--gray)}
+  .lead p+p{margin-top:26px}
+
+  /* 板块文字列表 */
+  .block{max-width:30em}
+  .block h3{font-size:clamp(24px,2.6vw,34px);font-weight:700;letter-spacing:-.01em;color:var(--white)}
+  .block p{margin-top:14px;font-size:clamp(16px,1.5vw,19px);font-weight:400;line-height:1.6;color:var(--gray)}
+  .block+.block{margin-top:clamp(48px,7vh,72px)}
+
+  /* 原则列表：断言式，无项目符号 */
+  .principles .principle{max-width:30em}
+  .principle+.principle{margin-top:clamp(30px,4.5vh,44px)}
+  .principle strong{
+    display:block;font-size:clamp(19px,2vw,26px);font-weight:700;color:var(--white);
+  }
+  .principle span{
+    display:block;margin-top:6px;font-size:clamp(15px,1.4vw,18px);font-weight:400;line-height:1.5;color:var(--gray);
+  }
+
+  /* 底部 */
+  .bottombar{
+    margin-top:clamp(120px,18vh,200px);
+    border-top:1px solid var(--hair);
+  }
+  .fb-inner{
+    display:flex;align-items:center;flex-wrap:wrap;gap:12px 28px;
+    padding:clamp(26px,4vh,40px) clamp(40px,8vw,120px) clamp(30px,5vh,48px) clamp(120px,12vw,220px);
+    font-size:12px;color:var(--foot);
+  }
+  .fb-brand{font-size:13px;font-weight:600;color:var(--gray2)}
+  .fb-copy{color:var(--foot)}
+  .fb-links{display:flex;gap:18px;margin-left:auto}
+  .fb-links a{color:var(--foot);text-decoration:none;transition:color .25s var(--ease)}
+  .fb-links a:hover{color:var(--gray2)}
+
+  /* 滚动淡入 */
+  [data-reveal]{
+    opacity:0;transform:translateY(20px);
+    transition:opacity .8s var(--ease),transform .8s var(--ease);
+    will-change:opacity,transform;
+  }
+  [data-reveal].visible{opacity:1;transform:none}
+
+  @media (max-width:760px){
+    .content{padding:0 clamp(24px,7vw,48px)}
+    .tb-inner{padding:0 clamp(24px,7vw,48px);height:48px}
+    .tb-nav{gap:18px}
+    .tb-nav a{font-size:12px}
+    .fb-inner{padding:26px clamp(24px,7vw,48px);justify-content:center;text-align:center}
+    .fb-links{margin-left:0;width:100%;justify-content:center}
+  }
+  @media (max-width:420px){ .tb-nav{display:none} }
+</style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+
+  <!-- 顶栏 -->
+  <header class="topbar">
+    <div class="tb-inner">
+      <a class="tb-brand" href="#top">翱翔鸟<em>论坛</em></a>
+      <nav class="tb-nav">
+        <a href="#intro">简介</a>
+        <a href="#blocks">板块</a>
+        <a href="#principles">原则</a>
+        <a href="#join">加入</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- 首屏 -->
+    <section class="sec hero" id="top">
+      <h1 class="hero-title" data-reveal>在这里，<span class="grad">技术</span>回归讨论本身。</h1>
+      <p class="hero-sub" data-reveal>一个安静、克制的技术论坛。我们只筛选值得聊的话题，然后认真聊下去。不追热点，只聊值得聊的。</p>
+      <a class="join" href="#join" data-reveal>加入讨论 →</a>
+    </section>
+
+    <!-- 简介 -->
+    <section class="sec lead" id="intro">
+      <p data-reveal>我们花大多数时间浏览，只留一小部分时间停留。这里只保存那留下来的部分。没有热榜，没有推荐流，没有算法推着你往前走。</p>
+      <p data-reveal>内容来自真实的讨论，而非转发。<span class="grad">不追热点</span>，只聊值得聊的。</p>
+      <p class="muted" data-reveal>你看到的，是编选之后的结果，而不是一切。我们的工作，是把有价值的东西挑出来，安静地放在这里。</p>
+    </section>
+
+    <!-- 板块 -->
+    <section class="sec" id="blocks">
+      <h2 class="section-title" data-reveal>在这里聊什么</h2>
+      <div class="block" data-reveal>
+        <h3>技术</h3>
+        <p>端到端工程、底层原理、工具链。我们谈的是为什么，而不是怎么装。一个问题可以讨论三天，直到它变清楚。</p>
+      </div>
+      <div class="block" data-reveal>
+        <h3>产品</h3>
+        <p>从想法到取舍。不这样做，往往比这样做更有价值。会聊方案本身，但更常聊方案背后的判断。</p>
+      </div>
+      <div class="block" data-reveal>
+        <h3>认知</h3>
+        <p>关于学习方式、写作与判断。如何持续成长，如何安静地变强。慢一点，想清楚，再说话。</p>
+      </div>
+    </section>
+
+    <!-- 原则 -->
+    <section class="sec principles" id="principles">
+      <h2 class="section-title" data-reveal>我们不做</h2>
+      <div class="principle" data-reveal>
+        <strong>不做热榜。</strong>
+        <span>热度不是价值。被最多人点开的，不一定值得被记住。</span>
+      </div>
+      <div class="principle" data-reveal>
+        <strong>不追热点。</strong>
+        <span>热点太快，快到留不下东西。等它凉下来，我们再捡起来聊。</span>
+      </div>
+      <div class="principle" data-reveal>
+        <strong>不搬运。</strong>
+        <span>转载不产生讨论，只产生转发量。这里要的是你自己的想法。</span>
+      </div>
+      <div class="principle" data-reveal>
+        <strong>不做推荐流。</strong>
+        <span>算法替你决定，你就没得选。我们把选择权还给你。</span>
+      </div>
+    </section>
+
+    <!-- 加入 -->
+    <section class="sec lead" id="join">
+      <h2 class="section-title" data-reveal>加入</h2>
+      <p data-reveal>一个账号，一个名字。注册只要十秒，之后别急着发言。</p>
+      <p data-reveal>先看看别人怎么聊，再讲出你的主张。</p>
+      <a class="join" href="#" data-reveal>开始发言 →</a>
+    </section>
+
+  </div>
+
+  <!-- 底部 -->
+  <footer class="bottombar">
+    <div class="fb-inner">
+      <span class="fb-brand">翱翔鸟论坛</span>
+      <span class="fb-copy">© 2026 翱翔鸟 · 保留所有权利</span>
+      <span class="fb-links">
+        <a href="#intro">关于</a>
+        <a href="#principles">社区规范</a>
+        <a href="#top">回到顶部</a>
+      </span>
+    </div>
+  </footer>
+
+<script>
+  /* ================= 3D 粒子背景（圆形光点）================= */
+  (function(){
+    var canvas = document.getElementById('particles');
+    if (!canvas || typeof THREE === 'undefined') return;
+
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias:false, alpha:false, powerPreference:'high-performance' });
+    renderer.setClearColor(0x0a0a0a,1);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+
+    var scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x0a0a0a, 90, 500);
+
+    var camera = new THREE.PerspectiveCamera(45,1,1,1200);
+    camera.position.z = 260;
+
+    var Z_MIN=-200, Z_MAX=200;
+    var geometry=null, positions=null, velocities=null, material=null, points=null;
+    var bx=120, by=80;
+
+    // 程序化生成圆形柔边纹理（非外部贴图）
+    function makeCircle(){
+      var s=64, c=document.createElement('canvas'); c.width=c.height=s;
+      var g=c.getContext('2d');
+      var grad=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+      grad.addColorStop(0,'rgba(255,255,255,1)');
+      grad.addColorStop(0.45,'rgba(255,255,255,0.9)');
+      grad.addColorStop(1,'rgba(255,255,255,0)');
+      g.fillStyle=grad;
+      g.beginPath(); g.arc(s/2,s/2,s/2,0,Math.PI*2); g.fill();
+      var t=new THREE.CanvasTexture(c);
+      t.magFilter=THREE.LinearFilter; t.minFilter=THREE.LinearFilter;
+      return t;
+    }
+
+    function countFor(){ return window.innerWidth < 768 ? 520 : 1080; }
+
+    function build(){
+      if (points){ scene.remove(points); }
+      if (material && material.map){ material.map.dispose(); }
+      if (geometry) geometry.dispose();
+      var n = countFor();
+      geometry = new THREE.BufferGeometry();
+      positions  = new Float32Array(n*3);
+      velocities = new Float32Array(n*3);
+      var colors  = new Float32Array(n*3);
+
+      var fovRad = 45*Math.PI/180;
+      var hh = 2*Math.tan(fovRad/2)*camera.position.z;
+      var cw = renderer.domElement.clientWidth  || window.innerWidth  || 1;
+      var ch = renderer.domElement.clientHeight || window.innerHeight || 1;
+      var ww = hh*cw/ch;
+      bx = ww/2*1.6; by = hh/2*1.6;
+      if (!(bx > 0) || !isFinite(bx)) bx = 120;
+      if (!(by > 0) || !isFinite(by)) by = 80;
+
+      for (var i=0;i<n;i++){
+        var x=(Math.random()*2-1)*bx, y=(Math.random()*2-1)*by, z=Z_MIN+Math.random()*(Z_MAX-Z_MIN);
+        positions[i*3]=x; positions[i*3+1]=y; positions[i*3+2]=z;
+        velocities[i*3]=(Math.random()*2-1)*0.35;
+        velocities[i*3+1]=(Math.random()*2-1)*0.28;
+        velocities[i*3+2]=(Math.random()*2-1)*0.18;
+
+        var r=Math.random()*100, cr,cg,cb;
+        if (r<85){ cr=1.00;cg=0.98;cb=0.97; }      // 暖白 85%
+        else if (r<95){ cr=0.66;cg=0.77;cb=0.88; } // 淡蓝 10%
+        else { cr=0.91;cg=0.84;cb=0.72; }          // 淡金 5%
+
+        var depth=(z-Z_MIN)/(Z_MAX-Z_MIN);
+        var lum=0.25+0.75*depth;
+        colors[i*3]=cr*lum; colors[i*3+1]=cg*lum; colors[i*3+2]=cb*lum;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions,3));
+      geometry.setAttribute('color',    new THREE.BufferAttribute(colors,3));
+
+      material = new THREE.PointsMaterial({
+        map: makeCircle(),
+        size: 4.5,
+        vertexColors:true,
+        transparent:true,
+        opacity:0.85,
+        sizeAttenuation:true,
+        depthWrite:false,
+        blending: THREE.AdditiveBlending
+      });
+
+      points = new THREE.Points(geometry, material);
+      scene.add(points);
+    }
+
+    var mouse={ x:0, y:0, tx:0, ty:0 };
+
+    window.addEventListener('mousemove', function(e){
+      mouse.tx=(e.clientX/window.innerWidth)*2-1;
+      mouse.ty=(e.clientY/window.innerHeight)*2-1;
+    }, { passive:true });
+
+    function drift(){
+      if (!positions) return;
+      var n=positions.length/3;
+      for (var i=0;i<n;i++){
+        var ix=i*3, iy=ix+1, iz=ix+2;
+        positions[ix]+=velocities[ix];
+        positions[iy]+=velocities[iy];
+        positions[iz]+=velocities[iz];
+        if (positions[ix]>bx) positions[ix]=-bx; else if (positions[ix]<-bx) positions[ix]=bx;
+        if (positions[iy]>by) positions[iy]=-by; else if (positions[iy]<-by) positions[iy]=by;
+        if (positions[iz]>Z_MAX) positions[iz]=Z_MIN; else if (positions[iz]<Z_MIN) positions[iz]=Z_MAX;
+      }
+      geometry.attributes.position.needsUpdate=true;
+    }
+
+    function resize(){
+      renderer.setSize(window.innerWidth,window.innerHeight,false);
+      camera.aspect=window.innerWidth/window.innerHeight;
+      camera.updateProjectionMatrix();
+      build();
+    }
+    var rto;
+    window.addEventListener('resize', function(){ clearTimeout(rto); rto=setTimeout(resize,120); });
+
+    function render(){
+      mouse.x += (mouse.tx-mouse.x)*0.03;   // 阻尼 0.03，无弹跳
+      mouse.y += (mouse.ty-mouse.y)*0.03;
+      camera.position.x = mouse.x*26;
+      camera.position.y = mouse.y*18;
+      camera.lookAt(0,0,0);
+      drift();
+      renderer.render(scene,camera);
+      requestAnimationFrame(render);
+    }
+
+    resize();
+    render();
+  })();
+
+  /* ================= 滚动淡入 ================= */
+  (function(){
+    var els=document.querySelectorAll('[data-reveal]');
+    if (!('IntersectionObserver' in window)){
+      els.forEach(function(el){ el.classList.add('visible'); });
+      return;
+    }
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting){ en.target.classList.add('visible'); io.unobserve(en.target); }
+      });
+    },{ threshold:0.15, rootMargin:'0px 0px -8% 0px' });
+    els.forEach(function(el){ io.observe(el); });
+  })();
+</script>
+</body>
+</html>

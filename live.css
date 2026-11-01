@@ -1,0 +1,1014 @@
+/* Live — 沉浸式动态背景 + 横向货架 + 聚焦引擎 */
+
+:root {
+  --font: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --bg: #000000;
+  --bg-card: rgba(28,28,30,0.72);
+  --bg-fill: rgba(255,255,255,0.08);
+  --text: #ffffff;
+  --text2: rgba(235,235,245,0.6);
+  --text3: rgba(235,235,245,0.3);
+  --border: rgba(255,255,255,0.1);
+  --accent: #0A84FF;
+  --accent-hover: #409CFF;
+  --accent-soft: rgba(10,132,255,0.16);
+  --live: #FF453A;
+  --red: #FF453A;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --r: 16px;
+}
+
+[data-theme="light"] {
+  --bg: #f2f2f7;
+  --bg-card: rgba(255,255,255,0.72);
+  --bg-fill: rgba(0,0,0,0.05);
+  --text: #1c1c1e;
+  --text2: rgba(60,60,67,0.6);
+  --text3: rgba(60,60,67,0.3);
+  --border: rgba(0,0,0,0.08);
+  --accent: #007AFF;
+  --accent-hover: #0066CC;
+  --accent-soft: rgba(0,122,255,0.1);
+  --live: #FF3B30;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); }
+.lv-app { font-family: var(--font); -webkit-font-smoothing: antialiased; position: relative; min-height: 100vh; }
+
+/* ===== 内容区（顶栏下方留白） ===== */
+.lv-content { position: relative; z-index: 1; padding-top: 52px; }
+/* 为底部悬浮胶囊导航预留空间 */
+.lv-content { padding-bottom: 140px; }
+@media (max-width: 768px) {
+  .lv-content { padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
+}
+#listView, #hostView, #viewerView { animation: lvViewIn 0.45s var(--ease-out); }
+@keyframes lvViewIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== 浮动毛玻璃顶栏 ===== */
+.lv-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 44px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 0.5px solid rgba(255,255,255,0.05);
+}
+[data-theme="light"] .lv-nav { background: rgba(255,255,255,0.6); border-bottom-color: rgba(0,0,0,0.04); }
+.lv-nav-inner { max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+.lv-nav-left { display: flex; align-items: center; gap: 12px; }
+.lv-nav-back { color: var(--accent); text-decoration: none; display: flex; align-items: center; transition: transform 150ms var(--spring); }
+.lv-nav-back:active { transform: scale(0.9); }
+.lv-nav-label { font-size: 21px; font-weight: 700; color: var(--text); letter-spacing: -0.022em; }
+.lv-nav-right { display: flex; align-items: center; gap: 12px; }
+.lv-nav-link { color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 500; }
+.lv-nav-user { display: flex; align-items: center; }
+.lv-nav-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+
+/* 开播按钮（红色 pill + 光晕） */
+.lv-go-live {
+  display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px;
+  border: none; border-radius: 980px; background: var(--live); color: #fff;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  box-shadow: 0 1px 8px rgba(255,69,58,0.3);
+  transition: transform 150ms var(--spring), box-shadow 200ms var(--ease);
+}
+.lv-go-live:hover { box-shadow: 0 2px 12px rgba(255,69,58,0.42); }
+.lv-go-live:active { transform: scale(0.95); }
+
+/* ===== LIVE 徽章（红色脉冲点） ===== */
+.lv-live-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 11px; border-radius: 980px;
+  background: rgba(255,69,58,0.2); color: var(--live);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.lv-live-badge.lg { padding: 7px 15px; font-size: 12px; }
+.lv-live-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--live);
+  box-shadow: 0 0 8px var(--live);
+  animation: lvPulse 1.4s ease-in-out infinite;
+}
+@keyframes lvPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.8); }
+}
+
+/* ===== Hero 精选（沉浸式大图） ===== */
+.lv-hero { position: relative; width: 100%; height: 70vh; min-height: 480px; max-height: 680px; overflow: hidden; cursor: pointer; }
+.lv-hero-bg {
+  position: absolute; inset: 0; background-size: cover; background-position: center;
+  transform: scale(1.05); transition: transform 600ms var(--ease-out);
+}
+.lv-hero:hover .lv-hero-bg { transform: scale(1.08); }
+.lv-hero-overlay {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,0.12) 65%, transparent 100%),
+    linear-gradient(135deg, rgba(255,69,58,0.14) 0%, transparent 45%, rgba(10,132,255,0.14) 100%);
+}
+.lv-hero-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 48px; max-width: 1400px; margin: 0 auto; }
+.lv-hero-title {
+  font-size: 46px; font-weight: 800; letter-spacing: -0.035em; color: #fff;
+  line-height: 1.05; margin: 14px 0 12px; max-width: 720px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+.lv-hero-meta { font-size: 15px; color: rgba(255,255,255,0.8); margin-bottom: 22px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+.lv-hero-watch {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 30px; border: none; border-radius: 980px;
+  background: rgba(255,255,255,0.2); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
+  transition: background 200ms var(--ease), transform 150ms var(--spring);
+}
+.lv-hero-watch:hover { background: rgba(255,255,255,0.32); }
+.lv-hero-watch:active { transform: scale(0.96); }
+
+/* ===== 横向货架（carousel） ===== */
+.lv-shelf { max-width: 1400px; margin: 0 auto; padding: 32px 0 80px; }
+.lv-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 48px; margin-bottom: 18px; }
+.lv-section-title { font-size: 24px; font-weight: 700; letter-spacing: -0.025em; color: var(--text); }
+.lv-refresh {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
+  border: 0.5px solid var(--border); border-radius: 980px; background: var(--bg-card);
+  color: var(--text2); font-size: 13px; font-weight: 500; cursor: pointer;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  transition: background 150ms var(--ease), color 150ms var(--ease), transform 150ms var(--spring);
+}
+.lv-refresh:hover { color: var(--text); }
+.lv-refresh:active { transform: scale(0.96); }
+
+.lv-row {
+  display: flex; gap: 22px; overflow-x: auto; overflow-y: visible;
+  padding: 12px 48px 24px; scroll-snap-type: x mandatory;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.lv-row::-webkit-scrollbar { display: none; }
+
+/* ===== 聚焦卡片（Focus Engine：hover 放大 + 发光 + 强阴影） ===== */
+.lv-card {
+  flex: 0 0 320px; scroll-snap-align: start; cursor: pointer;
+  transition: transform 0.4s var(--ease-out);
+  will-change: transform;
+}
+.lv-card:active { transform: scale(0.97); transition: transform 150ms var(--spring); }
+
+.lv-card-thumb {
+  position: relative; width: 320px; aspect-ratio: 16/9; border-radius: var(--r);
+  overflow: hidden; background-size: cover; background-position: center; background-color: var(--bg-fill);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+}
+.lv-card:hover .lv-card-thumb {
+  transform: scale(1.09) translateY(-6px);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22), 0 0 0 1px rgba(255,255,255,0.1), 0 20px 40px rgba(0,0,0,0.5), 0 44px 88px rgba(0,0,0,0.42);
+}
+.lv-card-thumb-ph {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: var(--text3); background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+}
+.lv-card-thumb::after {
+  content: ''; position: absolute; inset: 0; border-radius: var(--r); pointer-events: none;
+  background: linear-gradient(to bottom, transparent 55%, rgba(0,0,0,0.28));
+}
+.lv-card-live { position: absolute; top: 12px; left: 12px; }
+.lv-card-viewers {
+  position: absolute; top: 12px; right: 12px;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 980px;
+  background: rgba(0,0,0,0.65); color: #fff; font-size: 11px; font-weight: 600;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.lv-card-body { padding: 14px 4px 0; width: 320px; }
+.lv-card-title {
+  font-size: 16px; font-weight: 600; color: var(--text); line-height: 1.3; letter-spacing: -0.01em;
+  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+}
+.lv-card-author { display: flex; align-items: center; gap: 7px; margin-top: 7px; }
+.lv-card-avatar { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; background: var(--bg-fill); }
+.lv-card-name { font-size: 13px; color: var(--text2); font-weight: 500; }
+
+/* ===== 空状态 ===== */
+.lv-empty { text-align: center; color: var(--text3); padding: 80px 0; }
+.lv-empty svg { opacity: 0.25; margin-bottom: 14px; }
+.lv-empty-text { font-size: 17px; font-weight: 600; color: var(--text2); }
+.lv-empty-sub { font-size: 13px; margin-top: 6px; }
+
+/* ===== 主播视图 ===== */
+.lv-host-screen { position: relative; width: 100%; height: calc(100vh - 44px); background: #000; overflow: hidden; }
+.lv-host-preview { width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+.lv-host-overlay { position: absolute; inset: 0; pointer-events: none; }
+.lv-host-top { position: absolute; top: 16px; left: 16px; right: 16px; display: flex; align-items: center; gap: 10px; pointer-events: auto; }
+.lv-timer {
+  display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 980px;
+  background: rgba(0,0,0,0.5); color: #fff; font-size: 12px; font-weight: 600;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.lv-host-bottom {
+  position: absolute; bottom: 24px; left: 24px; right: 24px;
+  padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 0.5px solid rgba(255,255,255,0.12); border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4); pointer-events: auto;
+}
+.lv-host-title { font-size: 19px; font-weight: 700; color: #fff; letter-spacing: -0.015em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lv-end-btn {
+  display: inline-flex; align-items: center; gap: 7px; padding: 12px 24px;
+  border: none; border-radius: 980px; background: var(--live); color: #fff;
+  font-size: 15px; font-weight: 600; cursor: pointer; flex-shrink: 0;
+  transition: background 150ms var(--ease), transform 150ms var(--spring);
+}
+.lv-end-btn:hover { background: #FF2D20; }
+.lv-end-btn:active { transform: scale(0.96); }
+
+/* 峰值观看 pill */
+.lv-peak-pill {
+  display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 980px;
+  background: rgba(255,159,10,0.18); color: #FFB340; font-size: 12px; font-weight: 600;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.01em;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+
+/* 主播控制坞 */
+.lv-host-dock {
+  position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%);
+  display: flex; gap: 8px; padding: 6px;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 0.5px solid rgba(255,255,255,0.12); border-radius: 980px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.4); pointer-events: auto; z-index: 6;
+}
+.lv-dock-btn {
+  width: 40px; height: 40px; border: none; border-radius: 50%;
+  background: rgba(255,255,255,0.1); color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 150ms var(--ease), transform 150ms var(--spring), color 150ms var(--ease);
+}
+.lv-dock-btn:hover { background: rgba(255,255,255,0.2); }
+.lv-dock-btn:active { transform: scale(0.9); }
+.lv-dock-btn.off { background: var(--live); color: #fff; }
+.lv-dock-btn.off:hover { background: #FF2D20; }
+
+/* 黄色优质主播标识（区别于蓝色认证，burst 印章内嵌白色 checkmark） */
+.lv-quality-badge {
+  color: #FFB340; flex-shrink: 0; filter: drop-shadow(0 0 3px rgba(255,179,64,0.4));
+}
+.lv-quality-badge .lv-quality-check { fill: #1a1a1a; }
+.lv-card-name.has-badge, .lv-featured-name.has-badge, .lv-viewer-name.has-badge { display: inline-flex; align-items: center; gap: 4px; }
+.lv-card-quality {
+  position: absolute; bottom: 10px; right: 10px; z-index: 3;
+  width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+  background: transparent; padding: 0;
+}
+.lv-card-quality svg { width: 22px; height: 22px; color: #FFB340; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.4)); }
+.lv-card-quality .lv-quality-check { fill: #1a1a1a; }
+.lv-chat-msg-name { display: inline-flex; align-items: center; gap: 4px; }
+
+/* 精选直播 carousel */
+.lv-featured { padding-top: 4px; }
+.lv-section-sub { font-size: 13px; color: var(--text3); font-weight: 400; letter-spacing: 0; }
+.lv-featured-row {
+  display: flex; gap: 16px; overflow-x: auto; padding: 4px 24px 18px;
+  scroll-snap-type: x mandatory; scrollbar-width: none; -ms-overflow-style: none;
+}
+.lv-featured-row::-webkit-scrollbar { display: none; }
+.lv-featured-card {
+  flex: 0 0 280px; scroll-snap-align: start; cursor: pointer; border-radius: 18px; overflow: hidden;
+  background: var(--card); border: 0.5px solid var(--border);
+  transition: transform 200ms var(--spring), box-shadow 200ms var(--ease);
+}
+.lv-featured-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.18); }
+.lv-featured-card:active { transform: scale(0.985); }
+.lv-featured-thumb { position: relative; width: 100%; aspect-ratio: 16/9; background: var(--bg-fill); background-size: cover; background-position: center; }
+.lv-featured-live { position: absolute; top: 12px; left: 12px; }
+.lv-featured-viewers {
+  position: absolute; top: 12px; right: 12px; display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 980px; background: rgba(0,0,0,0.6); color: #fff;
+  font-size: 12px; font-weight: 600; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.lv-featured-body { padding: 14px 16px 16px; }
+.lv-featured-title { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lv-featured-author { display: flex; align-items: center; gap: 8px; }
+.lv-featured-name { font-size: 13px; color: var(--text2); font-weight: 500; }
+
+/* 观众视图主播名带标识 */
+.lv-viewer-name { display: inline-flex; align-items: center; gap: 5px; }
+
+/* ===== 观众视图 ===== */
+.lv-viewer-screen { position: relative; width: 100%; height: calc(100vh - 44px); background: #000; overflow: hidden; }
+.lv-viewer-player { width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+.lv-viewer-close {
+  position: absolute; top: 16px; left: 16px; z-index: 10;
+  width: 36px; height: 36px; border: none; border-radius: 50%;
+  background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 200ms var(--ease), transform 150ms var(--spring);
+}
+.lv-viewer-close:hover { background: rgba(255,255,255,0.28); }
+.lv-viewer-close:active { transform: scale(0.9); }
+.lv-viewer-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: rgba(255,255,255,0.7); font-size: 14px; }
+.lv-spinner { width: 26px; height: 26px; border: 2.5px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: lvSpin 0.7s linear infinite; }
+@keyframes lvSpin { to { transform: rotate(360deg); } }
+.lv-viewer-overlay { position: absolute; inset: 0; pointer-events: none; }
+.lv-viewer-top { position: absolute; top: 16px; left: 64px; right: 16px; display: flex; align-items: center; gap: 10px; pointer-events: auto; }
+.lv-viewer-bottom {
+  position: absolute; bottom: 24px; left: 24px; right: 24px;
+  padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 0.5px solid rgba(255,255,255,0.12); border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4); pointer-events: auto;
+}
+.lv-viewer-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; background: rgba(255,255,255,0.15); }
+.lv-viewer-title { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.015em; }
+.lv-viewer-name { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+.lv-viewer-pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 980px;
+  background: rgba(0,0,0,0.6); color: #fff; font-size: 12px; font-weight: 600;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.lv-mute-btn {
+  width: 32px; height: 32px; border: none; border-radius: 50%;
+  background: rgba(0,0,0,0.6); color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  transition: background 150ms var(--ease), transform 150ms var(--spring);
+}
+.lv-mute-btn:active { transform: scale(0.9); }
+
+/* ===== 播放器选择器 ===== */
+.lv-player-select { position: relative; }
+.lv-player-select-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 980px;
+  background: rgba(0,0,0,0.6); color: #fff;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: none; transition: background 150ms var(--ease);
+}
+.lv-player-select-btn:hover { background: rgba(0,0,0,0.75); }
+.lv-player-dropdown {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  min-width: 170px; background: var(--bg-card);
+  border: 0.5px solid rgba(255,255,255,0.12); border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%);
+  z-index: 100; overflow: hidden;
+  animation: lvDropIn 0.2s var(--ease-out);
+}
+@keyframes lvDropIn { from { opacity: 0; transform: translateY(-6px) scale(0.96); } to { opacity: 1; transform: none; } }
+.lv-player-option {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; border: none; background: none;
+  color: var(--text); font-size: 13px; cursor: pointer;
+  transition: background 120ms var(--ease); text-align: left;
+}
+.lv-player-option:hover { background: rgba(255,255,255,0.06); }
+.lv-player-option.active { background: rgba(255,255,255,0.1); }
+.lv-player-option span:first-of-type { font-weight: 600; }
+.lv-player-status { font-size: 11px; color: rgba(255,255,255,0.5); margin-left: auto; }
+.lv-player-option.active .lv-player-status { color: rgba(100,200,255,0.8); }
+
+/* ===== 开播模态（毛玻璃材质浮现） ===== */
+.lv-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: none; align-items: flex-start; justify-content: center; z-index: 2000;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  overflow-y: auto; padding: 5vh 16px;
+}
+.lv-modal-overlay.show { display: flex; animation: lvFadeIn 0.3s var(--ease-out); }
+@keyframes lvFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.lv-modal {
+  background: var(--bg-card); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 0.5px solid rgba(255,255,255,0.12); border-radius: 22px; box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  padding: 26px; width: min(460px, calc(100vw - 32px)); max-height: 85vh; overflow-y: auto;
+  animation: lvModalIn 0.4s var(--ease-out);
+}
+@keyframes lvModalIn { from { opacity: 0; transform: scale(0.94) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.lv-modal-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.lv-modal-title { font-size: 19px; font-weight: 700; color: var(--text); letter-spacing: -0.015em; }
+.lv-modal-x {
+  width: 28px; height: 28px; border: none; background: var(--bg-fill); border-radius: 50%;
+  color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 150ms var(--ease), transform 150ms var(--spring);
+}
+.lv-modal-x:active { transform: scale(0.9); }
+.lv-modal-x:hover { color: var(--text); }
+
+.lv-source-section { margin-bottom: 20px; }
+.lv-field { margin-bottom: 18px; }
+.lv-field-label { display: block; font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 10px; }
+.lv-source-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lv-source-card {
+  display: flex; flex-direction: column; align-items: center; gap: 9px; padding: 20px 12px;
+  border: 1.5px solid var(--border); border-radius: var(--r); background: var(--bg-fill);
+  color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: border-color 200ms var(--ease), background 200ms var(--ease), color 200ms var(--ease), transform 150ms var(--spring);
+}
+.lv-source-card:active { transform: scale(0.97); }
+.lv-source-card:hover { border-color: var(--text3); color: var(--text); }
+.lv-source-card.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.lv-input {
+  width: 100%; background: var(--bg-fill); border: 0.5px solid var(--border); border-radius: 12px;
+  color: var(--text); font-family: var(--font); font-size: 15px; padding: 12px 14px; outline: none;
+  transition: border-color 200ms var(--ease), background 200ms var(--ease);
+}
+.lv-input:focus { border-color: var(--accent); background: rgba(0,0,0,0.2); }
+[data-theme="light"] .lv-input:focus { background: #fff; }
+.lv-modal-hint { font-size: 12px; color: var(--text3); margin-top: 6px; line-height: 1.5; }
+.lv-modal-foot { display: flex; gap: 10px; margin-top: 22px; }
+.lv-btn-ghost {
+  flex: 1; padding: 12px; border: 0.5px solid var(--border); border-radius: 12px;
+  background: var(--bg-fill); color: var(--text); font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: background 150ms var(--ease), transform 150ms var(--spring);
+}
+.lv-btn-ghost:active { transform: scale(0.97); }
+.lv-btn-primary {
+  flex: 1; padding: 12px; border: none; border-radius: 12px; background: var(--live); color: #fff;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: background 150ms var(--ease), transform 150ms var(--spring);
+}
+.lv-btn-primary:hover { background: #FF2D20; }
+.lv-btn-primary:active { transform: scale(0.97); }
+.lv-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ===== 预览确认 ===== */
+.lv-preview-wrap { position: relative; border-radius: 14px; overflow: hidden; background: #000; aspect-ratio: 16/9; }
+.lv-preview-video { width: 100%; height: 100%; object-fit: contain; display: block; }
+.lv-preview-status { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px 16px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: #fff; font-size: 13px; font-weight: 500; }
+.modal-sm { width: min(360px, calc(100vw - 32px)) !important; }
+
+/* ===== 申请直播权限 ===== */
+.lv-apply-status {
+  display: flex; align-items: center; gap: 8px; padding: 11px 14px; border-radius: 12px;
+  font-size: 13px; font-weight: 500; margin-bottom: 18px; line-height: 1.4;
+}
+.lv-apply-status.pending { background: rgba(255,159,10,0.12); color: #FF9F0A; }
+.lv-apply-status.rejected { background: rgba(255,69,58,0.12); color: var(--live); }
+.lv-apply-status svg { flex-shrink: 0; }
+
+.lv-cover-drop { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 14px; overflow: hidden; }
+.lv-cover-placeholder {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;
+  border: 1.5px dashed var(--border); border-radius: 14px; background: var(--bg-fill); color: var(--text2);
+  cursor: pointer; transition: border-color 200ms var(--ease), background 200ms var(--ease), transform 150ms var(--spring);
+}
+.lv-cover-placeholder:active { transform: scale(0.985); }
+.lv-cover-placeholder:hover { border-color: var(--accent); color: var(--accent); }
+.lv-cover-placeholder span { font-size: 14px; font-weight: 600; }
+.lv-cover-hint { font-size: 11px !important; font-weight: 400 !important; color: var(--text3); }
+.lv-cover-preview { position: absolute; inset: 0; }
+.lv-cover-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lv-cover-change {
+  position: absolute; right: 10px; bottom: 10px; padding: 6px 14px; border: none; border-radius: 980px;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: #fff;
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: transform 150ms var(--spring), background 150ms var(--ease);
+}
+.lv-cover-change:active { transform: scale(0.94); }
+.lv-cover-change:hover { background: rgba(0,0,0,0.75); }
+
+/* ===== Toast ===== */
+.lv-toast {
+  position: fixed; top: 56px; left: 50%; transform: translate(-50%, -8px); z-index: 9999;
+  background: rgba(28,28,30,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 0.5px solid rgba(255,255,255,0.12); color: #fff;
+  border-radius: 980px; padding: 11px 24px; font-size: 14px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  opacity: 0; pointer-events: none;
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out); max-width: calc(100vw - 40px);
+}
+[data-theme="light"] .lv-toast { background: rgba(255,255,255,0.85); color: #1c1c1e; border-color: rgba(0,0,0,0.08); }
+.lv-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.lv-toast.error { border-color: var(--live); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+  .lv-hero { height: 56vh; min-height: 360px; }
+  .lv-hero-title { font-size: 28px; }
+  .lv-hero-info { padding: 24px; }
+  .lv-shelf { padding: 24px 0 60px; }
+  .lv-bar { padding: 0 20px; }
+  .lv-row { padding: 12px 20px 24px; gap: 14px; }
+  .lv-card, .lv-card-thumb, .lv-card-body { flex: 0 0 240px; width: 240px; }
+  .lv-host-title, .lv-viewer-title { font-size: 16px; }
+  .lv-viewer-top { left: 60px; }
+  /* 聊天面板移动端全屏化 */
+  .lv-chat { width: 100% !important; right: 0 !important; top: 0 !important; bottom: 0 !important; border-radius: 0 !important; }
+  .lv-chat.collapsed { transform: translateX(100%); }
+  /* 导航栏移动端紧凑化 */
+  .lv-nav-inner { padding: 0 16px; gap: 12px; }
+  .lv-nav-label { font-size: 16px; }
+  /* 主播控制坞移动端优化 */
+  .lv-host-dock { gap: 4px; padding: 6px 8px; }
+  .lv-dock-btn { width: 36px; height: 36px; }
+  .lv-host-top { gap: 6px; flex-wrap: wrap; }
+  .lv-host-bottom { padding: 0 16px 16px; }
+  /* 观众操作栏移动端 */
+  .lv-viewer-bottom { padding: 0 16px 16px; }
+  .lv-action-rail { gap: 10px; }
+  /* 模态框移动端全屏 */
+  .lv-modal-overlay { padding: 0 !important; }
+  .lv-modal { width: 100% !important; max-width: 100% !important; max-height: 100vh !important; border-radius: 0 !important; margin: 0 !important; }
+}
+
+@media (max-width: 480px) {
+  .lv-hero { height: 50vh; min-height: 300px; }
+  .lv-hero-title { font-size: 22px; }
+  .lv-hero-info { padding: 20px; }
+  .lv-bar { padding: 0 16px; }
+  .lv-row { padding: 10px 16px 20px; gap: 12px; }
+  .lv-card, .lv-card-thumb, .lv-card-body { flex: 0 0 200px; width: 200px; }
+  .lv-nav-inner { padding: 0 14px; gap: 10px; }
+  .lv-go-live span { display: none; }
+  .lv-go-live { padding: 8px; }
+  .lv-host-dock { gap: 2px; }
+  .lv-dock-btn { width: 34px; height: 34px; }
+  .lv-host-top { gap: 4px; }
+  .lv-host-top .lv-status-pill, .lv-host-top .lv-quality-pill { font-size: 10px; padding: 3px 8px; }
+  .lv-host-top .lv-peak-pill, .lv-host-top .lv-latency-pill { font-size: 10px; padding: 3px 8px; }
+}
+
+/* ===== 直播聊天（毛玻璃浮动面板） ===== */
+.lv-chat {
+  position: absolute; top: 16px; right: 16px; bottom: 16px; width: 320px;
+  display: flex; flex-direction: column; z-index: 5;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 0.5px solid rgba(255,255,255,0.12); border-radius: 18px;
+  overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  transition: transform 0.4s var(--ease-out), opacity 0.3s var(--ease-out);
+}
+.lv-chat.collapsed { transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; }
+.lv-chat-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 16px; border-bottom: 0.5px solid rgba(255,255,255,0.08); flex-shrink: 0;
+}
+.lv-chat-title { font-size: 14px; font-weight: 600; color: #fff; letter-spacing: -0.01em; }
+.lv-chat-toggle { width: 24px; height: 24px; border: none; background: rgba(255,255,255,0.1); border-radius: 50%; color: rgba(255,255,255,0.7); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 150ms var(--ease), transform 150ms var(--spring); }
+.lv-chat-toggle:hover { background: rgba(255,255,255,0.18); color: #fff; }
+.lv-chat-toggle:active { transform: scale(0.9); }
+.lv-chat-list { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 11px; scrollbar-width: thin; }
+.lv-chat-list::-webkit-scrollbar { width: 4px; }
+.lv-chat-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+.lv-chat-msg { display: flex; gap: 8px; animation: lvMsgIn 0.3s var(--ease-out); }
+@keyframes lvMsgIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.lv-chat-msg-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: rgba(255,255,255,0.1); }
+.lv-chat-msg-avatar-ph { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; background: var(--accent-soft); color: var(--accent-hover); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+.lv-chat-msg-body { min-width: 0; }
+.lv-chat-msg-name { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 500; margin-bottom: 2px; }
+.lv-chat-msg-text { font-size: 13px; color: rgba(255,255,255,0.92); line-height: 1.4; word-break: break-word; }
+.lv-chat-msg.self .lv-chat-msg-text { color: var(--accent-hover); }
+.lv-chat-msg.system .lv-chat-msg-text { color: rgba(255,255,255,0.45); font-style: italic; font-size: 12px; }
+.lv-chat-input { display: flex; gap: 8px; padding: 12px; border-top: 0.5px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+.lv-chat-input input {
+  flex: 1; background: rgba(255,255,255,0.08); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 980px;
+  color: #fff; font-family: var(--font); font-size: 13px; padding: 8px 14px; outline: none;
+  transition: border-color 200ms var(--ease);
+}
+.lv-chat-input input::placeholder { color: rgba(255,255,255,0.35); }
+.lv-chat-input input:focus { border-color: var(--accent); }
+.lv-chat-send {
+  width: 32px; height: 32px; border: none; border-radius: 50%; background: var(--accent); color: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background 150ms var(--ease), transform 150ms var(--spring);
+}
+.lv-chat-send:hover { background: var(--accent-hover); }
+.lv-chat-send:active { transform: scale(0.9); }
+.lv-chat-empty { text-align: center; color: rgba(255,255,255,0.3); font-size: 12px; padding: 24px 0; }
+
+/* 聊天展开按钮（面板收起时显示） */
+.lv-chat-open-btn {
+  position: absolute; top: 16px; right: 16px; z-index: 5;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  color: #fff; cursor: pointer; display: none; align-items: center; justify-content: center;
+  border: 0.5px solid rgba(255,255,255,0.12);
+  transition: background 150ms var(--ease), transform 150ms var(--spring);
+}
+.lv-chat-open-btn:active { transform: scale(0.9); }
+
+/* ===== 触摸设备（关闭聚焦放大，避免误触） ===== */
+@media (hover: none) and (pointer: coarse) {
+  .lv-card:hover .lv-card-thumb { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+  .lv-hero:hover .lv-hero-bg { transform: scale(1.03); }
+}
+
+/* ===== 减弱动效 / 透明度 ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .lv-live-dot { animation: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .lv-nav, .lv-modal, .lv-toast, .lv-viewer-pill, .lv-mute-btn, .lv-live-badge, .lv-refresh { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* ===== 直播结束页（统计卡片） ===== */
+.lv-end-modal { width: min(400px, calc(100vw - 32px)) !important; }
+.lv-end-icon {
+  width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 16px;
+  background: rgba(48,209,88,0.12); color: #30d158;
+  display: flex; align-items: center; justify-content: center;
+  animation: lvEndPop 0.5s var(--spring);
+}
+@keyframes lvEndPop { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+.lv-end-title { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); margin-bottom: 4px; }
+.lv-end-sub { font-size: 14px; color: var(--text3); margin-bottom: 24px; }
+.lv-end-stats { display: flex; gap: 12px; margin-bottom: 24px; }
+.lv-end-stat { flex: 1; background: var(--bg-fill); border-radius: 14px; padding: 18px 16px; transition: transform 0.3s var(--ease-out); }
+.lv-end-stat:nth-child(1) { animation: lvStatIn 0.4s 0.1s var(--ease-out) backwards; }
+.lv-end-stat:nth-child(2) { animation: lvStatIn 0.4s 0.2s var(--ease-out) backwards; }
+@keyframes lvStatIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.lv-end-stat-val { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); font-variant-numeric: tabular-nums; }
+.lv-end-stat-label { font-size: 11px; color: var(--text3); margin-top: 4px; font-weight: 500; }
+.lv-end-actions { display: flex; gap: 10px; }
+
+/* ===== 主播信息卡 ===== */
+.lv-hostcard-avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; margin-bottom: 12px; background: var(--bg-fill); }
+.lv-hc-name { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); margin-bottom: 4px; }
+.lv-hc-meta { font-size: 13px; color: var(--text3); margin-bottom: 16px; }
+.lv-hc-stats { display: flex; gap: 10px; margin-bottom: 18px; }
+.lv-hc-stat { flex: 1; background: var(--bg-fill); border-radius: 12px; padding: 12px 8px; }
+.lv-hc-stat-val { font-size: 20px; font-weight: 700; letter-spacing: -0.015em; color: var(--text); }
+.lv-hc-stat-label { font-size: 10px; color: var(--text3); margin-top: 2px; font-weight: 500; }
+.lv-hc-profile { display: inline-block; text-decoration: none; padding: 10px 28px; border-radius: 980px; }
+
+/* ===== 自定义确认弹窗 ===== */
+.lv-confirm-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); margin-bottom: 8px; }
+.lv-confirm-msg { font-size: 14px; color: var(--text2); line-height: 1.5; margin-bottom: 22px; }
+.lv-confirm-actions { display: flex; gap: 10px; }
+
+/* ===== 直播间已满提示 ===== */
+.lv-full-icon {
+  width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 14px;
+  background: rgba(255,159,10,0.12); color: #FF9F0A;
+  display: flex; align-items: center; justify-content: center;
+  animation: lvEndPop 0.5s var(--spring);
+}
+.lv-full-title { font-size: 18px; font-weight: 700; letter-spacing: -0.015em; color: var(--text); margin-bottom: 6px; }
+.lv-full-msg { font-size: 13px; color: var(--text3); margin-bottom: 20px; line-height: 1.5; }
+
+/* ===== 预览状态优化 ===== */
+.lv-preview-status { display: flex; align-items: center; gap: 6px; }
+.lv-preview-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #30d158; flex-shrink: 0; }
+.lv-preview-status.loading::before { background: var(--text3); animation: lvPulse 1s ease-in-out infinite; }
+
+/* ===== 需求1：黄色优质标识改锯齿状（seal/burst 印章风格） ===== */
+.lv-quality-badge { animation: lvBadgePop 0.4s var(--spring); }
+@keyframes lvBadgePop { from { opacity: 0; transform: scale(0.4) rotate(-20deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+
+/* ===== 需求2：主播视图布局修正 + 新功能 ===== */
+/* 聊天展开时收窄底部条与控制坞，避免与聊天输入区重叠 */
+.lv-host-screen.chat-open .lv-host-bottom { right: 352px; }
+.lv-host-screen.chat-open .lv-host-dock { left: calc(50% - 176px); }
+@media (max-width: 768px) {
+  .lv-host-screen.chat-open .lv-host-bottom { right: 24px; bottom: 96px; }
+  .lv-host-screen.chat-open .lv-host-dock { left: 50%; }
+}
+/* 画质指示 pill */
+.lv-quality-pill {
+  display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 980px;
+  background: rgba(10,132,255,0.18); color: #409CFF; font-size: 11px; font-weight: 600;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.01em;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+/* 控制坞按钮激活态 */
+.lv-dock-btn.active { background: rgba(255,179,64,0.25); color: #FFB340; }
+
+/* ===== 需求3：精选直播离线卡片 ===== */
+.lv-featured-card.offline { opacity: 0.78; }
+.lv-featured-card.offline .lv-featured-thumb { filter: grayscale(0.4) brightness(0.7); }
+.lv-featured-offline {
+  position: absolute; top: 12px; left: 12px;
+  display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 980px;
+  background: rgba(0,0,0,0.65); color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 600;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.lv-featured-offline::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.5); }
+
+/* ===== 需求4：观众视图多功能 + 美化 ===== */
+.lv-viewer-spacer { flex: 1; }
+/* 音量控制组 */
+.lv-volume-ctrl { display: flex; align-items: center; gap: 6px; pointer-events: auto; }
+.lv-volume-slider {
+  -webkit-appearance: none; appearance: none; width: 0; height: 4px; border-radius: 980px;
+  background: rgba(255,255,255,0.3); outline: none; transition: width 0.3s var(--ease-out); cursor: pointer;
+}
+.lv-volume-ctrl:hover .lv-volume-slider, .lv-volume-ctrl.expanded .lv-volume-slider { width: 80px; }
+.lv-volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+.lv-volume-slider::-moz-range-thumb { width: 14px; height: 14px; border: none; border-radius: 50%; background: #fff; cursor: pointer; }
+
+/* 右侧操作栏（点赞/分享/画中画） */
+.lv-action-rail {
+  position: absolute; right: 20px; bottom: 110px; display: flex; flex-direction: column; gap: 18px;
+  pointer-events: auto; z-index: 6;
+}
+.lv-rail-btn {
+  width: 48px; border: none; background: transparent; color: #fff; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  transition: transform 150ms var(--spring), color 150ms var(--ease);
+}
+.lv-rail-btn:active { transform: scale(0.85); }
+.lv-rail-btn:hover { color: rgba(255,255,255,0.85); }
+.lv-rail-label { font-size: 10px; font-weight: 600; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+.lv-rail-btn.liked { color: #FF375F; animation: lvHeartBeat 0.4s var(--spring); }
+@keyframes lvHeartBeat { 0% { transform: scale(1); } 40% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+/* 飘心动画层 */
+.lv-hearts-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
+.lv-heart-fly {
+  position: absolute; bottom: 120px; width: 28px; height: 28px; color: #FF375F;
+  animation: lvHeartFloat 2.2s var(--ease-out) forwards; will-change: transform, opacity;
+}
+@keyframes lvHeartFloat {
+  0% { opacity: 0; transform: translateY(0) scale(0.4); }
+  15% { opacity: 1; transform: translateY(-40px) scale(1.1); }
+  100% { opacity: 0; transform: translateY(-340px) scale(0.7) translateX(var(--drift, 0)); }
+}
+/* 观众视图聊天展开时底部条让位 */
+.lv-viewer-screen.chat-open .lv-viewer-bottom { right: 352px; }
+.lv-viewer-screen.chat-open .lv-action-rail { right: 372px; }
+@media (max-width: 768px) {
+  .lv-viewer-screen.chat-open .lv-viewer-bottom { right: 24px; }
+  .lv-viewer-screen.chat-open .lv-action-rail { right: 20px; }
+  .lv-action-rail { bottom: 100px; gap: 14px; }
+}
+
+/* ===== 隐私须知 / 直播须知 / 同意勾选（申请弹窗） ===== */
+.lv-privacy-notice { display:flex; gap:12px; padding:14px 16px; background:rgba(10,132,255,0.08); border-radius:12px; margin-bottom:16px; }
+.lv-privacy-icon { color:var(--accent); flex-shrink:0; padding-top:2px; }
+.lv-privacy-text h4 { font-size:14px; font-weight:600; margin:0 0 4px; color:var(--text); }
+.lv-privacy-text p { font-size:12.5px; line-height:1.5; color:var(--text2); margin:0; }
+.lv-terms-box { background:rgba(255,255,255,0.04); border-radius:10px; padding:12px 16px; margin:12px 0; }
+.lv-terms-box h5 { font-size:12px; font-weight:600; color:var(--text2); margin:0 0 6px; text-transform:uppercase; letter-spacing:0.04em; }
+.lv-terms-box ul { margin:0; padding-left:16px; }
+.lv-terms-box li { font-size:12.5px; color:var(--text2); line-height:1.6; }
+.lv-consent-check { display:flex; align-items:flex-start; gap:8px; font-size:12.5px; color:var(--text2); cursor:pointer; margin-top:8px; }
+.lv-consent-check input { margin-top:2px; }
+.lv-consent-check a { color:var(--accent); }
+
+/* ===== 首次进入同意弹窗 ===== */
+.lv-consent-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000;
+  display: none; align-items: flex-start; justify-content: center; padding: 5vh 16px;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  overflow-y: auto;
+}
+.lv-consent-overlay.show { display: flex; animation: lvFadeIn 0.3s var(--ease-out); }
+.lv-consent {
+  background: var(--bg-card); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 0.5px solid rgba(255,255,255,0.12); border-radius: 22px; box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+  padding: 28px 26px; width: min(420px, calc(100vw - 32px)); max-height: 85vh; overflow-y: auto;
+  animation: lvModalIn 0.4s var(--ease-out);
+}
+.lv-consent-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.015em; margin: 0 0 14px; }
+.lv-consent-body { font-size: 14px; line-height: 1.55; color: var(--text2); margin: 0 0 14px; }
+.lv-consent-list { margin: 0 0 14px; padding-left: 18px; }
+.lv-consent-list li { font-size: 13px; line-height: 1.65; color: var(--text2); margin-bottom: 4px; }
+.lv-consent-links { font-size: 12.5px; color: var(--text3); margin: 0 0 20px; }
+.lv-consent-links a { color: var(--accent); }
+.lv-consent-btns { display: flex; gap: 10px; }
+.lv-consent-deny {
+  flex: 1; padding: 13px; border: 0.5px solid var(--border); border-radius: 12px;
+  background: var(--bg-fill); color: var(--text2); font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: background 150ms var(--ease), transform 150ms var(--spring);
+}
+.lv-consent-deny:active { transform: scale(0.97); }
+.lv-consent-agree {
+  flex: 1.5; padding: 13px; border: none; border-radius: 12px;
+  background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: transform 150ms var(--spring), opacity 150ms var(--ease);
+}
+.lv-consent-agree:active { transform: scale(0.97); }
+
+/* ===== 截图闪光动画 ===== */
+.lv-snap-flash { position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; animation:lvSnapFlash 0.3s ease-out; }
+@keyframes lvSnapFlash { 0%{opacity:0;} 20%{opacity:0.6;} 100%{opacity:0;} }
+
+/* ===== v20260802-1：画质选择 / 状态指示 / PiP 摄像头小窗 / 延迟显示 / 频道列表 / FAQ / 设置 ===== */
+/* 分段控件（画质选择） */
+.lv-seg {
+  display: inline-flex; padding: 3px; background: var(--bg-fill); border-radius: 980px;
+  border: 0.5px solid var(--border); gap: 2px;
+}
+.lv-seg-btn {
+  padding: 7px 16px; border: none; border-radius: 980px; background: transparent;
+  color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.01em;
+  transition: background 200ms var(--ease), color 200ms var(--ease), transform 150ms var(--spring);
+}
+.lv-seg-btn:active { transform: scale(0.96); }
+.lv-seg-btn.active { background: var(--accent); color: #fff; box-shadow: 0 1px 6px rgba(10,132,255,0.35); }
+
+/* 主播状态指示 pill（MIC ON/OFF, CAM ON/OFF） */
+.lv-status-pill {
+  display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 980px;
+  background: rgba(48,209,88,0.18); color: #30d158; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.04em; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  font-variant-numeric: tabular-nums;
+}
+.lv-status-pill.off { background: rgba(255,69,58,0.18); color: var(--live); }
+.lv-status-pill .lv-status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 6px currentColor; }
+
+/* 延迟显示 pill */
+.lv-latency-pill {
+  display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 980px;
+  background: rgba(10,132,255,0.18); color: #409CFF; font-size: 11px; font-weight: 600;
+  font-variant-numeric: tabular-nums; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.lv-latency-pill.warn { background: rgba(255,159,10,0.18); color: #FFB340; }
+.lv-latency-pill.bad { background: rgba(255,69,58,0.18); color: var(--live); }
+
+/* 屏幕共享时的摄像头小窗（PiP overlay） */
+.lv-host-cam-overlay {
+  position: absolute; right: 24px; bottom: 110px; width: 180px; aspect-ratio: 16/9;
+  border-radius: 14px; overflow: hidden; background: #000;
+  border: 2px solid rgba(255,255,255,0.85); box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  z-index: 7; pointer-events: auto; cursor: move;
+  transition: transform 150ms var(--spring);
+}
+.lv-host-cam-overlay:active { transform: scale(0.97); }
+.lv-host-cam-overlay video { width: 100%; height: 100%; object-fit: cover; display: block; background: #000; transform: scaleX(-1); }
+.lv-host-cam-overlay .lv-cam-label {
+  position: absolute; top: 6px; left: 6px; padding: 2px 8px; border-radius: 980px;
+  background: rgba(0,0,0,0.6); color: #fff; font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.lv-host-cam-overlay .lv-cam-close {
+  position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border: none; border-radius: 50%;
+  background: rgba(0,0,0,0.6); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform 150ms var(--spring);
+}
+.lv-host-cam-overlay .lv-cam-close:active { transform: scale(0.9); }
+
+/* 全部直播间货架（listView）— 网格全部展示 */
+.lv-shelf.all-channels .lv-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+  padding: 12px 48px 32px;
+  overflow: visible;
+  scroll-snap-type: none;
+}
+@media (max-width: 768px) {
+  .lv-shelf.all-channels .lv-row { padding: 12px 20px 32px; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
+@media (max-width: 480px) {
+  .lv-shelf.all-channels .lv-row { padding: 10px 16px 28px; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.lv-channel-card {
+  width: 100%; min-width: 0; cursor: pointer;
+  transition: transform 200ms var(--ease-out);
+}
+.lv-channel-card:active { transform: scale(0.98); }
+.lv-channel-card.offline { opacity: 0.6; }
+.lv-channel-card.offline .lv-channel-thumb { filter: grayscale(0.5) brightness(0.7); }
+.lv-channel-card .lv-channel-thumb {
+  position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 14px; overflow: hidden;
+  background-size: cover; background-position: center; background-color: var(--bg-fill);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+.lv-channel-card .lv-channel-thumb::after {
+  content: ''; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
+  background: linear-gradient(to bottom, transparent 55%, rgba(0,0,0,0.4));
+}
+.lv-channel-card .lv-channel-status {
+  position: absolute; top: 12px; left: 12px;
+  display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 980px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.lv-channel-card .lv-channel-status.live { background: rgba(255,69,58,0.2); color: var(--live); }
+.lv-channel-card .lv-channel-status.offline { background: rgba(0,0,0,0.55); color: rgba(255,255,255,0.8); }
+.lv-channel-card .lv-channel-status .lv-status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.lv-channel-card .lv-channel-status.live .lv-status-dot { animation: lvPulse 1.4s ease-in-out infinite; box-shadow: 0 0 6px currentColor; }
+.lv-channel-card .lv-channel-body { padding: 12px 4px 0; }
+.lv-channel-card .lv-channel-title { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lv-channel-card .lv-channel-author { display: flex; align-items: center; gap: 7px; margin-top: 6px; }
+.lv-channel-card .lv-channel-author img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; background: var(--bg-fill); }
+.lv-channel-card .lv-channel-author span { font-size: 12px; color: var(--text2); font-weight: 500; }
+
+/* 频道选择面板（多频道用户开播时） */
+.lv-channel-picker { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.lv-pick-channel {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+  border: 1.5px solid var(--border); border-radius: 14px; background: var(--bg-fill);
+  cursor: pointer; text-align: left; transition: border-color 200ms var(--ease), background 200ms var(--ease), transform 150ms var(--spring);
+}
+.lv-pick-channel:active { transform: scale(0.985); }
+.lv-pick-channel:hover { border-color: var(--text3); }
+.lv-pick-channel.selected { border-color: var(--accent); background: var(--accent-soft); }
+.lv-pick-channel img { width: 56px; height: 32px; border-radius: 6px; object-fit: cover; background: var(--bg-fill); flex-shrink: 0; }
+.lv-pick-channel .lv-pick-info { flex: 1; min-width: 0; }
+.lv-pick-channel .lv-pick-name { font-size: 14px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lv-pick-channel .lv-pick-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.lv-pick-channel .lv-pick-radio {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--text3);
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  transition: border-color 200ms var(--ease);
+}
+.lv-pick-channel.selected .lv-pick-radio { border-color: var(--accent); }
+.lv-pick-channel.selected .lv-pick-radio::after {
+  content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+}
+
+/* 我的频道管理列表 */
+.lv-my-channels-list { display: flex; flex-direction: column; gap: 10px; }
+.lv-my-channel-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px;
+  border: 0.5px solid var(--border); border-radius: 14px; background: var(--bg-fill);
+}
+.lv-my-channel-item img { width: 80px; height: 45px; border-radius: 8px; object-fit: cover; background: var(--bg-fill); flex-shrink: 0; }
+.lv-my-channel-item .lv-mc-info { flex: 1; min-width: 0; }
+.lv-my-channel-item .lv-mc-name { font-size: 14px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lv-my-channel-item .lv-mc-meta { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.lv-my-channel-item .lv-mc-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.lv-mc-btn {
+  padding: 6px 12px; border: 0.5px solid var(--border); border-radius: 980px; background: var(--bg-fill);
+  color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: background 150ms var(--ease), transform 150ms var(--spring);
+}
+.lv-mc-btn:active { transform: scale(0.95); }
+.lv-mc-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.lv-mc-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* 状态徽章（pending/approved/rejected） */
+.lv-tag {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 980px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
+}
+.lv-tag.pending { background: rgba(255,159,10,0.16); color: #FFB340; }
+.lv-tag.approved { background: rgba(48,209,88,0.16); color: #30d158; }
+.lv-tag.rejected { background: rgba(255,69,58,0.16); color: var(--live); }
+
+/* FAQ 模态 */
+.lv-faq-item { border-bottom: 0.5px solid var(--border); padding: 14px 0; }
+.lv-faq-item:last-child { border-bottom: none; }
+.lv-faq-q { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.lv-faq-q svg { flex-shrink: 0; color: var(--accent); }
+.lv-faq-a { font-size: 13px; color: var(--text2); line-height: 1.55; padding-left: 24px; }
+.lv-faq-a code { background: var(--bg-fill); padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+
+/* 设置模态开关 */
+.lv-setting-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 0; border-bottom: 0.5px solid var(--border);
+}
+.lv-setting-row:last-child { border-bottom: none; }
+.lv-setting-label { font-size: 14px; font-weight: 500; color: var(--text); }
+.lv-setting-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.lv-switch {
+  position: relative; width: 44px; height: 26px; border-radius: 980px;
+  background: var(--bg-fill); border: 0.5px solid var(--border); cursor: pointer; flex-shrink: 0;
+  transition: background 200ms var(--ease);
+}
+.lv-switch::after {
+  content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  transition: transform 200ms var(--spring);
+}
+.lv-switch.on { background: var(--accent); border-color: var(--accent); }
+.lv-switch.on::after { transform: translateX(18px); }
+
+/* 顶栏新按钮（FAQ / Settings / My Channels） */
+.lv-nav-icon-btn {
+  width: 32px; height: 32px; border: none; border-radius: 50%; background: transparent;
+  color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 150ms var(--ease), color 150ms var(--ease), transform 150ms var(--spring);
+}
+.lv-nav-icon-btn:hover { color: var(--text); }
+.lv-nav-icon-btn:active { transform: scale(0.9); }
+
+/* 九宫格菜单对齐（live 顶栏高 44px） */
+.lv-app .section-menu { top: calc(44px + 10px); }
+@media(max-width:768px){
+  .lv-app .section-menu { top: calc(44px + 8px); }
+}
+
+/* OBS 提示卡（可展开） */
+.lv-obs-hint {
+  padding: 0; background: rgba(10,132,255,0.08);
+  border-radius: 12px; margin-top: 14px; font-size: 12px; color: var(--text2); line-height: 1.5;
+  overflow: hidden;
+}
+.lv-obs-hint-head {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 12px 14px; background: transparent; border: none; cursor: pointer;
+  color: var(--text2); font-size: 12px; text-align: left;
+}
+.lv-obs-hint-head svg { color: var(--accent); flex-shrink: 0; }
+.lv-obs-hint-head span { flex: 1; }
+.lv-obs-caret { color: var(--text3); transition: transform 0.2s ease; }
+.lv-obs-hint.open .lv-obs-caret { transform: rotate(180deg); }
+.lv-obs-hint-body {
+  display: none; padding: 0 14px 12px 14px;
+}
+.lv-obs-hint-body p { margin: 0 0 8px 0; }
+.lv-obs-hint-body code {
+  display: block; background: var(--bg-fill); padding: 6px 8px; border-radius: 6px;
+  font-size: 11px; word-break: break-all; margin-top: 4px; color: var(--text1);
+}
+.lv-obs-field { margin-bottom: 8px; }
+.lv-obs-field label { display: block; font-size: 11px; color: var(--text3); margin-bottom: 2px; }
+.lv-obs-note { color: var(--text3); font-size: 11px; margin-top: 8px; }
