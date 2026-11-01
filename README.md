@@ -1,7 +1,7 @@
 # SoaringBird
 
 <div align="center">
-<img src="logo-light.png" width="76" alt="SoaringBird">
+<img src="logo-light.png" width="72" alt="SoaringBird">
 <br><br>
 <strong>一个论坛，一个新闻阅读器，一小块可以开直播的场地。</strong><br>
 <sub>A forum, a news reader, and a small stage for live conversations.</sub>
@@ -12,26 +12,50 @@
 > [!NOTE]
 > 翱翔鸟论坛于 2026 年 6 月 5 日上线，2026 年 12 月 1 日终止服务。
 > 这份代码是它留下的全部：一个小型社区用半年时间写成的样子。
-> 现在把它完整地开放出来，给任何还想搭一个安静地方的人。
+> 现在把它完整地公开，给任何还想搭一个安静地方的人。
 
----
+<img src="imgs/demo-closing.png" alt="2026 年 12 月 1 日，关站页">
 
 ## 缘起
 
 2026 年春天，我们想要一个不被推荐算法支配的地方。
-不追热点，不做停留时长，不把讨论压缩成十五秒。只是一个版面、一场直播、一篇文章，
-和一群愿意多写两句话的人。
 
-三个月后它上线了。半年后我们决定让它停下来——出于实用性与运营上的考量。
-停之前，我们把代码整理干净，原样交出来。
+不追热点，不做停留时长，不把讨论压缩成十五秒。只是一个版面、一场直播、一篇文章，和一群愿意多写两句话的人。
+
+三个月后它上线了。半年里，它有过深夜的直播，有几十行的回帖，有几张自己做的海报。它没有长成很大的样子，但它一直是那个样子。
+
+2026 年 12 月 1 日，我们让它停下来——出于实用性与运营上的考量。停之前，我们把代码整理干净，原样交出来。
+
+## 半年
+
+| 时间 | |
+|---|---|
+| 2026.6.5 | 上线 |
+| 2026.12.1 | 终止全部服务 |
+| 2027.6 | 域名到期 |
+
+服务终止之后，页面不会立刻消失。关站信、数据导出入口与纪念徽章会一直保留到域名到期。
 
 ## 界面
 
 <div align="center">
-<img src="imgs/首页.png" width="220" alt="首页">
-<img src="imgs/帖子详情页.png" width="220" alt="帖子详情">
-<img src="imgs/直播页.png" width="220" alt="直播">
+<img src="imgs/demo-home.png" width="270" alt="首页：帖子流与关站提醒">
+<img src="imgs/demo-live.png" width="270" alt="直播：房间与在线状态">
+<img src="imgs/demo-music.png" width="270" alt="Music：推荐与排行榜">
 </div>
+
+**首页**把帖子放进一条安静的流里，关站提醒固定在顶部，三个月内的每一篇都还在。
+**直播**用房间卡片承载封面、频道名与在线状态，开播只需要一次点击。
+**Music** 把歌单、排行榜与推荐排在同一张网格上，播放器常驻在底部。
+
+<sub>截图仅作功能示意：用户昵称与头像已隐去，第三方封面与歌名已遮蔽。</sub>
+
+## 它留下的
+
+- **代码。** 你正在读的这一份，与线上运行的那一份一致，没有删减，也没有"整理过的版本"。
+- **数据。** 停服之前，每位用户都可以把自己的帖子、回复、收藏与私信打包带走，格式是 JSON 与 Markdown。
+- **纪念。** 一枚可下载的纪念徽章，写着加入的次序、发帖与关注，以及 2026.6.5 — 2026.12.1。
+- **告别。** 那封关站信至今仍挂在首页，会一直挂到域名到期。
 
 ## 能力
 
@@ -112,12 +136,17 @@ requirements.txt     依赖
 
 [MIT](LICENSE) © 2026 SoaringBird
 
-## 中文说明
-
-这是一个用 Flask 与原生 JavaScript 写的完整论坛：后端一个文件，前端没有构建步骤。
-把仓库拉下来、装依赖、改 `.env`、跑 `python3 server.py` 就能起来。
-代码按原样保留，不做删减；与线上运行的那一份一致。
-
 ---
+
+## About
+
+SoaringBird was a small Chinese-language forum that ran from June 5 to December 1, 2026:
+a feed, a live-streaming corner, a news reader, and a music channel, written in Flask
+and plain JavaScript — one backend file, no build step, no frontend toolchain.
+
+It is published here exactly as it ran. Every credential was removed and replaced with
+a placeholder; nothing personal, no user data, no third-party artwork.
+
+Run it with `python3 server.py` and read `.env.example` for configuration.
 
 <div align="center"><sub>谢谢你来过。</sub></div>
